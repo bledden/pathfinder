@@ -1,0 +1,49 @@
+
+============================================================
+CODE TYPE: color_code:memory_xyz d=3
+============================================================
+Grid: 3x3x2, 9 det, 1 obs
+63745 params
+  step      0/40000 loss=0.7059
+  step  10000/40000 loss=0.0404
+  EVAL LER=0.038100 best=0.038100
+  step  20000/40000 loss=0.0498
+  EVAL LER=0.040000 best=0.038100
+  step  30000/40000 loss=0.0732
+  EVAL LER=0.037000 best=0.037000
+  Neural=0.037550 PM=0.125100 ratio=0.30x NEURAL  time=790s
+
+============================================================
+CODE TYPE: surface_code:unrotated_memory_z d=5
+============================================================
+Grid: 6x9x9, 200 det, 1 obs
+94977 params
+  step      0/40000 loss=0.7471
+  step  10000/40000 loss=0.0270
+  EVAL LER=0.075900 best=0.075900
+  step  20000/40000 loss=0.0530
+  EVAL LER=0.043100 best=0.043100
+  step  30000/40000 loss=0.0654
+  EVAL LER=0.034000 best=0.034000
+  Neural=0.034550 PM=0.025650 ratio=1.35x PM  time=3578s
+
+============================================================
+CODE TYPE: surface_code:rotated_memory_x d=5
+============================================================
+Grid: 6x6x6, 120 det, 1 obs
+94977 params
+  step      0/40000 loss=1.0651
+  step  10000/40000 loss=0.0212
+  EVAL LER=0.038400 best=0.038400
+  step  20000/40000 loss=0.0552
+  EVAL LER=0.027000 best=0.027000
+  step  30000/40000 loss=0.0364
+  EVAL LER=0.020400 best=0.020400
+  Neural=0.020100 PM=0.022750 ratio=0.88x NEURAL  time=3410s
+
+============================================================
+CODE TYPE RESULTS
+============================================================
+  color_code:memory_xyz: N=0.037550 PM=0.125100 (0.30x) NEURAL
+  surface_code:unrotated_memory_z: N=0.034550 PM=0.025650 (1.35x) PM
+  surface_code:rotated_memory_x: N=0.020100 PM=0.022750 (0.88x) NEURAL

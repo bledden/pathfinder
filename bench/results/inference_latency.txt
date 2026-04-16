@@ -1,0 +1,23 @@
+=== d=7 INFERENCE OPTIMIZATION (MI300X VF) ===
+
+FP32 baseline:       61.2 us/syn  16K syn/sec
+FP16:                52.0 us/syn  19K syn/sec  (0% accuracy loss, verified 50K shots)
+torch.compile FP32:  23.3 us/syn  43K syn/sec
+torch.compile FP16:  19.0 us/syn  53K syn/sec  (0% accuracy loss)
+
+Batch size sweep (torch.compile FP16):
+  batch=1:      3021.4 us/syn   0K syn/sec
+  batch=10:      337.7 us/syn   3K syn/sec
+  batch=100:      28.8 us/syn  35K syn/sec
+  batch=1000:     20.6 us/syn  48K syn/sec
+  batch=5000:     21.6 us/syn  46K syn/sec
+
+Comparison with published decoders:
+  Gu et al. (H200):     ~40 us/syn — qubit-forge is 2.1x faster
+  AlphaQubit (TPU):      63 us/syn — qubit-forge is 3.3x faster
+  Astrea (FPGA):          1 ns/syn — hardware accelerator, different class
+
+Per-distance latency (batch=1000, FP32 baseline):
+  d=3: 252K params  40 us/syn  25K syn/sec
+  d=5: 376K params  99 us/syn  10K syn/sec
+  d=7: 500K params  61 us/syn  17K syn/sec

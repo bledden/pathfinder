@@ -1,0 +1,10 @@
+Device: cpu
+Model: d=3, H=256, L=3, 252,417 params (0.5 MB at FP16)
+Optimizers: 2 (Muon, AdamW)
+Pre-compiling Stim samplers for curriculum... 41 samplers ready.
+step      0/40000  loss=0.6206  p=0.00070  lr=0.000000  1.0 steps/s  ETA 667min
+step   2000/40000  loss=0.0014  p=0.00070  lr=0.019968  2.6 steps/s  ETA 248min
+step   4000/40000  loss=0.0000  p=0.00070  lr=0.019709  2.6 steps/s  ETA 233min
+  >>> EVAL LER at p=0.007: 0.031200
+  >>> Saved best model (LER=0.031200)
+step   6000/40000  loss=0.0007  p=0.00070  lr=0.019200  2.7 steps/s  ETA 213min

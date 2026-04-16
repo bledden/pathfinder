@@ -1,0 +1,284 @@
+{
+  "rotZ_d3_p0.0005": {
+    "code": "rotated_z",
+    "d": 3,
+    "p": 0.0005,
+    "neural": 9e-05,
+    "pm": 0.00011,
+    "pm_corr": 0.00011,
+    "uf": 0.00724,
+    "n": 100000
+  },
+  "rotZ_d3_p0.001": {
+    "code": "rotated_z",
+    "d": 3,
+    "p": 0.001,
+    "neural": 0.00046,
+    "pm": 0.00064,
+    "pm_corr": 0.00064,
+    "uf": 0.00648,
+    "n": 100000
+  },
+  "rotZ_d3_p0.002": {
+    "code": "rotated_z",
+    "d": 3,
+    "p": 0.002,
+    "neural": 0.00161,
+    "pm": 0.00191,
+    "pm_corr": 0.00191,
+    "uf": 0.02093,
+    "n": 100000
+  },
+  "rotZ_d3_p0.003": {
+    "code": "rotated_z",
+    "d": 3,
+    "p": 0.003,
+    "neural": 0.00333,
+    "pm": 0.00402,
+    "pm_corr": 0.00402,
+    "uf": 0.03651,
+    "n": 100000
+  },
+  "rotZ_d3_p0.005": {
+    "code": "rotated_z",
+    "d": 3,
+    "p": 0.005,
+    "neural": 0.01002,
+    "pm": 0.01098,
+    "pm_corr": 0.01098,
+    "uf": 0.0488,
+    "n": 100000
+  },
+  "rotZ_d3_p0.007": {
+    "code": "rotated_z",
+    "d": 3,
+    "p": 0.007,
+    "neural": 0.01818,
+    "pm": 0.02014,
+    "pm_corr": 0.02014,
+    "uf": 0.04946,
+    "n": 100000
+  },
+  "rotZ_d3_p0.01": {
+    "code": "rotated_z",
+    "d": 3,
+    "p": 0.01,
+    "neural": 0.03521,
+    "pm": 0.03742,
+    "pm_corr": 0.03742,
+    "uf": 0.10762,
+    "n": 100000
+  },
+  "rotZ_d3_p0.015": {
+    "code": "rotated_z",
+    "d": 3,
+    "p": 0.015,
+    "neural": 0.07315,
+    "pm": 0.07728,
+    "pm_corr": 0.07728,
+    "uf": 0.12713,
+    "n": 100000
+  },
+  "rotZ_d5_p0.0005": {
+    "code": "rotated_z",
+    "d": 5,
+    "p": 0.0005,
+    "neural": 0.0,
+    "pm": 0.0,
+    "pm_corr": 0.0,
+    "uf": 0.01452,
+    "n": 100000
+  },
+  "rotZ_d5_p0.001": {
+    "code": "rotated_z",
+    "d": 5,
+    "p": 0.001,
+    "neural": 7e-05,
+    "pm": 9e-05,
+    "pm_corr": 9e-05,
+    "uf": 0.0172,
+    "n": 100000
+  },
+  "rotZ_d5_p0.002": {
+    "code": "rotated_z",
+    "d": 5,
+    "p": 0.002,
+    "neural": 0.00028,
+    "pm": 0.00055,
+    "pm_corr": 0.00055,
+    "uf": 0.03753,
+    "n": 100000
+  },
+  "rotZ_d5_p0.003": {
+    "code": "rotated_z",
+    "d": 5,
+    "p": 0.003,
+    "neural": 0.00104,
+    "pm": 0.00154,
+    "pm_corr": 0.00154,
+    "uf": 0.0542,
+    "n": 100000
+  },
+  "rotZ_d5_p0.005": {
+    "code": "rotated_z",
+    "d": 5,
+    "p": 0.005,
+    "neural": 0.00585,
+    "pm": 0.00751,
+    "pm_corr": 0.00751,
+    "uf": 0.05771,
+    "n": 100000
+  },
+  "rotZ_d5_p0.007": {
+    "code": "rotated_z",
+    "d": 5,
+    "p": 0.007,
+    "neural": 0.01521,
+    "pm": 0.01891,
+    "pm_corr": 0.01891,
+    "uf": 0.06902,
+    "n": 100000
+  },
+  "rotZ_d5_p0.01": {
+    "code": "rotated_z",
+    "d": 5,
+    "p": 0.01,
+    "neural": 0.04145,
+    "pm": 0.0481,
+    "pm_corr": 0.0481,
+    "uf": 0.11423,
+    "n": 100000
+  },
+  "rotZ_d5_p0.015": {
+    "code": "rotated_z",
+    "d": 5,
+    "p": 0.015,
+    "neural": 0.12137,
+    "pm": 0.12606,
+    "pm_corr": 0.12606,
+    "uf": 0.18241,
+    "n": 100000
+  },
+  "rotZ_d7_p0.0005": {
+    "code": "rotated_z",
+    "d": 7,
+    "p": 0.0005,
+    "neural": 0.0,
+    "pm": 0.0,
+    "pm_corr": 0.0,
+    "uf": 0.02472,
+    "n": 100000
+  },
+  "rotZ_d7_p0.001": {
+    "code": "rotated_z",
+    "d": 7,
+    "p": 0.001,
+    "neural": 0.0,
+    "pm": 1e-05,
+    "pm_corr": 1e-05,
+    "uf": 0.03028,
+    "n": 100000
+  },
+  "rotZ_d7_p0.002": {
+    "code": "rotated_z",
+    "d": 7,
+    "p": 0.002,
+    "neural": 5e-05,
+    "pm": 7e-05,
+    "pm_corr": 7e-05,
+    "uf": 0.04735,
+    "n": 100000
+  },
+  "rotZ_d7_p0.003": {
+    "code": "rotated_z",
+    "d": 7,
+    "p": 0.003,
+    "neural": 0.00032,
+    "pm": 0.00057,
+    "pm_corr": 0.00057,
+    "uf": 0.05457,
+    "n": 100000
+  },
+  "rotZ_d7_p0.005": {
+    "code": "rotated_z",
+    "d": 7,
+    "p": 0.005,
+    "neural": 0.00253,
+    "pm": 0.00442,
+    "pm_corr": 0.00442,
+    "uf": 0.05274,
+    "n": 100000
+  },
+  "rotZ_d7_p0.007": {
+    "code": "rotated_z",
+    "d": 7,
+    "p": 0.007,
+    "neural": 0.01041,
+    "pm": 0.01489,
+    "pm_corr": 0.01489,
+    "uf": 0.07239,
+    "n": 100000
+  },
+  "rotZ_d7_p0.01": {
+    "code": "rotated_z",
+    "d": 7,
+    "p": 0.01,
+    "neural": 0.04104,
+    "pm": 0.05161,
+    "pm_corr": 0.05161,
+    "uf": 0.12913,
+    "n": 100000
+  },
+  "rotZ_d7_p0.015": {
+    "code": "rotated_z",
+    "d": 7,
+    "p": 0.015,
+    "neural": 0.15843,
+    "pm": 0.17045,
+    "pm_corr": 0.17045,
+    "uf": 0.24835,
+    "n": 100000
+  },
+  "ablation_d5": {
+    "variant": "Full (DirConv+Muon+Curriculum)",
+    "ler": 0.01443,
+    "n": 100000
+  },
+  "ablation_abl_noc": {
+    "variant": "NoCurriculum (DirConv+Muon+Fixed)",
+    "ler": 0.0134,
+    "n": 100000
+  },
+  "ct_surface_code_rotated_memory_z_d5": {
+    "code": "surface_code:rotated_memory_z",
+    "d": 5,
+    "p": 0.007,
+    "neural": 0.0156,
+    "pm": 0.0192,
+    "n": 20000
+  },
+  "ct_surface_code_unrotated_memory_z_d5": {
+    "code": "surface_code:unrotated_memory_z",
+    "d": 5,
+    "p": 0.007,
+    "neural": -1,
+    "pm": 0.02455,
+    "n": 20000
+  },
+  "ct_surface_code_rotated_memory_x_d5": {
+    "code": "surface_code:rotated_memory_x",
+    "d": 5,
+    "p": 0.007,
+    "neural": -1,
+    "pm": 0.02135,
+    "n": 20000
+  },
+  "ct_color_code_memory_xyz_d3": {
+    "code": "color_code:memory_xyz",
+    "d": 3,
+    "p": 0.007,
+    "neural": -1,
+    "pm": 0.1254,
+    "n": 20000
+  }
+}

@@ -1,0 +1,33 @@
+Device: cpu
+Model: d=3, H=256, L=3, 252,417 params (0.5 MB at FP16)
+Optimizers: 2 (Muon, AdamW)
+Pre-compiling Stim samplers for curriculum... 41 samplers ready.
+step      0/20000  loss=0.7630  p=0.00070  lr=0.000000  1.0 steps/s  ETA 333min
+step   2000/20000  loss=0.0020  p=0.00070  lr=0.019864  4.4 steps/s  ETA 68min
+  >>> EVAL LER at p=0.007: 0.031600
+  >>> Saved best model (LER=0.031600)
+step   4000/20000  loss=0.0012  p=0.00070  lr=0.018795  4.2 steps/s  ETA 64min
+  >>> EVAL LER at p=0.007: 0.034000
+step   6000/20000  loss=0.0002  p=0.00140  lr=0.016773  4.3 steps/s  ETA 55min
+  >>> EVAL LER at p=0.007: 0.025600
+  >>> Saved best model (LER=0.025600)
+step   8000/20000  loss=0.0062  p=0.00210  lr=0.014017  4.2 steps/s  ETA 48min
+  >>> EVAL LER at p=0.007: 0.024600
+  >>> Saved best model (LER=0.024600)
+step  10000/20000  loss=0.0095  p=0.00280  lr=0.010826  4.2 steps/s  ETA 39min
+  >>> EVAL LER at p=0.007: 0.020400
+  >>> Saved best model (LER=0.020400)
+step  12000/20000  loss=0.0430  p=0.00350  lr=0.007545  4.2 steps/s  ETA 32min
+  >>> EVAL LER at p=0.007: 0.020500
+step  14000/20000  loss=0.0658  p=0.00438  lr=0.004531  4.1 steps/s  ETA 25min
+  >>> EVAL LER at p=0.007: 0.019200
+  >>> Saved best model (LER=0.019200)
+step  16000/20000  loss=0.0188  p=0.00525  lr=0.002109  3.9 steps/s  ETA 17min
+  >>> EVAL LER at p=0.007: 0.017100
+  >>> Saved best model (LER=0.017100)
+step  18000/20000  loss=0.0830  p=0.00613  lr=0.000542  3.8 steps/s  ETA 9min
+  >>> EVAL LER at p=0.007: 0.017100
+
+Final LER at p=0.007: 0.019260
+Best LER: 0.017100
+Total time: 5391s

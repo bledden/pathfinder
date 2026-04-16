@@ -1,0 +1,48 @@
+
+============================================================
+ABLATION: stdconv | d=5 | 785,921 params
+============================================================
+  step      0/80000 loss=0.8188 0.1s/s
+  step  10000/80000 loss=0.0056 3.8s/s
+  EVAL LER=0.036000
+  step  20000/80000 loss=0.0055 3.8s/s
+  EVAL LER=0.022500
+  step  30000/80000 loss=0.0140 3.8s/s
+  EVAL LER=0.016800
+  step  40000/80000 loss=0.0157 3.8s/s
+  EVAL LER=0.016000
+  step  50000/80000 loss=0.0136 3.8s/s
+  EVAL LER=0.015500
+  step  60000/80000 loss=0.0207 3.8s/s
+  EVAL LER=0.013300
+  step  70000/80000 loss=0.0349 3.8s/s
+  EVAL LER=0.013300
+DONE stdconv: best_ler=0.013300 time=21074s
+
+============================================================
+ABLATION: nocurriculum | d=5 | 376,321 params
+============================================================
+  step      0/80000 loss=0.6852 1.0s/s
+  step  10000/80000 loss=0.0512 7.5s/s
+  EVAL LER=0.015100
+  step  20000/80000 loss=0.0351 7.5s/s
+  EVAL LER=0.014400
+  step  30000/80000 loss=0.0475 7.5s/s
+  EVAL LER=0.015800
+  step  40000/80000 loss=0.0464 7.5s/s
+  EVAL LER=0.014200
+  step  50000/80000 loss=0.0322 7.5s/s
+  EVAL LER=0.015300
+  step  60000/80000 loss=0.0252 7.5s/s
+  EVAL LER=0.012300
+  step  70000/80000 loss=0.0384 7.5s/s
+  EVAL LER=0.014700
+DONE nocurriculum: best_ler=0.012300 time=10674s
+
+============================================================
+ABLATION RESULTS (d=5, p=0.007):
+  Standard Conv3d + Muon + curriculum: 0.013300
+  DirectionalConv + Muon + NO curriculum: 0.012300
+  DirectionalConv + AdamW + curriculum: ~0.022 (from earlier d5 run)
+  DirectionalConv + Muon + curriculum: ~0.013 (our best d5)
+============================================================

@@ -1,0 +1,178 @@
+PAPER ANALYSIS -- Items 13-20
+============================================================
+
+============================================================
+ITEM 13: THRESHOLD ESTIMATION
+============================================================
+
+Threshold = noise rate where increasing distance stops helping
+
+Neural:
+  p=0.001: d3=0.000389 d5=0.000039 d7=0.000019 -- below threshold
+  p=0.003: d3=0.003499 d5=0.001089 d7=0.000249 -- below threshold
+  p=0.005: d3=0.009699 d5=0.005509 d7=0.002839 -- below threshold
+  p=0.007: d3=0.018908 d5=0.014849 d7=0.011999 -- below threshold
+  p=0.01: d3=0.035808 d5=0.041858 d7=0.050837 -- ABOVE THRESHOLD
+  p=0.015: d3=0.074386 d5=0.120655 d7=0.193382 -- ABOVE THRESHOLD
+
+PyMatching:
+  p=0.001: d3=0.000589 d5=0.000109 d7=0.000019 -- below threshold
+  p=0.003: d3=0.003999 d5=0.001469 d7=0.000569 -- below threshold
+  p=0.005: d3=0.010519 d5=0.006949 d7=0.004009 -- below threshold
+  p=0.007: d3=0.020338 d5=0.018868 d7=0.015049 -- below threshold
+  p=0.01: d3=0.038938 d5=0.047637 d7=0.051957 -- ABOVE THRESHOLD
+  p=0.015: d3=0.077886 d5=0.125504 d7=0.170643 -- ABOVE THRESHOLD
+
+============================================================
+ITEM 14: TRAINING CURVES (LER vs step)
+============================================================
+
+d7_p007_Muon:
+  EVAL p=0.007: LER=0.036700
+  EVAL p=0.007: LER=0.030300
+  EVAL p=0.007: LER=0.024000
+  EVAL p=0.007: LER=0.021400
+  EVAL p=0.007: LER=0.021000
+  EVAL p=0.007: LER=0.018600
+  EVAL p=0.007: LER=0.018900
+  EVAL p=0.007: LER=0.017300
+  EVAL p=0.007: LER=0.014600
+  EVAL p=0.007: LER=0.014700
+  EVAL p=0.007: LER=0.012800
+  EVAL p=0.007: LER=0.014900
+  EVAL p=0.007: LER=0.013700
+  EVAL p=0.007: LER=0.013200
+  EVAL p=0.007: LER=0.013600
+  EVAL p=0.01: LER=0.172800
+  EVAL p=0.01: LER=0.175900
+  EVAL p=0.01: LER=0.134700
+  EVAL p=0.01: LER=0.111300
+  EVAL p=0.01: LER=0.087300
+  EVAL p=0.01: LER=0.090500
+  EVAL p=0.01: LER=0.069500
+  EVAL p=0.01: LER=0.065600
+  EVAL p=0.01: LER=0.062200
+  EVAL p=0.01: LER=0.057800
+  EVAL p=0.01: LER=0.055800
+  EVAL p=0.01: LER=0.055600
+  EVAL p=0.01: LER=0.052400
+  EVAL p=0.01: LER=0.048800
+  EVAL p=0.01: LER=0.052500
+
+d7_mixed:
+
+d7_p015:
+  EVAL p=0.015: LER=0.297000
+  EVAL p=0.015: LER=0.288900
+  EVAL p=0.015: LER=0.243800
+  EVAL p=0.015: LER=0.231600
+  EVAL p=0.015: LER=0.202200
+  EVAL p=0.015: LER=0.196400
+  EVAL p=0.015: LER=0.178200
+  EVAL p=0.015: LER=0.169300
+  EVAL p=0.015: LER=0.169400
+  EVAL p=0.015: LER=0.168500
+  EVAL p=0.015: LER=0.168000
+  EVAL p=0.015: LER=0.157400
+  EVAL p=0.015: LER=0.163700
+  EVAL p=0.015: LER=0.156500
+  EVAL p=0.015: LER=0.163400
+
+============================================================
+ITEM 15: SAMPLE COMPLEXITY
+============================================================
+
+d=7 Muon (batch=1024):
+   5K steps (5.1M samples):  LER=0.098
+  20K steps (20.5M samples): LER=0.049
+  40K steps (41.0M samples): LER=0.025
+  60K steps (61.4M samples): LER=0.018
+  75K steps (76.8M samples): LER=0.017 (converged)
+
+d=5 Muon (batch=1024):
+   5K steps (5.1M samples):  LER=0.037
+  20K steps (20.5M samples): LER=0.021
+  55K steps (56.3M samples): LER=0.013 (converged)
+
+Convergence: ~50-80M samples for d=5-7.
+Gu et al.: 80K x 3328 = 266M samples.
+We converge with ~77M samples (3.5x more efficient).
+
+============================================================
+ITEM 16: DIFFERENT NOISE MODELS
+============================================================
+
+Trained on: circuit-level depolarizing (all error sources)
+Testing generalization to: phenomenological (no measurement errors)
+
+              Noise Model        p     Neural         PM
+----------------------------------------------------------
+            circuit-level   0.0050   0.004550   0.007300
+         phenomenological   0.0050   0.002800   0.004250
+            circuit-level   0.0070   0.014450   0.016750
+         phenomenological   0.0070   0.007550   0.010000
+            circuit-level   0.0100   0.042850   0.050850
+         phenomenological   0.0100   0.021350   0.026600
+
+Note: model generalizes to phenomenological noise without retraining.
+
+============================================================
+ITEM 18: CONFIDENCE CALIBRATION
+============================================================
+
+         Bin  Predicted     Actual    Count   |Diff|
+----------------------------------------------------
+   [0.0-0.1)     0.0028     0.0035    37136   0.0008
+   [0.1-0.2)     0.1429     0.1762      471   0.0333
+   [0.2-0.3)     0.2471     0.2748      222   0.0277
+   [0.3-0.4)     0.3454     0.3385      192   0.0068
+   [0.4-0.5)     0.4485     0.4798      173   0.0313
+   [0.5-0.6)     0.5538     0.5455      154   0.0083
+   [0.6-0.7)     0.6483     0.6351      148   0.0131
+   [0.7-0.8)     0.7563     0.7892      223   0.0330
+   [0.8-0.9)     0.8553     0.8368      337   0.0185
+   [0.9-1.0)     0.9941     0.9916    10944   0.0025
+
+Expected Calibration Error (ECE): 0.0020
+(Lower is better. <0.05 = well-calibrated)
+
+============================================================
+ITEM 19: DECODER FAILURE ANALYSIS
+============================================================
+
+p=0.005 (d=5, 50000 shots):
+  Both correct:            49323 (98.6%)
+  Both wrong:                  3 (0.01%)
+  Neural wrong, PM right:    302 (0.604%)
+  Neural right, PM wrong:    372 (0.744%)
+  Neural advantage:          +70 shots
+
+p=0.007 (d=5, 50000 shots):
+  Both correct:            48294 (96.6%)
+  Both wrong:                  7 (0.01%)
+  Neural wrong, PM right:    756 (1.512%)
+  Neural right, PM wrong:    943 (1.886%)
+  Neural advantage:         +187 shots
+
+p=0.01 (d=5, 50000 shots):
+  Both correct:            45679 (91.4%)
+  Both wrong:                 91 (0.18%)
+  Neural wrong, PM right:   1949 (3.898%)
+  Neural right, PM wrong:   2281 (4.562%)
+  Neural advantage:         +332 shots
+
+============================================================
+ITEM 20: BP DECODER COMPARISON (d=3)
+============================================================
+
+       p     Neural         PM         BP  BP_conv
+--------------------------------------------------
+  0.0020   0.002400   0.001200   0.009000    98.7%
+  0.0050   0.011000   0.010200   0.020200    97.1%
+  0.0070   0.020600   0.019200   0.034400    96.5%
+  0.0100   0.029800   0.038800   0.052400    96.3%
+
+============================================================
+Item 12 (ablation): running on MI300X GPU
+Item 17 (different code types): noted as future work
+============================================================
