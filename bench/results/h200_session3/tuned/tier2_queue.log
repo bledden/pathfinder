@@ -1,0 +1,22 @@
+[Sun Apr 19 18:58:06 UTC 2026] === Tier 2 start ===
+[Sun Apr 19 18:58:06 UTC 2026] 1/4 fixed_d5 4-param from scratch
+[Sun Apr 19 19:40:00 UTC 2026] fixed_d5 rc=0
+[Sun Apr 19 19:40:00 UTC 2026] 2/4 finetune_d5 from Table-1 (d5_muon)
+[Sun Apr 19 20:00:30 UTC 2026] finetune_d5 rc=0
+[Sun Apr 19 20:00:30 UTC 2026] 3/4 finetune_d7 from Table-1 (d7_final)
+[Sun Apr 19 20:35:06 UTC 2026] finetune_d7 rc=0
+[Sun Apr 19 20:35:06 UTC 2026] 4/4 ensemble with tuned Pathfinder models
+Traceback (most recent call last):
+  File "<string>", line 10, in <module>
+  File "/usr/local/lib/python3.11/dist-packages/torch/serialization.py", line 1097, in load
+    return _load(
+           ^^^^^^
+  File "/usr/local/lib/python3.11/dist-packages/torch/serialization.py", line 1525, in _load
+    result = unpickler.load()
+             ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/dist-packages/torch/serialization.py", line 1515, in find_class
+    return super().find_class(mod_name, name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'model'
+[Sun Apr 19 20:35:52 UTC 2026] ensemble_tuned rc=0
+[Sun Apr 19 20:35:52 UTC 2026] === Tier 2 DONE ===
