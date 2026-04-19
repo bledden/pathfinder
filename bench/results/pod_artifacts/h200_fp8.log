@@ -1,0 +1,43 @@
+torch: 2.6.0+cu124 | GPU: NVIDIA H200
+
+=== d=5 FP8 on H200 ===
+  FP16 compile(reduce-oh) B=1:       373.38 us/call
+  FP16 LER @ p=0.007 (5K shots):   0.01380
+  FP8 quantized: OK
+  FP8 eager B=1:                   12289.52 us/call
+  FP8 compile(reduce-oh) B=1:        781.81 us/call
+  FP8 LER @ p=0.007 (5K shots):    0.01300   (delta vs FP16: -0.080%pt)
+  FP16 compile B=1024:              3357.91 us/call (3.28 us/syn)
+/usr/local/lib/python3.11/dist-packages/torch/autograd/graph.py:823: UserWarning: Error detected in torch::autograd::NotImplemented. Traceback of forward call that caused the error:
+  File "/workspace/pathfinder/train/model.py", line 165, in forward
+    return self.head(x)               # [B, n_observables]
+ (Triggered internally at /pytorch/torch/csrc/autograd/python_anomaly_mode.cpp:122.)
+  return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+  FP8 B=1024 FAIL: BackendCompilerFailed: backend='inductor' raised:
+RuntimeError: derivative for aten::_scaled_mm is not implemented
+
+Set TORCH_LOGS="+dynamo" and TORCHDYNAMO_VERBOSE=1 for more information
+
+
+You can suppress this exception a
+
+=== d=7 FP8 on H200 ===
+  FP16 compile(reduce-oh) B=1:       492.54 us/call
+  FP16 LER @ p=0.007 (5K shots):   0.01660
+  FP8 quantized: OK
+  FP8 eager B=1:                   17230.12 us/call
+  FP8 compile(reduce-oh) B=1:       1162.06 us/call
+  FP8 LER @ p=0.007 (5K shots):    0.01780   (delta vs FP16: +0.120%pt)
+  FP16 compile B=1024:             16796.34 us/call (16.40 us/syn)
+/usr/local/lib/python3.11/dist-packages/torch/autograd/graph.py:823: UserWarning: Error detected in torch::autograd::NotImplemented. Traceback of forward call that caused the error:
+  File "/workspace/pathfinder/train/model.py", line 165, in forward
+    return self.head(x)               # [B, n_observables]
+ (Triggered internally at /pytorch/torch/csrc/autograd/python_anomaly_mode.cpp:122.)
+  return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+  FP8 B=1024 FAIL: BackendCompilerFailed: backend='inductor' raised:
+RuntimeError: derivative for aten::_scaled_mm is not implemented
+
+Set TORCH_LOGS="+dynamo" and TORCHDYNAMO_VERBOSE=1 for more information
+
+
+You can suppress this exception a

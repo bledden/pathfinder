@@ -1,0 +1,33 @@
+{
+  "gpu": "NVIDIA H200",
+  "torch": "2.4.1+cu124",
+  "results": [
+    {
+      "distance": 3,
+      "rounds": 3,
+      "params": 252417,
+      "fp16_compile_reduce_overhead_us": 148.57278554700315,
+      "fp16_compile_max_autotune_us": 110.71157758124173,
+      "fp16_compile_default_then_graph_us": 147.12004293687642,
+      "fp16_eager_then_graph_us": 202.44405989069492
+    },
+    {
+      "distance": 5,
+      "rounds": 5,
+      "params": 376321,
+      "fp16_compile_reduce_overhead_us": 255.29991299845278,
+      "fp16_compile_max_autotune_us": 187.28290556464344,
+      "fp16_compile_default_then_graph_us": 251.69903750065714,
+      "fp16_eager_then_graph_us": 336.5354749839753
+    },
+    {
+      "distance": 7,
+      "rounds": 7,
+      "params": 500225,
+      "fp16_compile_reduce_overhead_us": 372.6621496025473,
+      "fp16_compile_max_autotune_us": 269.3301064427942,
+      "fp16_compile_default_then_graph_us": 370.1188734266907,
+      "fp16_eager_then_graph_us": 484.6673475112766
+    }
+  ]
+}

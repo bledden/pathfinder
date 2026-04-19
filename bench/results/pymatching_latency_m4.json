@@ -1,0 +1,155 @@
+{
+  "hardware": "Apple M4 single core",
+  "cpu_count": 16,
+  "pymatching_version": "2.3.1",
+  "stim_version": "1.15.0",
+  "data": [
+    {
+      "distance": 3,
+      "rounds": 3,
+      "noise_rate": 0.001,
+      "single_us_per_syn": 2.0127581999986432,
+      "batch_us_per_syn": 0.051733200962189585
+    },
+    {
+      "distance": 3,
+      "rounds": 3,
+      "noise_rate": 0.002,
+      "single_us_per_syn": 2.0056499997735955,
+      "batch_us_per_syn": 0.06989999965298921
+    },
+    {
+      "distance": 3,
+      "rounds": 3,
+      "noise_rate": 0.003,
+      "single_us_per_syn": 1.7969749998883344,
+      "batch_us_per_syn": 0.10312499944120646
+    },
+    {
+      "distance": 3,
+      "rounds": 3,
+      "noise_rate": 0.005,
+      "single_us_per_syn": 1.8674000006285496,
+      "batch_us_per_syn": 0.16263339930446818
+    },
+    {
+      "distance": 3,
+      "rounds": 3,
+      "noise_rate": 0.007,
+      "single_us_per_syn": 1.8727084010606632,
+      "batch_us_per_syn": 0.20640000002458692
+    },
+    {
+      "distance": 3,
+      "rounds": 3,
+      "noise_rate": 0.01,
+      "single_us_per_syn": 2.1103249993757345,
+      "batch_us_per_syn": 0.34893319971160963
+    },
+    {
+      "distance": 3,
+      "rounds": 3,
+      "noise_rate": 0.015,
+      "single_us_per_syn": 2.172308400622569,
+      "batch_us_per_syn": 0.508758399519138
+    },
+    {
+      "distance": 5,
+      "rounds": 5,
+      "noise_rate": 0.001,
+      "single_us_per_syn": 2.2377832006895915,
+      "batch_us_per_syn": 0.3131416000542231
+    },
+    {
+      "distance": 5,
+      "rounds": 5,
+      "noise_rate": 0.002,
+      "single_us_per_syn": 2.5084418011829257,
+      "batch_us_per_syn": 0.6126000007498078
+    },
+    {
+      "distance": 5,
+      "rounds": 5,
+      "noise_rate": 0.003,
+      "single_us_per_syn": 2.8121167997596785,
+      "batch_us_per_syn": 0.8399084006669
+    },
+    {
+      "distance": 5,
+      "rounds": 5,
+      "noise_rate": 0.005,
+      "single_us_per_syn": 3.2545499998377636,
+      "batch_us_per_syn": 1.4805666010943241
+    },
+    {
+      "distance": 5,
+      "rounds": 5,
+      "noise_rate": 0.007,
+      "single_us_per_syn": 4.160716600017622,
+      "batch_us_per_syn": 2.082158399571199
+    },
+    {
+      "distance": 5,
+      "rounds": 5,
+      "noise_rate": 0.01,
+      "single_us_per_syn": 5.43245000008028,
+      "batch_us_per_syn": 3.4224999995785765
+    },
+    {
+      "distance": 5,
+      "rounds": 5,
+      "noise_rate": 0.015,
+      "single_us_per_syn": 7.708250000723638,
+      "batch_us_per_syn": 5.1913584000431
+    },
+    {
+      "distance": 7,
+      "rounds": 7,
+      "noise_rate": 0.001,
+      "single_us_per_syn": 2.5391000002855435,
+      "batch_us_per_syn": 0.7923500001197681
+    },
+    {
+      "distance": 7,
+      "rounds": 7,
+      "noise_rate": 0.002,
+      "single_us_per_syn": 3.5236915995483287,
+      "batch_us_per_syn": 1.5612415998475626
+    },
+    {
+      "distance": 7,
+      "rounds": 7,
+      "noise_rate": 0.003,
+      "single_us_per_syn": 4.656666799564846,
+      "batch_us_per_syn": 2.632558399636764
+    },
+    {
+      "distance": 7,
+      "rounds": 7,
+      "noise_rate": 0.005,
+      "single_us_per_syn": 6.774033400870394,
+      "batch_us_per_syn": 5.037441599415615
+    },
+    {
+      "distance": 7,
+      "rounds": 7,
+      "noise_rate": 0.007,
+      "single_us_per_syn": 9.651008399669081,
+      "batch_us_per_syn": 7.767458399757743
+    },
+    {
+      "distance": 7,
+      "rounds": 7,
+      "noise_rate": 0.01,
+      "single_us_per_syn": 14.96774160041241,
+      "batch_us_per_syn": 12.762483400001656
+    },
+    {
+      "distance": 7,
+      "rounds": 7,
+      "noise_rate": 0.015,
+      "single_us_per_syn": 22.93445840041386,
+      "batch_us_per_syn": 20.687358400027733
+    }
+  ]
+}

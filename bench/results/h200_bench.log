@@ -1,0 +1,105 @@
+GPU: NVIDIA H200
+PyTorch: 2.4.1+cu124
+
+=== d=3, rounds=3, params=252,417 ===
+ dtype           compile  batch    us/syn       syn/s
+  fp32             eager      1   1291.48         774
+  fp32             eager     16     85.30       11723
+  fp32             eager     64     21.89       45685
+  fp32             eager    256      5.54      180448
+  fp32             eager   1024      1.37      728644
+/usr/local/lib/python3.11/dist-packages/torch/_inductor/compile_fx.py:150: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+  fp32           default      1    803.86        1244
+  fp32           default     16     51.58       19386
+  fp32           default     64     13.11       76279
+  fp32           default    256      3.33      300047
+  fp32           default   1024      0.82     1212994
+  fp32   reduce-overhead      1    226.45        4416
+  fp32   reduce-overhead     16     19.93       50175
+  fp32   reduce-overhead     64      2.94      340704
+  fp32   reduce-overhead    256      1.07      932087
+  fp32   reduce-overhead   1024      0.58     1731158
+  fp16             eager      1   1354.51         738
+  fp16             eager     16     87.97       11368
+  fp16             eager     64     20.45       48888
+  fp16             eager    256      5.08      196908
+  fp16             eager   1024      1.38      722615
+  fp16           default      1    865.28        1156
+  fp16           default     16     57.54       17379
+  fp16           default     64     13.26       75435
+  fp16           default    256      3.25      307645
+  fp16           default   1024      0.91     1095812
+  fp16   reduce-overhead      1    148.26        6745
+  fp16   reduce-overhead     16      9.38      106634
+  fp16   reduce-overhead     64      2.43      410726
+  fp16   reduce-overhead    256      0.80     1245509
+  fp16   reduce-overhead   1024      0.44     2266559
+
+=== d=5, rounds=5, params=376,321 ===
+ dtype           compile  batch    us/syn       syn/s
+  fp32             eager      1   2026.70         493
+  fp32             eager     16    142.19        7033
+  fp32             eager     64     35.03       28550
+  fp32             eager    256      8.58      116554
+  fp32             eager   1024      6.48      154207
+  fp32           default      1   1384.32         722
+  fp32           default     16     83.09       12036
+  fp32           default     64     20.55       48664
+  fp32           default    256      5.39      185517
+  fp32           default   1024      3.49      286770
+  fp32   reduce-overhead      1    394.72        2533
+  fp32   reduce-overhead     16     19.76       50615
+  fp32   reduce-overhead     64      6.95      143863
+  fp32   reduce-overhead    256      3.87      258128
+  fp32   reduce-overhead   1024      3.36      297313
+  fp16             eager      1   2309.82         433
+  fp16             eager     16    138.94        7197
+  fp16             eager     64     34.40       29069
+  fp16             eager    256      9.21      108523
+  fp16             eager   1024      4.14      241530
+  fp16           default      1   1421.70         703
+  fp16           default     16     81.60       12255
+  fp16           default     64     20.50       48787
+  fp16           default    256      5.59      178993
+  fp16           default   1024      1.99      503225
+  fp16   reduce-overhead      1    254.48        3930
+  fp16   reduce-overhead     16     14.61       68424
+  fp16   reduce-overhead     64      4.84      206400
+  fp16   reduce-overhead    256      2.48      402724
+  fp16   reduce-overhead   1024      1.89      530461
+
+=== d=7, rounds=7, params=500,225 ===
+ dtype           compile  batch    us/syn       syn/s
+  fp32             eager      1   2915.93         343
+  fp32             eager     16    189.06        5289
+  fp32             eager     64     47.47       21067
+  fp32             eager    256     25.21       39674
+  fp32             eager   1024     22.74       43973
+  fp32           default      1   1850.84         540
+  fp32           default     16    111.60        8960
+  fp32           default     64     28.23       35420
+  fp32           default    256     13.66       73225
+  fp32           default   1024     11.79       84833
+  fp32   reduce-overhead      1    752.39        1329
+  fp32   reduce-overhead     16     33.54       29816
+  fp32   reduce-overhead     64     16.16       61899
+  fp32   reduce-overhead    256     13.09       76399
+  fp32   reduce-overhead   1024     11.63       85962
+  fp16             eager      1   3195.97         313
+  fp16             eager     16    190.99        5236
+  fp16             eager     64     51.44       19441
+  fp16             eager    256     16.70       59875
+  fp16             eager   1024     14.61       68457
+  fp16           default      1   1974.84         506
+  fp16           default     16    111.29        8986
+  fp16           default     64     30.99       32271
+  fp16           default    256      8.10      123451
+  fp16           default   1024      6.43      155597
+  fp16   reduce-overhead      1    372.80        2682
+  fp16   reduce-overhead     16     25.36       39429
+  fp16   reduce-overhead     64     11.40       87735
+  fp16   reduce-overhead    256      7.45      134257
+  fp16   reduce-overhead   1024      6.38      156808
+
+=== wrote /workspace/h200_latency_results.json ===

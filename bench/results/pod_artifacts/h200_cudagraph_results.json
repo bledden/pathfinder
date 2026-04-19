@@ -1,0 +1,33 @@
+{
+  "gpu": "NVIDIA H200",
+  "torch": "2.4.1+cu124",
+  "results": [
+    {
+      "distance": 3,
+      "rounds": 3,
+      "params": 252417,
+      "fp32_cuda_graph_us": 269.2658877931535,
+      "fp32_eager_us": 1235.116741154343,
+      "fp16_cuda_graph_us": 206.96080708876252,
+      "fp16_eager_us": 1333.2382889930159
+    },
+    {
+      "distance": 5,
+      "rounds": 5,
+      "params": 376321,
+      "fp32_cuda_graph_us": 452.0939141511917,
+      "fp32_eager_us": 1932.3940929025412,
+      "fp16_cuda_graph_us": 348.14327606000006,
+      "fp16_eager_us": 2160.303105134517
+    },
+    {
+      "distance": 7,
+      "rounds": 7,
+      "params": 500225,
+      "fp32_cuda_graph_us": 814.2914809286594,
+      "fp32_eager_us": 2658.9644430205226,
+      "fp16_cuda_graph_us": 484.3263649381697,
+      "fp16_eager_us": 3189.6427129395306
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+GPU: NVIDIA H200
+PyTorch: 2.4.1+cu124
+
+=== d=3, rounds=3, params=252,417 ===
+  fp32 eager:                     1235.12 us/call
+/usr/local/lib/python3.11/dist-packages/torch/_inductor/compile_fx.py:150: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+  fp32 compile(default):            781.65 us/call
+  fp32 compile(reduce-overhead):   225.29 us/call
+  fp32 CUDA Graph (manual):        269.27 us/call  <-- pure replay
+  fp16 eager:                     1333.24 us/call
+  fp16 compile(default):            859.41 us/call
+  fp16 compile(reduce-overhead):   148.35 us/call
+  fp16 CUDA Graph (manual):        206.96 us/call  <-- pure replay
+
+=== d=5, rounds=5, params=376,321 ===
+  fp32 eager:                     1932.39 us/call
+  fp32 compile(default):           1219.86 us/call
+  fp32 compile(reduce-overhead):   395.05 us/call
+  fp32 CUDA Graph (manual):        452.09 us/call  <-- pure replay
+  fp16 eager:                     2160.30 us/call
+  fp16 compile(default):           1328.75 us/call
+  fp16 compile(reduce-overhead):   254.00 us/call
+  fp16 CUDA Graph (manual):        348.14 us/call  <-- pure replay
+
+=== d=7, rounds=7, params=500,225 ===
+  fp32 eager:                     2658.96 us/call
+  fp32 compile(default):           1662.20 us/call
+  fp32 compile(reduce-overhead):   754.95 us/call
+  fp32 CUDA Graph (manual):        814.29 us/call  <-- pure replay
+  fp16 eager:                     3189.64 us/call
+  fp16 compile(default):           1812.20 us/call
+  fp16 compile(reduce-overhead):   374.48 us/call
+  fp16 CUDA Graph (manual):        484.33 us/call  <-- pure replay
+
+=== wrote /workspace/h200_cudagraph_results.json ===

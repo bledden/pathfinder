@@ -1,0 +1,262 @@
+GPU: NVIDIA H200
+PyTorch: 2.4.1+cu124
+
+=== d=3, rounds=3, params=252,417 ===
+  fp16 compile(reduce-overhead):              148.57 us/call
+AUTOTUNE mm(27x64, 64x64)
+  triton_mm_14 0.0058 ms 100.0%
+  triton_mm_7 0.0060 ms 95.7%
+  triton_mm_1 0.0061 ms 93.7%
+  triton_mm_8 0.0062 ms 92.3%
+  mm 0.0063 ms 91.8%
+  triton_mm_4 0.0063 ms 90.9%
+  triton_mm_11 0.0064 ms 89.6%
+  triton_mm_12 0.0065 ms 89.1%
+  triton_mm_3 0.0066 ms 87.4%
+  triton_mm_2 0.0069 ms 83.7%
+SingleProcess AUTOTUNE benchmarking takes 1.9197 seconds and 0.0070 seconds precompiling
+AUTOTUNE mm(27x64, 64x64)
+  triton_mm_109 0.0056 ms 100.0%
+  triton_mm_113 0.0057 ms 97.8%
+  triton_mm_116 0.0057 ms 97.2%
+  triton_mm_107 0.0058 ms 96.7%
+  triton_mm_106 0.0058 ms 95.6%
+  triton_mm_108 0.0058 ms 95.6%
+  triton_mm_112 0.0059 ms 95.1%
+  triton_mm_119 0.0059 ms 95.1%
+  triton_mm_117 0.0059 ms 94.6%
+  triton_mm_115 0.0060 ms 93.5%
+SingleProcess AUTOTUNE benchmarking takes 1.7853 seconds and 0.0024 seconds precompiling
+AUTOTUNE mm(1x256, 256x256)
+  triton_mm_319 0.0061 ms 100.0%
+  triton_mm_323 0.0063 ms 97.4%
+  triton_mm_318 0.0066 ms 92.7%
+  triton_mm_316 0.0067 ms 91.8%
+  triton_mm_322 0.0067 ms 91.4%
+  triton_mm_317 0.0068 ms 89.3%
+  triton_mm_327 0.0068 ms 89.3%
+  triton_mm_331 0.0070 ms 86.8%
+  triton_mm_326 0.0071 ms 85.7%
+  triton_mm_329 0.0073 ms 83.8%
+SingleProcess AUTOTUNE benchmarking takes 2.0113 seconds and 0.0019 seconds precompiling
+AUTOTUNE mm(18x64, 64x64)
+  triton_mm_61 0.0055 ms 100.0%
+  triton_mm_63 0.0056 ms 99.4%
+  triton_mm_68 0.0057 ms 97.7%
+  triton_mm_74 0.0057 ms 97.7%
+  triton_mm_62 0.0058 ms 95.6%
+  triton_mm_64 0.0058 ms 95.3%
+  triton_mm_67 0.0059 ms 94.0%
+  triton_mm_71 0.0059 ms 94.0%
+  triton_mm_72 0.0059 ms 93.5%
+  triton_mm_69 0.0060 ms 93.0%
+SingleProcess AUTOTUNE benchmarking takes 1.7909 seconds and 0.0018 seconds precompiling
+AUTOTUNE mm(18x64, 64x64)
+  triton_mm_22 0.0058 ms 100.0%
+  triton_mm_29 0.0060 ms 96.3%
+  triton_mm_23 0.0062 ms 92.3%
+  triton_mm_27 0.0062 ms 92.3%
+  mm 0.0063 ms 91.8%
+  triton_mm_19 0.0063 ms 91.4%
+  triton_mm_16 0.0064 ms 90.5%
+  triton_mm_18 0.0064 ms 90.0%
+  triton_mm_26 0.0064 ms 90.0%
+  triton_mm_17 0.0067 ms 86.1%
+SingleProcess AUTOTUNE benchmarking takes 1.7921 seconds and 0.0014 seconds precompiling
+AUTOTUNE mm(18x64, 64x64)
+  triton_mm_37 0.0057 ms 100.0%
+  triton_mm_44 0.0058 ms 99.4%
+  triton_mm_34 0.0061 ms 93.2%
+  triton_mm_41 0.0062 ms 91.8%
+  triton_mm_42 0.0063 ms 91.3%
+  triton_mm_31 0.0063 ms 90.4%
+  mm 0.0065 ms 88.6%
+  triton_mm_38 0.0065 ms 88.6%
+  triton_mm_33 0.0066 ms 86.9%
+  triton_mm_40 0.0067 ms 86.1%
+SingleProcess AUTOTUNE benchmarking takes 1.7935 seconds and 0.0015 seconds precompiling
+AUTOTUNE mm(18x64, 64x64)
+  triton_mm_138 0.0056 ms 100.0%
+  triton_mm_142 0.0056 ms 98.9%
+  triton_mm_149 0.0056 ms 98.9%
+  triton_mm_144 0.0057 ms 97.8%
+  triton_mm_145 0.0057 ms 97.2%
+  triton_mm_136 0.0058 ms 96.7%
+  triton_mm_137 0.0058 ms 96.7%
+  triton_mm_139 0.0058 ms 96.1%
+  triton_mm_146 0.0059 ms 95.1%
+  triton_mm_147 0.0059 ms 95.1%
+SingleProcess AUTOTUNE benchmarking takes 1.7954 seconds and 0.0011 seconds precompiling
+AUTOTUNE addmm(1x1, 1x256, 256x1)
+  triton_mm_335 0.0061 ms 100.0%
+  triton_mm_341 0.0061 ms 100.0%
+  triton_mm_342 0.0062 ms 99.0%
+  triton_mm_334 0.0063 ms 97.0%
+  triton_mm_338 0.0065 ms 94.1%
+  triton_mm_340 0.0067 ms 92.3%
+  triton_mm_333 0.0068 ms 91.0%
+  triton_mm_339 0.0071 ms 86.5%
+  triton_mm_337 0.0092 ms 66.4%
+  triton_mm_332 0.0102 ms 60.4%
+SingleProcess AUTOTUNE benchmarking takes 1.3527 seconds and 0.0013 seconds precompiling
+  fp16 compile(max-autotune):                 110.71 us/call
+  fp16 compile(default) + manual graph:     147.12 us/call  <-- pure replay
+  fp16 eager + manual graph:               202.44 us/call
+
+=== d=5, rounds=5, params=376,321 ===
+  fp16 compile(reduce-overhead):              255.30 us/call
+AUTOTUNE mm(125x64, 64x64)
+  triton_mm_344 0.0063 ms 100.0%
+  triton_mm_350 0.0064 ms 98.5%
+  triton_mm_355 0.0066 ms 95.2%
+  mm 0.0067 ms 94.7%
+  triton_mm_354 0.0068 ms 92.5%
+  triton_mm_347 0.0069 ms 91.6%
+  triton_mm_351 0.0069 ms 91.6%
+  triton_mm_345 0.0069 ms 91.2%
+  triton_mm_346 0.0069 ms 91.2%
+  triton_mm_353 0.0070 ms 90.4%
+SingleProcess AUTOTUNE benchmarking takes 2.1047 seconds and 0.0015 seconds precompiling
+AUTOTUNE mm(125x64, 64x64)
+  triton_mm_471 0.0059 ms 100.0%
+  triton_mm_470 0.0059 ms 99.5%
+  triton_mm_472 0.0059 ms 99.5%
+  triton_mm_473 0.0059 ms 99.5%
+  triton_mm_478 0.0059 ms 99.5%
+  triton_mm_480 0.0060 ms 98.4%
+  triton_mm_476 0.0061 ms 96.3%
+  triton_mm_479 0.0061 ms 95.8%
+  triton_mm_481 0.0061 ms 95.8%
+  triton_mm_477 0.0062 ms 95.3%
+SingleProcess AUTOTUNE benchmarking takes 2.1261 seconds and 0.0018 seconds precompiling
+AUTOTUNE mm(100x64, 64x64)
+  triton_mm_416 0.0057 ms 100.0%
+  triton_mm_419 0.0058 ms 98.9%
+  triton_mm_417 0.0059 ms 96.7%
+  triton_mm_418 0.0059 ms 96.7%
+  triton_mm_424 0.0059 ms 96.7%
+  triton_mm_423 0.0059 ms 96.2%
+  triton_mm_427 0.0060 ms 95.7%
+  triton_mm_422 0.0061 ms 92.7%
+  triton_mm_426 0.0061 ms 92.7%
+  triton_mm_425 0.0062 ms 92.5%
+SingleProcess AUTOTUNE benchmarking takes 2.1311 seconds and 0.0016 seconds precompiling
+AUTOTUNE mm(100x64, 64x64)
+  triton_mm_362 0.0063 ms 100.0%
+  triton_mm_369 0.0066 ms 96.1%
+  mm 0.0066 ms 95.2%
+  triton_mm_368 0.0066 ms 95.2%
+  triton_mm_364 0.0067 ms 94.7%
+  triton_mm_371 0.0067 ms 94.7%
+  triton_mm_372 0.0067 ms 93.8%
+  triton_mm_373 0.0067 ms 93.8%
+  triton_mm_378 0.0068 ms 92.5%
+  triton_mm_365 0.0069 ms 91.2%
+SingleProcess AUTOTUNE benchmarking takes 2.1288 seconds and 0.0020 seconds precompiling
+AUTOTUNE mm(100x64, 64x64)
+  triton_mm_386 0.0063 ms 100.0%
+  triton_mm_380 0.0063 ms 99.0%
+  mm 0.0065 ms 97.0%
+  triton_mm_382 0.0065 ms 96.6%
+  triton_mm_389 0.0066 ms 95.1%
+  triton_mm_387 0.0066 ms 94.7%
+  triton_mm_391 0.0066 ms 94.7%
+  triton_mm_390 0.0067 ms 94.2%
+  triton_mm_383 0.0067 ms 93.3%
+  triton_mm_396 0.0068 ms 91.8%
+SingleProcess AUTOTUNE benchmarking takes 2.1309 seconds and 0.0014 seconds precompiling
+AUTOTUNE mm(100x64, 64x64)
+  triton_mm_506 0.0055 ms 100.0%
+  triton_mm_509 0.0055 ms 100.0%
+  triton_mm_517 0.0057 ms 96.6%
+  triton_mm_516 0.0058 ms 96.1%
+  triton_mm_508 0.0059 ms 94.0%
+  triton_mm_507 0.0059 ms 93.5%
+  triton_mm_512 0.0059 ms 93.5%
+  triton_mm_513 0.0060 ms 93.0%
+  triton_mm_514 0.0060 ms 93.0%
+  triton_mm_515 0.0060 ms 92.5%
+SingleProcess AUTOTUNE benchmarking takes 2.1377 seconds and 0.0012 seconds precompiling
+  fp16 compile(max-autotune):                 187.28 us/call
+  fp16 compile(default) + manual graph:     251.70 us/call  <-- pure replay
+  fp16 eager + manual graph:               336.54 us/call
+
+=== d=7, rounds=7, params=500,225 ===
+  fp16 compile(reduce-overhead):              372.66 us/call
+AUTOTUNE mm(343x64, 64x64)
+  triton_mm_1008 0.0063 ms 100.0%
+  triton_mm_1002 0.0064 ms 98.5%
+  mm 0.0065 ms 98.0%
+  triton_mm_1009 0.0067 ms 94.7%
+  triton_mm_1013 0.0067 ms 94.7%
+  triton_mm_1004 0.0068 ms 92.5%
+  triton_mm_1012 0.0069 ms 92.1%
+  triton_mm_1003 0.0069 ms 91.7%
+  triton_mm_1011 0.0070 ms 90.8%
+  triton_mm_1018 0.0070 ms 90.0%
+SingleProcess AUTOTUNE benchmarking takes 2.5094 seconds and 0.0016 seconds precompiling
+AUTOTUNE mm(343x64, 64x64)
+  triton_mm_1128 0.0057 ms 100.0%
+  triton_mm_1131 0.0057 ms 99.4%
+  triton_mm_1130 0.0059 ms 96.2%
+  triton_mm_1134 0.0059 ms 96.2%
+  triton_mm_1129 0.0060 ms 95.7%
+  triton_mm_1135 0.0060 ms 94.7%
+  triton_mm_1138 0.0060 ms 94.7%
+  triton_mm_1136 0.0061 ms 93.2%
+  triton_mm_1137 0.0061 ms 92.7%
+  triton_mm_1139 0.0062 ms 92.2%
+SingleProcess AUTOTUNE benchmarking takes 2.1267 seconds and 0.0014 seconds precompiling
+AUTOTUNE mm(294x64, 64x64)
+  triton_mm_1074 0.0059 ms 100.0%
+  triton_mm_1083 0.0059 ms 98.9%
+  triton_mm_1077 0.0060 ms 98.4%
+  triton_mm_1081 0.0060 ms 98.4%
+  triton_mm_1082 0.0060 ms 98.4%
+  triton_mm_1075 0.0061 ms 96.3%
+  triton_mm_1080 0.0061 ms 95.8%
+  triton_mm_1076 0.0061 ms 95.3%
+  triton_mm_1084 0.0062 ms 94.8%
+  triton_mm_1085 0.0062 ms 94.8%
+SingleProcess AUTOTUNE benchmarking takes 2.1301 seconds and 0.0017 seconds precompiling
+AUTOTUNE mm(294x64, 64x64)
+  triton_mm_1020 0.0063 ms 100.0%
+  triton_mm_1026 0.0063 ms 99.0%
+  mm 0.0065 ms 97.0%
+  triton_mm_1027 0.0067 ms 93.8%
+  triton_mm_1029 0.0067 ms 93.3%
+  triton_mm_1021 0.0068 ms 91.6%
+  triton_mm_1022 0.0068 ms 91.6%
+  triton_mm_1023 0.0069 ms 91.2%
+  triton_mm_1030 0.0069 ms 90.7%
+  triton_mm_1031 0.0069 ms 90.7%
+SingleProcess AUTOTUNE benchmarking takes 2.1237 seconds and 0.0012 seconds precompiling
+AUTOTUNE mm(294x64, 64x64)
+  triton_mm_1038 0.0062 ms 100.0%
+  mm 0.0065 ms 96.1%
+  triton_mm_1044 0.0065 ms 95.6%
+  triton_mm_1040 0.0067 ms 93.8%
+  triton_mm_1048 0.0069 ms 90.7%
+  triton_mm_1049 0.0069 ms 90.7%
+  triton_mm_1045 0.0069 ms 90.3%
+  triton_mm_1047 0.0070 ms 89.4%
+  triton_mm_1054 0.0070 ms 88.6%
+  triton_mm_1039 0.0071 ms 87.8%
+SingleProcess AUTOTUNE benchmarking takes 2.1285 seconds and 0.0014 seconds precompiling
+AUTOTUNE mm(294x64, 64x64)
+  triton_mm_1164 0.0057 ms 100.0%
+  triton_mm_1165 0.0059 ms 96.7%
+  triton_mm_1166 0.0059 ms 96.7%
+  triton_mm_1170 0.0059 ms 96.5%
+  triton_mm_1167 0.0060 ms 95.2%
+  triton_mm_1171 0.0060 ms 95.2%
+  triton_mm_1172 0.0060 ms 95.2%
+  triton_mm_1174 0.0060 ms 95.2%
+  triton_mm_1173 0.0061 ms 93.2%
+  triton_mm_1175 0.0062 ms 92.2%
+SingleProcess AUTOTUNE benchmarking takes 2.1336 seconds and 0.0018 seconds precompiling
+  fp16 compile(max-autotune):                 269.33 us/call
+  fp16 compile(default) + manual graph:     370.12 us/call  <-- pure replay
+  fp16 eager + manual graph:               484.67 us/call
+
+=== wrote /workspace/h200_maxspeed_results.json ===

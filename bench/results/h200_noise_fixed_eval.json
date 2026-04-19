@@ -1,0 +1,1610 @@
+{
+  "d3_p0.0005": {
+    "d": 3,
+    "p": 0.0005,
+    "seeds": [
+      {
+        "seed": 1000,
+        "n": 20000,
+        "pm_errs": 3,
+        "neural_errs": {
+          "d3": 2
+        },
+        "model_used": "d3"
+      },
+      {
+        "seed": 1001,
+        "n": 20000,
+        "pm_errs": 11,
+        "neural_errs": {
+          "d3": 8
+        },
+        "model_used": "d3"
+      },
+      {
+        "seed": 1002,
+        "n": 20000,
+        "pm_errs": 4,
+        "neural_errs": {
+          "d3": 4
+        },
+        "model_used": "d3"
+      },
+      {
+        "seed": 1003,
+        "n": 20000,
+        "pm_errs": 3,
+        "neural_errs": {
+          "d3": 2
+        },
+        "model_used": "d3"
+      },
+      {
+        "seed": 1004,
+        "n": 20000,
+        "pm_errs": 7,
+        "neural_errs": {
+          "d3": 5
+        },
+        "model_used": "d3"
+      }
+    ],
+    "pm_ler": 0.00028,
+    "pm_ci": [
+      0.00019373769447967064,
+      0.0004046553176543752
+    ],
+    "pm_errs_total": 28,
+    "neural_ler": 0.00021,
+    "neural_ci": [
+      0.00013736257326243457,
+      0.00032103581690500876
+    ],
+    "neural_errs_total": 21,
+    "total_shots": 100000,
+    "model_used": "d3",
+    "ci_non_overlap": false,
+    "verdict": "NEURAL_WINS"
+  },
+  "d3_p0.001": {
+    "d": 3,
+    "p": 0.001,
+    "seeds": [
+      {
+        "seed": 1000,
+        "n": 20000,
+        "pm_errs": 12,
+        "neural_errs": {
+          "d3": 11
+        },
+        "model_used": "d3"
+      },
+      {
+        "seed": 1001,
+        "n": 20000,
+        "pm_errs": 22,
+        "neural_errs": {
+          "d3": 19
+        },
+        "model_used": "d3"
+      },
+      {
+        "seed": 1002,
+        "n": 20000,
+        "pm_errs": 16,
+        "neural_errs": {
+          "d3": 13
+        },
+        "model_used": "d3"
+      },
+      {
+        "seed": 1003,
+        "n": 20000,
+        "pm_errs": 18,
+        "neural_errs": {
+          "d3": 17
+        },
+        "model_used": "d3"
+      },
+      {
+        "seed": 1004,
+        "n": 20000,
+        "pm_errs": 7,
+        "neural_errs": {
+          "d3": 6
+        },
+        "model_used": "d3"
+      }
+    ],
+    "pm_ler": 0.00075,
+    "pm_ci": [
+      0.0005984239548933321,
+      0.0009399329475879022
+    ],
+    "pm_errs_total": 75,
+    "neural_ler": 0.00066,
+    "neural_ci": [
+      0.0005188547484488186,
+      0.000839509068646784
+    ],
+    "neural_errs_total": 66,
+    "total_shots": 100000,
+    "model_used": "d3",
+    "ci_non_overlap": false,
+    "verdict": "NEURAL_WINS"
+  },
+  "d3_p0.002": {
+    "d": 3,
+    "p": 0.002,
+    "seeds": [
+      {
+        "seed": 1000,
+        "n": 20000,
+        "pm_errs": 60,
+        "neural_errs": {
+          "d3": 46
+        },
+        "model_used": "d3"
+      },
+      {
+        "seed": 1001,
+        "n": 20000,
+        "pm_errs": 57,
+        "neural_errs": {
+          "d3": 58
+        },
+        "model_used": "d3"
+      },
+      {
+        "seed": 1002,
+        "n": 20000,
+        "pm_errs": 55,
+        "neural_errs": {
+          "d3": 46
+        },
+        "model_used": "d3"
+      },
+      {
+        "seed": 1003,
+        "n": 20000,
+        "pm_errs": 60,
+        "neural_errs": {
+          "d3": 56
+        },
+        "model_used": "d3"
+      },
+      {
+        "seed": 1004,
+        "n": 20000,
+        "pm_errs": 60,
+        "neural_errs": {
+          "d3": 54
+        },
+        "model_used": "d3"
+      }
+    ],
+    "pm_ler": 0.00292,
+    "pm_ci": [
+      0.002604121218428801,
+      0.003274068965017112
+    ],
+    "pm_errs_total": 292,
+    "neural_ler": 0.0026,
+    "neural_ci": [
+      0.002302906225218365,
+      0.002935308543523079
+    ],
+    "neural_errs_total": 260,
+    "total_shots": 100000,
+    "model_used": "d3",
+    "ci_non_overlap": false,
+    "verdict": "NEURAL_WINS"
+  },
+  "d3_p0.003": {
+    "d": 3,
+    "p": 0.003,
+    "seeds": [
+      {
+        "seed": 1000,
+        "n": 20000,
+        "pm_errs": 129,
+        "neural_errs": {
+          "d3": 110
+        },
+        "model_used": "d3"
+      },
+      {
+        "seed": 1001,
+        "n": 20000,
+        "pm_errs": 119,
+        "neural_errs": {
+          "d3": 110
+        },
+        "model_used": "d3"
+      },
+      {
+        "seed": 1002,
+        "n": 20000,
+        "pm_errs": 125,
+        "neural_errs": {
+          "d3": 121
+        },
+        "model_used": "d3"
+      },
+      {
+        "seed": 1003,
+        "n": 20000,
+        "pm_errs": 109,
+        "neural_errs": {
+          "d3": 100
+        },
+        "model_used": "d3"
+      },
+      {
+        "seed": 1004,
+        "n": 20000,
+        "pm_errs": 110,
+        "neural_errs": {
+          "d3": 103
+        },
+        "model_used": "d3"
+      }
+    ],
+    "pm_ler": 0.00592,
+    "pm_ci": [
+      0.005463135411892974,
+      0.006414824284407332
+    ],
+    "pm_errs_total": 592,
+    "neural_ler": 0.00544,
+    "neural_ci": [
+      0.005002709866422642,
+      0.005915286707820963
+    ],
+    "neural_errs_total": 544,
+    "total_shots": 100000,
+    "model_used": "d3",
+    "ci_non_overlap": false,
+    "verdict": "NEURAL_WINS"
+  },
+  "d3_p0.005": {
+    "d": 3,
+    "p": 0.005,
+    "seeds": [
+      {
+        "seed": 1000,
+        "n": 20000,
+        "pm_errs": 326,
+        "neural_errs": {
+          "d3": 296
+        },
+        "model_used": "d3"
+      },
+      {
+        "seed": 1001,
+        "n": 20000,
+        "pm_errs": 338,
+        "neural_errs": {
+          "d3": 321
+        },
+        "model_used": "d3"
+      },
+      {
+        "seed": 1002,
+        "n": 20000,
+        "pm_errs": 350,
+        "neural_errs": {
+          "d3": 331
+        },
+        "model_used": "d3"
+      },
+      {
+        "seed": 1003,
+        "n": 20000,
+        "pm_errs": 347,
+        "neural_errs": {
+          "d3": 309
+        },
+        "model_used": "d3"
+      },
+      {
+        "seed": 1004,
+        "n": 20000,
+        "pm_errs": 322,
+        "neural_errs": {
+          "d3": 301
+        },
+        "model_used": "d3"
+      }
+    ],
+    "pm_ler": 0.01683,
+    "pm_ci": [
+      0.01605107715779528,
+      0.017646044333585506
+    ],
+    "pm_errs_total": 1683,
+    "neural_ler": 0.01558,
+    "neural_ci": [
+      0.014830806725001604,
+      0.01636641080268985
+    ],
+    "neural_errs_total": 1558,
+    "total_shots": 100000,
+    "model_used": "d3",
+    "ci_non_overlap": false,
+    "verdict": "NEURAL_WINS"
+  },
+  "d3_p0.007": {
+    "d": 3,
+    "p": 0.007,
+    "seeds": [
+      {
+        "seed": 1000,
+        "n": 20000,
+        "pm_errs": 624,
+        "neural_errs": {
+          "d3": 573
+        },
+        "model_used": "d3"
+      },
+      {
+        "seed": 1001,
+        "n": 20000,
+        "pm_errs": 686,
+        "neural_errs": {
+          "d3": 655
+        },
+        "model_used": "d3"
+      },
+      {
+        "seed": 1002,
+        "n": 20000,
+        "pm_errs": 626,
+        "neural_errs": {
+          "d3": 594
+        },
+        "model_used": "d3"
+      },
+      {
+        "seed": 1003,
+        "n": 20000,
+        "pm_errs": 646,
+        "neural_errs": {
+          "d3": 587
+        },
+        "model_used": "d3"
+      },
+      {
+        "seed": 1004,
+        "n": 20000,
+        "pm_errs": 620,
+        "neural_errs": {
+          "d3": 567
+        },
+        "model_used": "d3"
+      }
+    ],
+    "pm_ler": 0.03202,
+    "pm_ci": [
+      0.030946661239535007,
+      0.033129293218598525
+    ],
+    "pm_errs_total": 3202,
+    "neural_ler": 0.02976,
+    "neural_ci": [
+      0.02872472628591583,
+      0.030831401805867395
+    ],
+    "neural_errs_total": 2976,
+    "total_shots": 100000,
+    "model_used": "d3",
+    "ci_non_overlap": true,
+    "verdict": "NEURAL_WINS"
+  },
+  "d3_p0.01": {
+    "d": 3,
+    "p": 0.01,
+    "seeds": [
+      {
+        "seed": 1000,
+        "n": 20000,
+        "pm_errs": 1193,
+        "neural_errs": {
+          "d3": 1152
+        },
+        "model_used": "d3"
+      },
+      {
+        "seed": 1001,
+        "n": 20000,
+        "pm_errs": 1188,
+        "neural_errs": {
+          "d3": 1123
+        },
+        "model_used": "d3"
+      },
+      {
+        "seed": 1002,
+        "n": 20000,
+        "pm_errs": 1222,
+        "neural_errs": {
+          "d3": 1151
+        },
+        "model_used": "d3"
+      },
+      {
+        "seed": 1003,
+        "n": 20000,
+        "pm_errs": 1165,
+        "neural_errs": {
+          "d3": 1140
+        },
+        "model_used": "d3"
+      },
+      {
+        "seed": 1004,
+        "n": 20000,
+        "pm_errs": 1167,
+        "neural_errs": {
+          "d3": 1128
+        },
+        "model_used": "d3"
+      }
+    ],
+    "pm_ler": 0.05935,
+    "pm_ci": [
+      0.05790238771702325,
+      0.06083146700321381
+    ],
+    "pm_errs_total": 5935,
+    "neural_ler": 0.05694,
+    "neural_ci": [
+      0.05552068205483606,
+      0.05839335782340797
+    ],
+    "neural_errs_total": 5694,
+    "total_shots": 100000,
+    "model_used": "d3",
+    "ci_non_overlap": false,
+    "verdict": "NEURAL_WINS"
+  },
+  "d3_p0.015": {
+    "d": 3,
+    "p": 0.015,
+    "seeds": [
+      {
+        "seed": 1000,
+        "n": 20000,
+        "pm_errs": 2257,
+        "neural_errs": {
+          "d3": 2188
+        },
+        "model_used": "d3"
+      },
+      {
+        "seed": 1001,
+        "n": 20000,
+        "pm_errs": 2319,
+        "neural_errs": {
+          "d3": 2273
+        },
+        "model_used": "d3"
+      },
+      {
+        "seed": 1002,
+        "n": 20000,
+        "pm_errs": 2321,
+        "neural_errs": {
+          "d3": 2183
+        },
+        "model_used": "d3"
+      },
+      {
+        "seed": 1003,
+        "n": 20000,
+        "pm_errs": 2279,
+        "neural_errs": {
+          "d3": 2171
+        },
+        "model_used": "d3"
+      },
+      {
+        "seed": 1004,
+        "n": 20000,
+        "pm_errs": 2336,
+        "neural_errs": {
+          "d3": 2236
+        },
+        "model_used": "d3"
+      }
+    ],
+    "pm_ler": 0.11512,
+    "pm_ci": [
+      0.1131565519948341,
+      0.11711301796936618
+    ],
+    "pm_errs_total": 11512,
+    "neural_ler": 0.11051,
+    "neural_ci": [
+      0.10858169752710152,
+      0.1124682266190125
+    ],
+    "neural_errs_total": 11051,
+    "total_shots": 100000,
+    "model_used": "d3",
+    "ci_non_overlap": true,
+    "verdict": "NEURAL_WINS"
+  },
+  "d5_p0.0005": {
+    "d": 5,
+    "p": 0.0005,
+    "seeds": [
+      {
+        "seed": 1000,
+        "n": 20000,
+        "pm_errs": 0,
+        "neural_errs": {
+          "d5": 0
+        },
+        "model_used": "d5"
+      },
+      {
+        "seed": 1001,
+        "n": 20000,
+        "pm_errs": 1,
+        "neural_errs": {
+          "d5": 0
+        },
+        "model_used": "d5"
+      },
+      {
+        "seed": 1002,
+        "n": 20000,
+        "pm_errs": 1,
+        "neural_errs": {
+          "d5": 1
+        },
+        "model_used": "d5"
+      },
+      {
+        "seed": 1003,
+        "n": 20000,
+        "pm_errs": 1,
+        "neural_errs": {
+          "d5": 0
+        },
+        "model_used": "d5"
+      },
+      {
+        "seed": 1004,
+        "n": 20000,
+        "pm_errs": 0,
+        "neural_errs": {
+          "d5": 0
+        },
+        "model_used": "d5"
+      }
+    ],
+    "pm_ler": 3e-05,
+    "pm_ci": [
+      1.0202573900776641e-05,
+      8.820964549540304e-05
+    ],
+    "pm_errs_total": 3,
+    "neural_ler": 1e-05,
+    "neural_ci": [
+      1.765202323777592e-06,
+      5.664855365337279e-05
+    ],
+    "neural_errs_total": 1,
+    "total_shots": 100000,
+    "model_used": "d5",
+    "ci_non_overlap": false,
+    "verdict": "NEURAL_WINS"
+  },
+  "d5_p0.001": {
+    "d": 5,
+    "p": 0.001,
+    "seeds": [
+      {
+        "seed": 1000,
+        "n": 20000,
+        "pm_errs": 3,
+        "neural_errs": {
+          "d5": 3
+        },
+        "model_used": "d5"
+      },
+      {
+        "seed": 1001,
+        "n": 20000,
+        "pm_errs": 4,
+        "neural_errs": {
+          "d5": 2
+        },
+        "model_used": "d5"
+      },
+      {
+        "seed": 1002,
+        "n": 20000,
+        "pm_errs": 5,
+        "neural_errs": {
+          "d5": 2
+        },
+        "model_used": "d5"
+      },
+      {
+        "seed": 1003,
+        "n": 20000,
+        "pm_errs": 3,
+        "neural_errs": {
+          "d5": 2
+        },
+        "model_used": "d5"
+      },
+      {
+        "seed": 1004,
+        "n": 20000,
+        "pm_errs": 0,
+        "neural_errs": {
+          "d5": 1
+        },
+        "model_used": "d5"
+      }
+    ],
+    "pm_ler": 0.00015,
+    "pm_ci": [
+      9.090710734703477e-05,
+      0.00024749589256332065
+    ],
+    "pm_errs_total": 15,
+    "neural_ler": 0.0001,
+    "neural_ci": [
+      5.432014358021984e-05,
+      0.0001840866977825624
+    ],
+    "neural_errs_total": 10,
+    "total_shots": 100000,
+    "model_used": "d5",
+    "ci_non_overlap": false,
+    "verdict": "NEURAL_WINS"
+  },
+  "d5_p0.002": {
+    "d": 5,
+    "p": 0.002,
+    "seeds": [
+      {
+        "seed": 1000,
+        "n": 20000,
+        "pm_errs": 19,
+        "neural_errs": {
+          "d5": 14
+        },
+        "model_used": "d5"
+      },
+      {
+        "seed": 1001,
+        "n": 20000,
+        "pm_errs": 27,
+        "neural_errs": {
+          "d5": 14
+        },
+        "model_used": "d5"
+      },
+      {
+        "seed": 1002,
+        "n": 20000,
+        "pm_errs": 25,
+        "neural_errs": {
+          "d5": 18
+        },
+        "model_used": "d5"
+      },
+      {
+        "seed": 1003,
+        "n": 20000,
+        "pm_errs": 28,
+        "neural_errs": {
+          "d5": 17
+        },
+        "model_used": "d5"
+      },
+      {
+        "seed": 1004,
+        "n": 20000,
+        "pm_errs": 27,
+        "neural_errs": {
+          "d5": 16
+        },
+        "model_used": "d5"
+      }
+    ],
+    "pm_ler": 0.00126,
+    "pm_ci": [
+      0.0010584591190345631,
+      0.0014998586006319183
+    ],
+    "pm_errs_total": 126,
+    "neural_ler": 0.00079,
+    "neural_ci": [
+      0.0006339877205787896,
+      0.0009843661087405036
+    ],
+    "neural_errs_total": 79,
+    "total_shots": 100000,
+    "model_used": "d5",
+    "ci_non_overlap": true,
+    "verdict": "NEURAL_WINS"
+  },
+  "d5_p0.003": {
+    "d": 5,
+    "p": 0.003,
+    "seeds": [
+      {
+        "seed": 1000,
+        "n": 20000,
+        "pm_errs": 69,
+        "neural_errs": {
+          "d5": 51
+        },
+        "model_used": "d5"
+      },
+      {
+        "seed": 1001,
+        "n": 20000,
+        "pm_errs": 64,
+        "neural_errs": {
+          "d5": 41
+        },
+        "model_used": "d5"
+      },
+      {
+        "seed": 1002,
+        "n": 20000,
+        "pm_errs": 61,
+        "neural_errs": {
+          "d5": 43
+        },
+        "model_used": "d5"
+      },
+      {
+        "seed": 1003,
+        "n": 20000,
+        "pm_errs": 78,
+        "neural_errs": {
+          "d5": 58
+        },
+        "model_used": "d5"
+      },
+      {
+        "seed": 1004,
+        "n": 20000,
+        "pm_errs": 62,
+        "neural_errs": {
+          "d5": 37
+        },
+        "model_used": "d5"
+      }
+    ],
+    "pm_ler": 0.00334,
+    "pm_ci": [
+      0.003000972855174126,
+      0.0037171850600714023
+    ],
+    "pm_errs_total": 334,
+    "neural_ler": 0.0023,
+    "neural_ci": [
+      0.002021602983686777,
+      0.0026166348337692278
+    ],
+    "neural_errs_total": 230,
+    "total_shots": 100000,
+    "model_used": "d5",
+    "ci_non_overlap": true,
+    "verdict": "NEURAL_WINS"
+  },
+  "d5_p0.005": {
+    "d": 5,
+    "p": 0.005,
+    "seeds": [
+      {
+        "seed": 1000,
+        "n": 20000,
+        "pm_errs": 310,
+        "neural_errs": {
+          "d5": 214
+        },
+        "model_used": "d5"
+      },
+      {
+        "seed": 1001,
+        "n": 20000,
+        "pm_errs": 288,
+        "neural_errs": {
+          "d5": 201
+        },
+        "model_used": "d5"
+      },
+      {
+        "seed": 1002,
+        "n": 20000,
+        "pm_errs": 298,
+        "neural_errs": {
+          "d5": 258
+        },
+        "model_used": "d5"
+      },
+      {
+        "seed": 1003,
+        "n": 20000,
+        "pm_errs": 281,
+        "neural_errs": {
+          "d5": 212
+        },
+        "model_used": "d5"
+      },
+      {
+        "seed": 1004,
+        "n": 20000,
+        "pm_errs": 294,
+        "neural_errs": {
+          "d5": 221
+        },
+        "model_used": "d5"
+      }
+    ],
+    "pm_ler": 0.01471,
+    "pm_ci": [
+      0.01398224223086542,
+      0.015475042138098263
+    ],
+    "pm_errs_total": 1471,
+    "neural_ler": 0.01106,
+    "neural_ci": [
+      0.010430308485949993,
+      0.011727256309040842
+    ],
+    "neural_errs_total": 1106,
+    "total_shots": 100000,
+    "model_used": "d5",
+    "ci_non_overlap": true,
+    "verdict": "NEURAL_WINS"
+  },
+  "d5_p0.007": {
+    "d": 5,
+    "p": 0.007,
+    "seeds": [
+      {
+        "seed": 1000,
+        "n": 20000,
+        "pm_errs": 773,
+        "neural_errs": {
+          "d5": 642
+        },
+        "model_used": "d5"
+      },
+      {
+        "seed": 1001,
+        "n": 20000,
+        "pm_errs": 729,
+        "neural_errs": {
+          "d5": 618
+        },
+        "model_used": "d5"
+      },
+      {
+        "seed": 1002,
+        "n": 20000,
+        "pm_errs": 679,
+        "neural_errs": {
+          "d5": 572
+        },
+        "model_used": "d5"
+      },
+      {
+        "seed": 1003,
+        "n": 20000,
+        "pm_errs": 679,
+        "neural_errs": {
+          "d5": 567
+        },
+        "model_used": "d5"
+      },
+      {
+        "seed": 1004,
+        "n": 20000,
+        "pm_errs": 684,
+        "neural_errs": {
+          "d5": 576
+        },
+        "model_used": "d5"
+      }
+    ],
+    "pm_ler": 0.03544,
+    "pm_ci": [
+      0.03431177394360186,
+      0.03660391775918568
+    ],
+    "pm_errs_total": 3544,
+    "neural_ler": 0.02975,
+    "neural_ci": [
+      0.028714898172644367,
+      0.03082123068742934
+    ],
+    "neural_errs_total": 2975,
+    "total_shots": 100000,
+    "model_used": "d5",
+    "ci_non_overlap": true,
+    "verdict": "NEURAL_WINS"
+  },
+  "d5_p0.01": {
+    "d": 5,
+    "p": 0.01,
+    "seeds": [
+      {
+        "seed": 1000,
+        "n": 20000,
+        "pm_errs": 1659,
+        "neural_errs": {
+          "d5": 1647
+        },
+        "model_used": "d5"
+      },
+      {
+        "seed": 1001,
+        "n": 20000,
+        "pm_errs": 1646,
+        "neural_errs": {
+          "d5": 1534
+        },
+        "model_used": "d5"
+      },
+      {
+        "seed": 1002,
+        "n": 20000,
+        "pm_errs": 1639,
+        "neural_errs": {
+          "d5": 1631
+        },
+        "model_used": "d5"
+      },
+      {
+        "seed": 1003,
+        "n": 20000,
+        "pm_errs": 1667,
+        "neural_errs": {
+          "d5": 1556
+        },
+        "model_used": "d5"
+      },
+      {
+        "seed": 1004,
+        "n": 20000,
+        "pm_errs": 1726,
+        "neural_errs": {
+          "d5": 1627
+        },
+        "model_used": "d5"
+      }
+    ],
+    "pm_ler": 0.08337,
+    "pm_ci": [
+      0.08167256579108616,
+      0.08509944349540512
+    ],
+    "pm_errs_total": 8337,
+    "neural_ler": 0.07995,
+    "neural_ci": [
+      0.07828507806498328,
+      0.08164719397685397
+    ],
+    "neural_errs_total": 7995,
+    "total_shots": 100000,
+    "model_used": "d5",
+    "ci_non_overlap": true,
+    "verdict": "NEURAL_WINS"
+  },
+  "d5_p0.015": {
+    "d": 5,
+    "p": 0.015,
+    "seeds": [
+      {
+        "seed": 1000,
+        "n": 20000,
+        "pm_errs": 3843,
+        "neural_errs": {
+          "d5": 3993
+        },
+        "model_used": "d5"
+      },
+      {
+        "seed": 1001,
+        "n": 20000,
+        "pm_errs": 3941,
+        "neural_errs": {
+          "d5": 3934
+        },
+        "model_used": "d5"
+      },
+      {
+        "seed": 1002,
+        "n": 20000,
+        "pm_errs": 3988,
+        "neural_errs": {
+          "d5": 4015
+        },
+        "model_used": "d5"
+      },
+      {
+        "seed": 1003,
+        "n": 20000,
+        "pm_errs": 3824,
+        "neural_errs": {
+          "d5": 3918
+        },
+        "model_used": "d5"
+      },
+      {
+        "seed": 1004,
+        "n": 20000,
+        "pm_errs": 3937,
+        "neural_errs": {
+          "d5": 4052
+        },
+        "model_used": "d5"
+      }
+    ],
+    "pm_ler": 0.19533,
+    "pm_ci": [
+      0.1928844724686866,
+      0.19779893503753063
+    ],
+    "pm_errs_total": 19533,
+    "neural_ler": 0.19912,
+    "neural_ci": [
+      0.19665645314269153,
+      0.20160666318143172
+    ],
+    "neural_errs_total": 19912,
+    "total_shots": 100000,
+    "model_used": "d5",
+    "ci_non_overlap": false,
+    "verdict": "PM_WINS"
+  },
+  "d7_p0.0005": {
+    "d": 7,
+    "p": 0.0005,
+    "seeds": [
+      {
+        "seed": 1000,
+        "n": 20000,
+        "pm_errs": 0,
+        "neural_errs": {
+          "d7_final": 0
+        },
+        "model_used": "d7_final"
+      },
+      {
+        "seed": 1001,
+        "n": 20000,
+        "pm_errs": 0,
+        "neural_errs": {
+          "d7_final": 0
+        },
+        "model_used": "d7_final"
+      },
+      {
+        "seed": 1002,
+        "n": 20000,
+        "pm_errs": 0,
+        "neural_errs": {
+          "d7_final": 0
+        },
+        "model_used": "d7_final"
+      },
+      {
+        "seed": 1003,
+        "n": 20000,
+        "pm_errs": 0,
+        "neural_errs": {
+          "d7_final": 0
+        },
+        "model_used": "d7_final"
+      },
+      {
+        "seed": 1004,
+        "n": 20000,
+        "pm_errs": 0,
+        "neural_errs": {
+          "d7_final": 0
+        },
+        "model_used": "d7_final"
+      }
+    ],
+    "pm_ler": 0.0,
+    "pm_ci": [
+      0,
+      3.8414524267635735e-05
+    ],
+    "pm_errs_total": 0,
+    "neural_ler": 0.0,
+    "neural_ci": [
+      0,
+      3.8414524267635735e-05
+    ],
+    "neural_errs_total": 0,
+    "total_shots": 100000,
+    "model_used": "d7_final",
+    "ci_non_overlap": false,
+    "verdict": "TIE"
+  },
+  "d7_p0.001": {
+    "d": 7,
+    "p": 0.001,
+    "seeds": [
+      {
+        "seed": 1000,
+        "n": 20000,
+        "pm_errs": 0,
+        "neural_errs": {
+          "d7_final": 0
+        },
+        "model_used": "d7_final"
+      },
+      {
+        "seed": 1001,
+        "n": 20000,
+        "pm_errs": 0,
+        "neural_errs": {
+          "d7_final": 0
+        },
+        "model_used": "d7_final"
+      },
+      {
+        "seed": 1002,
+        "n": 20000,
+        "pm_errs": 0,
+        "neural_errs": {
+          "d7_final": 0
+        },
+        "model_used": "d7_final"
+      },
+      {
+        "seed": 1003,
+        "n": 20000,
+        "pm_errs": 0,
+        "neural_errs": {
+          "d7_final": 1
+        },
+        "model_used": "d7_final"
+      },
+      {
+        "seed": 1004,
+        "n": 20000,
+        "pm_errs": 0,
+        "neural_errs": {
+          "d7_final": 0
+        },
+        "model_used": "d7_final"
+      }
+    ],
+    "pm_ler": 0.0,
+    "pm_ci": [
+      0,
+      3.8414524267635735e-05
+    ],
+    "pm_errs_total": 0,
+    "neural_ler": 1e-05,
+    "neural_ci": [
+      1.765202323777592e-06,
+      5.664855365337279e-05
+    ],
+    "neural_errs_total": 1,
+    "total_shots": 100000,
+    "model_used": "d7_final",
+    "ci_non_overlap": false,
+    "verdict": "PM_WINS"
+  },
+  "d7_p0.002": {
+    "d": 7,
+    "p": 0.002,
+    "seeds": [
+      {
+        "seed": 1000,
+        "n": 20000,
+        "pm_errs": 9,
+        "neural_errs": {
+          "d7_final": 3
+        },
+        "model_used": "d7_final"
+      },
+      {
+        "seed": 1001,
+        "n": 20000,
+        "pm_errs": 3,
+        "neural_errs": {
+          "d7_final": 1
+        },
+        "model_used": "d7_final"
+      },
+      {
+        "seed": 1002,
+        "n": 20000,
+        "pm_errs": 4,
+        "neural_errs": {
+          "d7_final": 3
+        },
+        "model_used": "d7_final"
+      },
+      {
+        "seed": 1003,
+        "n": 20000,
+        "pm_errs": 4,
+        "neural_errs": {
+          "d7_final": 5
+        },
+        "model_used": "d7_final"
+      },
+      {
+        "seed": 1004,
+        "n": 20000,
+        "pm_errs": 8,
+        "neural_errs": {
+          "d7_final": 4
+        },
+        "model_used": "d7_final"
+      }
+    ],
+    "pm_ler": 0.00028,
+    "pm_ci": [
+      0.00019373769447967064,
+      0.0004046553176543752
+    ],
+    "pm_errs_total": 28,
+    "neural_ler": 0.00016,
+    "neural_ci": [
+      9.849161624918321e-05,
+      0.0002599106153706869
+    ],
+    "neural_errs_total": 16,
+    "total_shots": 100000,
+    "model_used": "d7_final",
+    "ci_non_overlap": false,
+    "verdict": "NEURAL_WINS"
+  },
+  "d7_p0.003": {
+    "d": 7,
+    "p": 0.003,
+    "seeds": [
+      {
+        "seed": 1000,
+        "n": 20000,
+        "pm_errs": 34,
+        "neural_errs": {
+          "d7_final": 31
+        },
+        "model_used": "d7_final"
+      },
+      {
+        "seed": 1001,
+        "n": 20000,
+        "pm_errs": 25,
+        "neural_errs": {
+          "d7_final": 16
+        },
+        "model_used": "d7_final"
+      },
+      {
+        "seed": 1002,
+        "n": 20000,
+        "pm_errs": 27,
+        "neural_errs": {
+          "d7_final": 21
+        },
+        "model_used": "d7_final"
+      },
+      {
+        "seed": 1003,
+        "n": 20000,
+        "pm_errs": 31,
+        "neural_errs": {
+          "d7_final": 25
+        },
+        "model_used": "d7_final"
+      },
+      {
+        "seed": 1004,
+        "n": 20000,
+        "pm_errs": 23,
+        "neural_errs": {
+          "d7_final": 23
+        },
+        "model_used": "d7_final"
+      }
+    ],
+    "pm_ler": 0.0014,
+    "pm_ci": [
+      0.0011866198339718732,
+      0.001651687129627813
+    ],
+    "pm_errs_total": 140,
+    "neural_ler": 0.00116,
+    "neural_ci": [
+      0.0009673222738711472,
+      0.0013910031287001877
+    ],
+    "neural_errs_total": 116,
+    "total_shots": 100000,
+    "model_used": "d7_final",
+    "ci_non_overlap": false,
+    "verdict": "NEURAL_WINS"
+  },
+  "d7_p0.005": {
+    "d": 7,
+    "p": 0.005,
+    "seeds": [
+      {
+        "seed": 1000,
+        "n": 20000,
+        "pm_errs": 206,
+        "neural_errs": {
+          "d7_final": 191
+        },
+        "model_used": "d7_final"
+      },
+      {
+        "seed": 1001,
+        "n": 20000,
+        "pm_errs": 207,
+        "neural_errs": {
+          "d7_final": 199
+        },
+        "model_used": "d7_final"
+      },
+      {
+        "seed": 1002,
+        "n": 20000,
+        "pm_errs": 174,
+        "neural_errs": {
+          "d7_final": 186
+        },
+        "model_used": "d7_final"
+      },
+      {
+        "seed": 1003,
+        "n": 20000,
+        "pm_errs": 182,
+        "neural_errs": {
+          "d7_final": 197
+        },
+        "model_used": "d7_final"
+      },
+      {
+        "seed": 1004,
+        "n": 20000,
+        "pm_errs": 189,
+        "neural_errs": {
+          "d7_final": 186
+        },
+        "model_used": "d7_final"
+      }
+    ],
+    "pm_ler": 0.00958,
+    "pm_ci": [
+      0.00899481895901691,
+      0.010202859542965757
+    ],
+    "pm_errs_total": 958,
+    "neural_ler": 0.00959,
+    "neural_ci": [
+      0.009004506772860198,
+      0.010213170960831984
+    ],
+    "neural_errs_total": 959,
+    "total_shots": 100000,
+    "model_used": "d7_final",
+    "ci_non_overlap": false,
+    "verdict": "PM_WINS"
+  },
+  "d7_p0.007": {
+    "d": 7,
+    "p": 0.007,
+    "seeds": [
+      {
+        "seed": 1000,
+        "n": 20000,
+        "pm_errs": 643,
+        "neural_errs": {
+          "d7_final": 785
+        },
+        "model_used": "d7_final"
+      },
+      {
+        "seed": 1001,
+        "n": 20000,
+        "pm_errs": 697,
+        "neural_errs": {
+          "d7_final": 803
+        },
+        "model_used": "d7_final"
+      },
+      {
+        "seed": 1002,
+        "n": 20000,
+        "pm_errs": 671,
+        "neural_errs": {
+          "d7_final": 854
+        },
+        "model_used": "d7_final"
+      },
+      {
+        "seed": 1003,
+        "n": 20000,
+        "pm_errs": 687,
+        "neural_errs": {
+          "d7_final": 816
+        },
+        "model_used": "d7_final"
+      },
+      {
+        "seed": 1004,
+        "n": 20000,
+        "pm_errs": 653,
+        "neural_errs": {
+          "d7_final": 795
+        },
+        "model_used": "d7_final"
+      }
+    ],
+    "pm_ler": 0.03351,
+    "pm_ci": [
+      0.032412368382189576,
+      0.034643471600661634
+    ],
+    "pm_errs_total": 3351,
+    "neural_ler": 0.04053,
+    "neural_ci": [
+      0.03932529628227772,
+      0.04177000436065278
+    ],
+    "neural_errs_total": 4053,
+    "total_shots": 100000,
+    "model_used": "d7_final",
+    "ci_non_overlap": true,
+    "verdict": "PM_WINS"
+  },
+  "d7_p0.01": {
+    "d": 7,
+    "p": 0.01,
+    "seeds": [
+      {
+        "seed": 1000,
+        "n": 20000,
+        "pm_errs": 2081,
+        "neural_errs": {
+          "d7_p01": 2165
+        },
+        "model_used": "d7_p01"
+      },
+      {
+        "seed": 1001,
+        "n": 20000,
+        "pm_errs": 2050,
+        "neural_errs": {
+          "d7_p01": 2173
+        },
+        "model_used": "d7_p01"
+      },
+      {
+        "seed": 1002,
+        "n": 20000,
+        "pm_errs": 2092,
+        "neural_errs": {
+          "d7_p01": 2239
+        },
+        "model_used": "d7_p01"
+      },
+      {
+        "seed": 1003,
+        "n": 20000,
+        "pm_errs": 2061,
+        "neural_errs": {
+          "d7_p01": 2232
+        },
+        "model_used": "d7_p01"
+      },
+      {
+        "seed": 1004,
+        "n": 20000,
+        "pm_errs": 1978,
+        "neural_errs": {
+          "d7_p01": 2121
+        },
+        "model_used": "d7_p01"
+      }
+    ],
+    "pm_ler": 0.10262,
+    "pm_ci": [
+      0.10075436289093617,
+      0.1045161674363708
+    ],
+    "pm_errs_total": 10262,
+    "neural_ler": 0.1093,
+    "neural_ci": [
+      0.10738109696690389,
+      0.11124892014235886
+    ],
+    "neural_errs_total": 10930,
+    "total_shots": 100000,
+    "model_used": "d7_p01",
+    "ci_non_overlap": true,
+    "verdict": "PM_WINS"
+  },
+  "d7_p0.015": {
+    "d": 7,
+    "p": 0.015,
+    "seeds": [
+      {
+        "seed": 1000,
+        "n": 20000,
+        "pm_errs": 5590,
+        "neural_errs": {
+          "d7_p015": 5288
+        },
+        "model_used": "d7_p015"
+      },
+      {
+        "seed": 1001,
+        "n": 20000,
+        "pm_errs": 5473,
+        "neural_errs": {
+          "d7_p015": 5372
+        },
+        "model_used": "d7_p015"
+      },
+      {
+        "seed": 1002,
+        "n": 20000,
+        "pm_errs": 5389,
+        "neural_errs": {
+          "d7_p015": 5215
+        },
+        "model_used": "d7_p015"
+      },
+      {
+        "seed": 1003,
+        "n": 20000,
+        "pm_errs": 5410,
+        "neural_errs": {
+          "d7_p015": 5333
+        },
+        "model_used": "d7_p015"
+      },
+      {
+        "seed": 1004,
+        "n": 20000,
+        "pm_errs": 5397,
+        "neural_errs": {
+          "d7_p015": 5291
+        },
+        "model_used": "d7_p015"
+      }
+    ],
+    "pm_ler": 0.27259,
+    "pm_ci": [
+      0.26983882852534663,
+      0.2753586431685808
+    ],
+    "pm_errs_total": 27259,
+    "neural_ler": 0.26499,
+    "neural_ci": [
+      0.262263686883815,
+      0.26773436871088124
+    ],
+    "neural_errs_total": 26499,
+    "total_shots": 100000,
+    "model_used": "d7_p015",
+    "ci_non_overlap": true,
+    "verdict": "NEURAL_WINS"
+  }
+}

@@ -1,0 +1,200 @@
+Loading models...
+  d3: OK  (distance=3, H=256)
+  d5: OK  (distance=5, H=256)
+  d7_final: OK  (distance=7, H=256)
+  d7_p01: OK  (distance=7, H=256)
+  d7_p015: OK  (distance=7, H=256)
+
+d=3 p=0.0005: running 5 seeds x 20000 shots = 100,000 total
+  seed=1000: pm_errs=3, neural_errs={'d3': 2} (model=d3)
+  seed=1001: pm_errs=11, neural_errs={'d3': 8} (model=d3)
+  seed=1002: pm_errs=4, neural_errs={'d3': 4} (model=d3)
+  seed=1003: pm_errs=3, neural_errs={'d3': 2} (model=d3)
+  seed=1004: pm_errs=7, neural_errs={'d3': 5} (model=d3)
+  SUMMARY: Pathfinder 0.0210% [0.0137,0.0321]  PM 0.0280% [0.0194,0.0405]  sig=False  NEURAL_WINS
+
+d=3 p=0.001: running 5 seeds x 20000 shots = 100,000 total
+  seed=1000: pm_errs=12, neural_errs={'d3': 11} (model=d3)
+  seed=1001: pm_errs=22, neural_errs={'d3': 19} (model=d3)
+  seed=1002: pm_errs=16, neural_errs={'d3': 13} (model=d3)
+  seed=1003: pm_errs=18, neural_errs={'d3': 17} (model=d3)
+  seed=1004: pm_errs=7, neural_errs={'d3': 6} (model=d3)
+  SUMMARY: Pathfinder 0.0660% [0.0519,0.0840]  PM 0.0750% [0.0598,0.0940]  sig=False  NEURAL_WINS
+
+d=3 p=0.002: running 5 seeds x 20000 shots = 100,000 total
+  seed=1000: pm_errs=60, neural_errs={'d3': 46} (model=d3)
+  seed=1001: pm_errs=57, neural_errs={'d3': 58} (model=d3)
+  seed=1002: pm_errs=55, neural_errs={'d3': 46} (model=d3)
+  seed=1003: pm_errs=60, neural_errs={'d3': 56} (model=d3)
+  seed=1004: pm_errs=60, neural_errs={'d3': 54} (model=d3)
+  SUMMARY: Pathfinder 0.2600% [0.2303,0.2935]  PM 0.2920% [0.2604,0.3274]  sig=False  NEURAL_WINS
+
+d=3 p=0.003: running 5 seeds x 20000 shots = 100,000 total
+  seed=1000: pm_errs=129, neural_errs={'d3': 110} (model=d3)
+  seed=1001: pm_errs=119, neural_errs={'d3': 110} (model=d3)
+  seed=1002: pm_errs=125, neural_errs={'d3': 121} (model=d3)
+  seed=1003: pm_errs=109, neural_errs={'d3': 100} (model=d3)
+  seed=1004: pm_errs=110, neural_errs={'d3': 103} (model=d3)
+  SUMMARY: Pathfinder 0.5440% [0.5003,0.5915]  PM 0.5920% [0.5463,0.6415]  sig=False  NEURAL_WINS
+
+d=3 p=0.005: running 5 seeds x 20000 shots = 100,000 total
+  seed=1000: pm_errs=326, neural_errs={'d3': 296} (model=d3)
+  seed=1001: pm_errs=338, neural_errs={'d3': 321} (model=d3)
+  seed=1002: pm_errs=350, neural_errs={'d3': 331} (model=d3)
+  seed=1003: pm_errs=347, neural_errs={'d3': 309} (model=d3)
+  seed=1004: pm_errs=322, neural_errs={'d3': 301} (model=d3)
+  SUMMARY: Pathfinder 1.5580% [1.4831,1.6366]  PM 1.6830% [1.6051,1.7646]  sig=False  NEURAL_WINS
+
+d=3 p=0.007: running 5 seeds x 20000 shots = 100,000 total
+  seed=1000: pm_errs=624, neural_errs={'d3': 573} (model=d3)
+  seed=1001: pm_errs=686, neural_errs={'d3': 655} (model=d3)
+  seed=1002: pm_errs=626, neural_errs={'d3': 594} (model=d3)
+  seed=1003: pm_errs=646, neural_errs={'d3': 587} (model=d3)
+  seed=1004: pm_errs=620, neural_errs={'d3': 567} (model=d3)
+  SUMMARY: Pathfinder 2.9760% [2.8725,3.0831]  PM 3.2020% [3.0947,3.3129]  sig=True  NEURAL_WINS
+
+d=3 p=0.01: running 5 seeds x 20000 shots = 100,000 total
+  seed=1000: pm_errs=1193, neural_errs={'d3': 1152} (model=d3)
+  seed=1001: pm_errs=1188, neural_errs={'d3': 1123} (model=d3)
+  seed=1002: pm_errs=1222, neural_errs={'d3': 1151} (model=d3)
+  seed=1003: pm_errs=1165, neural_errs={'d3': 1140} (model=d3)
+  seed=1004: pm_errs=1167, neural_errs={'d3': 1128} (model=d3)
+  SUMMARY: Pathfinder 5.6940% [5.5521,5.8393]  PM 5.9350% [5.7902,6.0831]  sig=False  NEURAL_WINS
+
+d=3 p=0.015: running 5 seeds x 20000 shots = 100,000 total
+  seed=1000: pm_errs=2257, neural_errs={'d3': 2188} (model=d3)
+  seed=1001: pm_errs=2319, neural_errs={'d3': 2273} (model=d3)
+  seed=1002: pm_errs=2321, neural_errs={'d3': 2183} (model=d3)
+  seed=1003: pm_errs=2279, neural_errs={'d3': 2171} (model=d3)
+  seed=1004: pm_errs=2336, neural_errs={'d3': 2236} (model=d3)
+  SUMMARY: Pathfinder 11.0510% [10.8582,11.2468]  PM 11.5120% [11.3157,11.7113]  sig=True  NEURAL_WINS
+
+d=5 p=0.0005: running 5 seeds x 20000 shots = 100,000 total
+  seed=1000: pm_errs=0, neural_errs={'d5': 0} (model=d5)
+  seed=1001: pm_errs=1, neural_errs={'d5': 0} (model=d5)
+  seed=1002: pm_errs=1, neural_errs={'d5': 1} (model=d5)
+  seed=1003: pm_errs=1, neural_errs={'d5': 0} (model=d5)
+  seed=1004: pm_errs=0, neural_errs={'d5': 0} (model=d5)
+  SUMMARY: Pathfinder 0.0010% [0.0002,0.0057]  PM 0.0030% [0.0010,0.0088]  sig=False  NEURAL_WINS
+
+d=5 p=0.001: running 5 seeds x 20000 shots = 100,000 total
+  seed=1000: pm_errs=3, neural_errs={'d5': 3} (model=d5)
+  seed=1001: pm_errs=4, neural_errs={'d5': 2} (model=d5)
+  seed=1002: pm_errs=5, neural_errs={'d5': 2} (model=d5)
+  seed=1003: pm_errs=3, neural_errs={'d5': 2} (model=d5)
+  seed=1004: pm_errs=0, neural_errs={'d5': 1} (model=d5)
+  SUMMARY: Pathfinder 0.0100% [0.0054,0.0184]  PM 0.0150% [0.0091,0.0247]  sig=False  NEURAL_WINS
+
+d=5 p=0.002: running 5 seeds x 20000 shots = 100,000 total
+  seed=1000: pm_errs=19, neural_errs={'d5': 14} (model=d5)
+  seed=1001: pm_errs=27, neural_errs={'d5': 14} (model=d5)
+  seed=1002: pm_errs=25, neural_errs={'d5': 18} (model=d5)
+  seed=1003: pm_errs=28, neural_errs={'d5': 17} (model=d5)
+  seed=1004: pm_errs=27, neural_errs={'d5': 16} (model=d5)
+  SUMMARY: Pathfinder 0.0790% [0.0634,0.0984]  PM 0.1260% [0.1058,0.1500]  sig=True  NEURAL_WINS
+
+d=5 p=0.003: running 5 seeds x 20000 shots = 100,000 total
+  seed=1000: pm_errs=69, neural_errs={'d5': 51} (model=d5)
+  seed=1001: pm_errs=64, neural_errs={'d5': 41} (model=d5)
+  seed=1002: pm_errs=61, neural_errs={'d5': 43} (model=d5)
+  seed=1003: pm_errs=78, neural_errs={'d5': 58} (model=d5)
+  seed=1004: pm_errs=62, neural_errs={'d5': 37} (model=d5)
+  SUMMARY: Pathfinder 0.2300% [0.2022,0.2617]  PM 0.3340% [0.3001,0.3717]  sig=True  NEURAL_WINS
+
+d=5 p=0.005: running 5 seeds x 20000 shots = 100,000 total
+  seed=1000: pm_errs=310, neural_errs={'d5': 214} (model=d5)
+  seed=1001: pm_errs=288, neural_errs={'d5': 201} (model=d5)
+  seed=1002: pm_errs=298, neural_errs={'d5': 258} (model=d5)
+  seed=1003: pm_errs=281, neural_errs={'d5': 212} (model=d5)
+  seed=1004: pm_errs=294, neural_errs={'d5': 221} (model=d5)
+  SUMMARY: Pathfinder 1.1060% [1.0430,1.1727]  PM 1.4710% [1.3982,1.5475]  sig=True  NEURAL_WINS
+
+d=5 p=0.007: running 5 seeds x 20000 shots = 100,000 total
+  seed=1000: pm_errs=773, neural_errs={'d5': 642} (model=d5)
+  seed=1001: pm_errs=729, neural_errs={'d5': 618} (model=d5)
+  seed=1002: pm_errs=679, neural_errs={'d5': 572} (model=d5)
+  seed=1003: pm_errs=679, neural_errs={'d5': 567} (model=d5)
+  seed=1004: pm_errs=684, neural_errs={'d5': 576} (model=d5)
+  SUMMARY: Pathfinder 2.9750% [2.8715,3.0821]  PM 3.5440% [3.4312,3.6604]  sig=True  NEURAL_WINS
+
+d=5 p=0.01: running 5 seeds x 20000 shots = 100,000 total
+  seed=1000: pm_errs=1659, neural_errs={'d5': 1647} (model=d5)
+  seed=1001: pm_errs=1646, neural_errs={'d5': 1534} (model=d5)
+  seed=1002: pm_errs=1639, neural_errs={'d5': 1631} (model=d5)
+  seed=1003: pm_errs=1667, neural_errs={'d5': 1556} (model=d5)
+  seed=1004: pm_errs=1726, neural_errs={'d5': 1627} (model=d5)
+  SUMMARY: Pathfinder 7.9950% [7.8285,8.1647]  PM 8.3370% [8.1673,8.5099]  sig=True  NEURAL_WINS
+
+d=5 p=0.015: running 5 seeds x 20000 shots = 100,000 total
+  seed=1000: pm_errs=3843, neural_errs={'d5': 3993} (model=d5)
+  seed=1001: pm_errs=3941, neural_errs={'d5': 3934} (model=d5)
+  seed=1002: pm_errs=3988, neural_errs={'d5': 4015} (model=d5)
+  seed=1003: pm_errs=3824, neural_errs={'d5': 3918} (model=d5)
+  seed=1004: pm_errs=3937, neural_errs={'d5': 4052} (model=d5)
+  SUMMARY: Pathfinder 19.9120% [19.6656,20.1607]  PM 19.5330% [19.2884,19.7799]  sig=False  PM_WINS
+
+d=7 p=0.0005: running 5 seeds x 20000 shots = 100,000 total
+  seed=1000: pm_errs=0, neural_errs={'d7_final': 0} (model=d7_final)
+  seed=1001: pm_errs=0, neural_errs={'d7_final': 0} (model=d7_final)
+  seed=1002: pm_errs=0, neural_errs={'d7_final': 0} (model=d7_final)
+  seed=1003: pm_errs=0, neural_errs={'d7_final': 0} (model=d7_final)
+  seed=1004: pm_errs=0, neural_errs={'d7_final': 0} (model=d7_final)
+  SUMMARY: Pathfinder 0.0000% [0.0000,0.0038]  PM 0.0000% [0.0000,0.0038]  sig=False  TIE
+
+d=7 p=0.001: running 5 seeds x 20000 shots = 100,000 total
+  seed=1000: pm_errs=0, neural_errs={'d7_final': 0} (model=d7_final)
+  seed=1001: pm_errs=0, neural_errs={'d7_final': 0} (model=d7_final)
+  seed=1002: pm_errs=0, neural_errs={'d7_final': 0} (model=d7_final)
+  seed=1003: pm_errs=0, neural_errs={'d7_final': 1} (model=d7_final)
+  seed=1004: pm_errs=0, neural_errs={'d7_final': 0} (model=d7_final)
+  SUMMARY: Pathfinder 0.0010% [0.0002,0.0057]  PM 0.0000% [0.0000,0.0038]  sig=False  PM_WINS
+
+d=7 p=0.002: running 5 seeds x 20000 shots = 100,000 total
+  seed=1000: pm_errs=9, neural_errs={'d7_final': 3} (model=d7_final)
+  seed=1001: pm_errs=3, neural_errs={'d7_final': 1} (model=d7_final)
+  seed=1002: pm_errs=4, neural_errs={'d7_final': 3} (model=d7_final)
+  seed=1003: pm_errs=4, neural_errs={'d7_final': 5} (model=d7_final)
+  seed=1004: pm_errs=8, neural_errs={'d7_final': 4} (model=d7_final)
+  SUMMARY: Pathfinder 0.0160% [0.0098,0.0260]  PM 0.0280% [0.0194,0.0405]  sig=False  NEURAL_WINS
+
+d=7 p=0.003: running 5 seeds x 20000 shots = 100,000 total
+  seed=1000: pm_errs=34, neural_errs={'d7_final': 31} (model=d7_final)
+  seed=1001: pm_errs=25, neural_errs={'d7_final': 16} (model=d7_final)
+  seed=1002: pm_errs=27, neural_errs={'d7_final': 21} (model=d7_final)
+  seed=1003: pm_errs=31, neural_errs={'d7_final': 25} (model=d7_final)
+  seed=1004: pm_errs=23, neural_errs={'d7_final': 23} (model=d7_final)
+  SUMMARY: Pathfinder 0.1160% [0.0967,0.1391]  PM 0.1400% [0.1187,0.1652]  sig=False  NEURAL_WINS
+
+d=7 p=0.005: running 5 seeds x 20000 shots = 100,000 total
+  seed=1000: pm_errs=206, neural_errs={'d7_final': 191} (model=d7_final)
+  seed=1001: pm_errs=207, neural_errs={'d7_final': 199} (model=d7_final)
+  seed=1002: pm_errs=174, neural_errs={'d7_final': 186} (model=d7_final)
+  seed=1003: pm_errs=182, neural_errs={'d7_final': 197} (model=d7_final)
+  seed=1004: pm_errs=189, neural_errs={'d7_final': 186} (model=d7_final)
+  SUMMARY: Pathfinder 0.9590% [0.9005,1.0213]  PM 0.9580% [0.8995,1.0203]  sig=False  PM_WINS
+
+d=7 p=0.007: running 5 seeds x 20000 shots = 100,000 total
+  seed=1000: pm_errs=643, neural_errs={'d7_final': 785} (model=d7_final)
+  seed=1001: pm_errs=697, neural_errs={'d7_final': 803} (model=d7_final)
+  seed=1002: pm_errs=671, neural_errs={'d7_final': 854} (model=d7_final)
+  seed=1003: pm_errs=687, neural_errs={'d7_final': 816} (model=d7_final)
+  seed=1004: pm_errs=653, neural_errs={'d7_final': 795} (model=d7_final)
+  SUMMARY: Pathfinder 4.0530% [3.9325,4.1770]  PM 3.3510% [3.2412,3.4643]  sig=True  PM_WINS
+
+d=7 p=0.01: running 5 seeds x 20000 shots = 100,000 total
+  seed=1000: pm_errs=2081, neural_errs={'d7_p01': 2165} (model=d7_p01)
+  seed=1001: pm_errs=2050, neural_errs={'d7_p01': 2173} (model=d7_p01)
+  seed=1002: pm_errs=2092, neural_errs={'d7_p01': 2239} (model=d7_p01)
+  seed=1003: pm_errs=2061, neural_errs={'d7_p01': 2232} (model=d7_p01)
+  seed=1004: pm_errs=1978, neural_errs={'d7_p01': 2121} (model=d7_p01)
+  SUMMARY: Pathfinder 10.9300% [10.7381,11.1249]  PM 10.2620% [10.0754,10.4516]  sig=True  PM_WINS
+
+d=7 p=0.015: running 5 seeds x 20000 shots = 100,000 total
+  seed=1000: pm_errs=5590, neural_errs={'d7_p015': 5288} (model=d7_p015)
+  seed=1001: pm_errs=5473, neural_errs={'d7_p015': 5372} (model=d7_p015)
+  seed=1002: pm_errs=5389, neural_errs={'d7_p015': 5215} (model=d7_p015)
+  seed=1003: pm_errs=5410, neural_errs={'d7_p015': 5333} (model=d7_p015)
+  seed=1004: pm_errs=5397, neural_errs={'d7_p015': 5291} (model=d7_p015)
+  SUMMARY: Pathfinder 26.4990% [26.2264,26.7734]  PM 27.2590% [26.9839,27.5359]  sig=True  NEURAL_WINS
+
+=== wrote /workspace/run_eval_v2_results.json ===

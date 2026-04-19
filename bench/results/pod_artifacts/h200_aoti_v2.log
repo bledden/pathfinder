@@ -1,0 +1,36 @@
+PyTorch: 2.6.0+cu124
+GPU: NVIDIA H200
+
+=== d=3 ===
+  d=3 B=1    fp16: eager                    =  1350.36 us/call
+  d=3 B=1    fp16: torch.compile(reduce-oh) =   145.01 us/call
+  d=3 B=1    fp16: AOTI (default)           =   446.35 us/call
+  d=3 B=64   fp16: eager                    =  1256.28 us/call
+  d=3 B=64   fp16: torch.compile(reduce-oh) =   155.42 us/call
+  d=3 B=64   fp16: AOTI (default)           =   393.12 us/call
+  d=3 B=1024 fp16: eager                    =  1370.40 us/call
+  d=3 B=1024 fp16: torch.compile(reduce-oh) =   422.99 us/call
+  d=3 B=1024 fp16: AOTI (default)           =   650.76 us/call
+
+=== d=5 ===
+  d=5 B=1    fp16: eager                    =  2174.29 us/call
+  d=5 B=1    fp16: torch.compile(reduce-oh) =   241.64 us/call
+  d=5 B=1    fp16: AOTI (default)           =   674.03 us/call
+  d=5 B=64   fp16: eager                    =  2030.39 us/call
+  d=5 B=64   fp16: torch.compile(reduce-oh) =   308.18 us/call
+  d=5 B=64   fp16: AOTI (default)           =   590.05 us/call
+  d=5 B=1024 fp16: eager                    =  4074.71 us/call
+  d=5 B=1024 fp16: torch.compile(reduce-oh) =  1943.71 us/call
+  d=5 B=1024 fp16: AOTI (default)           =  2881.78 us/call
+
+=== d=7 ===
+  d=7 B=1    fp16: eager                    =  2955.80 us/call
+  d=7 B=1    fp16: torch.compile(reduce-oh) =   300.85 us/call
+  d=7 B=1    fp16: AOTI (default)           =   910.38 us/call
+  d=7 B=64   fp16: eager                    =  3056.44 us/call
+  d=7 B=64   fp16: torch.compile(reduce-oh) =   704.00 us/call
+  d=7 B=64   fp16: AOTI (default)           =  1199.26 us/call
+  d=7 B=1024 fp16: eager                    = 14405.08 us/call
+  d=7 B=1024 fp16: torch.compile(reduce-oh) =  6251.22 us/call
+  d=7 B=1024 fp16: AOTI (default)           = 10168.36 us/call
+

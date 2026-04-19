@@ -1,0 +1,148 @@
+Device: cuda
+Model: d=7, H=128, L=7, 126,209 params (0.3 MB at FP16)
+Optimizers: 2 (SingleDeviceMuon, AdamW)
+Pre-compiling Stim samplers for curriculum... 41 samplers ready.
+step      0/60000  loss=0.7564  p=0.00070  lr=0.000000  1.0 steps/s  ETA 1000min
+step    500/60000  loss=0.1175  p=0.00070  lr=0.010000  17.3 steps/s  ETA 57min
+step   1000/60000  loss=0.0222  p=0.00070  lr=0.020000  17.7 steps/s  ETA 56min
+step   1500/60000  loss=0.0128  p=0.00070  lr=0.019996  17.8 steps/s  ETA 55min
+step   2000/60000  loss=0.0118  p=0.00070  lr=0.019986  17.9 steps/s  ETA 54min
+step   2500/60000  loss=0.0096  p=0.00070  lr=0.019968  17.9 steps/s  ETA 54min
+step   3000/60000  loss=0.0010  p=0.00070  lr=0.019943  17.9 steps/s  ETA 53min
+step   3500/60000  loss=0.0061  p=0.00070  lr=0.019912  17.9 steps/s  ETA 53min
+step   4000/60000  loss=0.0051  p=0.00070  lr=0.019873  17.8 steps/s  ETA 52min
+step   4500/60000  loss=0.0014  p=0.00070  lr=0.019827  17.8 steps/s  ETA 52min
+step   5000/60000  loss=0.0104  p=0.00070  lr=0.019774  17.8 steps/s  ETA 52min
+  >>> EVAL LER at p=0.007: 0.175200
+  >>> Saved best model (LER=0.175200)
+step   5500/60000  loss=0.0043  p=0.00070  lr=0.019714  17.8 steps/s  ETA 51min
+step   6000/60000  loss=0.0038  p=0.00070  lr=0.019648  17.8 steps/s  ETA 51min
+step   6500/60000  loss=0.0067  p=0.00070  lr=0.019574  17.7 steps/s  ETA 50min
+step   7000/60000  loss=0.0044  p=0.00070  lr=0.019494  17.7 steps/s  ETA 50min
+step   7500/60000  loss=0.0064  p=0.00070  lr=0.019407  17.7 steps/s  ETA 49min
+step   8000/60000  loss=0.0045  p=0.00070  lr=0.019313  17.7 steps/s  ETA 49min
+step   8500/60000  loss=0.0112  p=0.00070  lr=0.019213  17.7 steps/s  ETA 49min
+step   9000/60000  loss=0.0030  p=0.00070  lr=0.019106  17.7 steps/s  ETA 48min
+step   9500/60000  loss=0.0044  p=0.00070  lr=0.018993  17.7 steps/s  ETA 48min
+step  10000/60000  loss=0.0033  p=0.00070  lr=0.018874  17.7 steps/s  ETA 47min
+  >>> EVAL LER at p=0.007: 0.165400
+  >>> Saved best model (LER=0.165400)
+step  10500/60000  loss=0.0033  p=0.00070  lr=0.018748  17.7 steps/s  ETA 47min
+step  11000/60000  loss=0.0031  p=0.00070  lr=0.018616  17.7 steps/s  ETA 46min
+step  11500/60000  loss=0.0094  p=0.00070  lr=0.018477  17.7 steps/s  ETA 46min
+step  12000/60000  loss=0.0031  p=0.00070  lr=0.018333  17.7 steps/s  ETA 45min
+step  12500/60000  loss=0.0081  p=0.00076  lr=0.018183  17.7 steps/s  ETA 45min
+step  13000/60000  loss=0.0048  p=0.00082  lr=0.018027  17.7 steps/s  ETA 44min
+step  13500/60000  loss=0.0181  p=0.00088  lr=0.017866  17.8 steps/s  ETA 44min
+step  14000/60000  loss=0.0071  p=0.00093  lr=0.017698  17.7 steps/s  ETA 43min
+step  14500/60000  loss=0.0036  p=0.00099  lr=0.017526  17.7 steps/s  ETA 43min
+step  15000/60000  loss=0.0039  p=0.00105  lr=0.017348  17.7 steps/s  ETA 42min
+  >>> EVAL LER at p=0.007: 0.182800
+step  15500/60000  loss=0.0118  p=0.00111  lr=0.017165  17.7 steps/s  ETA 42min
+step  16000/60000  loss=0.0071  p=0.00117  lr=0.016976  17.7 steps/s  ETA 41min
+step  16500/60000  loss=0.0022  p=0.00123  lr=0.016783  17.7 steps/s  ETA 41min
+step  17000/60000  loss=0.0128  p=0.00128  lr=0.016585  17.7 steps/s  ETA 40min
+step  17500/60000  loss=0.0015  p=0.00134  lr=0.016382  17.7 steps/s  ETA 40min
+step  18000/60000  loss=0.0031  p=0.00140  lr=0.016175  17.7 steps/s  ETA 39min
+step  18500/60000  loss=0.0027  p=0.00146  lr=0.015964  17.7 steps/s  ETA 39min
+step  19000/60000  loss=0.0108  p=0.00152  lr=0.015748  17.8 steps/s  ETA 38min
+step  19500/60000  loss=0.0084  p=0.00158  lr=0.015528  17.8 steps/s  ETA 38min
+step  20000/60000  loss=0.0096  p=0.00163  lr=0.015304  17.8 steps/s  ETA 38min
+  >>> EVAL LER at p=0.007: 0.101700
+  >>> Saved best model (LER=0.101700)
+step  20500/60000  loss=0.0161  p=0.00169  lr=0.015077  17.8 steps/s  ETA 37min
+step  21000/60000  loss=0.0056  p=0.00175  lr=0.014846  17.7 steps/s  ETA 37min
+step  21500/60000  loss=0.0135  p=0.00181  lr=0.014611  17.7 steps/s  ETA 36min
+step  22000/60000  loss=0.0034  p=0.00187  lr=0.014373  17.7 steps/s  ETA 36min
+step  22500/60000  loss=0.0068  p=0.00193  lr=0.014132  17.6 steps/s  ETA 35min
+step  23000/60000  loss=0.0155  p=0.00198  lr=0.013888  17.6 steps/s  ETA 35min
+step  23500/60000  loss=0.0053  p=0.00204  lr=0.013642  17.5 steps/s  ETA 35min
+step  24000/60000  loss=0.0060  p=0.00210  lr=0.013392  17.4 steps/s  ETA 34min
+step  24500/60000  loss=0.0063  p=0.00216  lr=0.013141  17.4 steps/s  ETA 34min
+step  25000/60000  loss=0.0076  p=0.00222  lr=0.012887  17.3 steps/s  ETA 34min
+  >>> EVAL LER at p=0.007: 0.084100
+  >>> Saved best model (LER=0.084100)
+step  25500/60000  loss=0.0032  p=0.00227  lr=0.012631  17.3 steps/s  ETA 33min
+step  26000/60000  loss=0.0070  p=0.00233  lr=0.012373  17.2 steps/s  ETA 33min
+step  26500/60000  loss=0.0092  p=0.00239  lr=0.012114  17.2 steps/s  ETA 32min
+step  27000/60000  loss=0.0011  p=0.00245  lr=0.011853  17.1 steps/s  ETA 32min
+step  27500/60000  loss=0.0173  p=0.00251  lr=0.011591  17.1 steps/s  ETA 32min
+step  28000/60000  loss=0.0172  p=0.00257  lr=0.011327  17.0 steps/s  ETA 31min
+step  28500/60000  loss=0.0095  p=0.00263  lr=0.011063  17.0 steps/s  ETA 31min
+step  29000/60000  loss=0.0171  p=0.00268  lr=0.010798  17.0 steps/s  ETA 30min
+step  29500/60000  loss=0.0055  p=0.00274  lr=0.010532  16.9 steps/s  ETA 30min
+step  30000/60000  loss=0.0027  p=0.00280  lr=0.010266  16.9 steps/s  ETA 30min
+  >>> EVAL LER at p=0.007: 0.067100
+  >>> Saved best model (LER=0.067100)
+step  30500/60000  loss=0.0123  p=0.00286  lr=0.010000  16.8 steps/s  ETA 29min
+step  31000/60000  loss=0.0049  p=0.00292  lr=0.009734  16.8 steps/s  ETA 29min
+step  31500/60000  loss=0.0165  p=0.00298  lr=0.009468  16.8 steps/s  ETA 28min
+step  32000/60000  loss=0.0075  p=0.00303  lr=0.009202  16.7 steps/s  ETA 28min
+step  32500/60000  loss=0.0071  p=0.00309  lr=0.008937  16.6 steps/s  ETA 28min
+step  33000/60000  loss=0.0209  p=0.00315  lr=0.008673  16.5 steps/s  ETA 27min
+step  33500/60000  loss=0.0096  p=0.00321  lr=0.008409  16.5 steps/s  ETA 27min
+step  34000/60000  loss=0.0085  p=0.00327  lr=0.008147  16.4 steps/s  ETA 26min
+step  34500/60000  loss=0.0177  p=0.00332  lr=0.007886  16.4 steps/s  ETA 26min
+step  35000/60000  loss=0.0166  p=0.00338  lr=0.007627  16.2 steps/s  ETA 26min
+  >>> EVAL LER at p=0.007: 0.046700
+  >>> Saved best model (LER=0.046700)
+step  35500/60000  loss=0.0159  p=0.00344  lr=0.007369  16.1 steps/s  ETA 25min
+step  36000/60000  loss=0.0115  p=0.00350  lr=0.007113  16.1 steps/s  ETA 25min
+step  36500/60000  loss=0.0107  p=0.00357  lr=0.006859  16.2 steps/s  ETA 24min
+step  37000/60000  loss=0.0241  p=0.00365  lr=0.006608  16.2 steps/s  ETA 24min
+step  37500/60000  loss=0.0117  p=0.00372  lr=0.006358  16.2 steps/s  ETA 23min
+step  38000/60000  loss=0.0112  p=0.00379  lr=0.006112  16.2 steps/s  ETA 23min
+step  38500/60000  loss=0.0311  p=0.00386  lr=0.005868  16.2 steps/s  ETA 22min
+step  39000/60000  loss=0.0111  p=0.00394  lr=0.005627  16.3 steps/s  ETA 22min
+step  39500/60000  loss=0.0311  p=0.00401  lr=0.005389  16.3 steps/s  ETA 21min
+step  40000/60000  loss=0.0039  p=0.00408  lr=0.005154  16.3 steps/s  ETA 20min
+  >>> EVAL LER at p=0.007: 0.042700
+  >>> Saved best model (LER=0.042700)
+step  40500/60000  loss=0.0120  p=0.00416  lr=0.004923  16.3 steps/s  ETA 20min
+step  41000/60000  loss=0.0058  p=0.00423  lr=0.004696  16.3 steps/s  ETA 19min
+step  41500/60000  loss=0.0128  p=0.00430  lr=0.004472  16.4 steps/s  ETA 19min
+step  42000/60000  loss=0.0142  p=0.00438  lr=0.004252  16.4 steps/s  ETA 18min
+step  42500/60000  loss=0.0129  p=0.00445  lr=0.004036  16.4 steps/s  ETA 18min
+step  43000/60000  loss=0.0196  p=0.00452  lr=0.003825  16.4 steps/s  ETA 17min
+step  43500/60000  loss=0.0202  p=0.00459  lr=0.003618  16.4 steps/s  ETA 17min
+step  44000/60000  loss=0.0278  p=0.00467  lr=0.003415  16.5 steps/s  ETA 16min
+step  44500/60000  loss=0.0261  p=0.00474  lr=0.003217  16.5 steps/s  ETA 16min
+step  45000/60000  loss=0.0273  p=0.00481  lr=0.003024  16.5 steps/s  ETA 15min
+  >>> EVAL LER at p=0.007: 0.032800
+  >>> Saved best model (LER=0.032800)
+step  45500/60000  loss=0.0169  p=0.00489  lr=0.002835  16.5 steps/s  ETA 15min
+step  46000/60000  loss=0.0098  p=0.00496  lr=0.002652  16.5 steps/s  ETA 14min
+step  46500/60000  loss=0.0161  p=0.00503  lr=0.002474  16.5 steps/s  ETA 14min
+step  47000/60000  loss=0.0417  p=0.00510  lr=0.002302  16.5 steps/s  ETA 13min
+step  47500/60000  loss=0.0163  p=0.00518  lr=0.002134  16.5 steps/s  ETA 13min
+step  48000/60000  loss=0.0167  p=0.00525  lr=0.001973  16.6 steps/s  ETA 12min
+step  48500/60000  loss=0.0331  p=0.00532  lr=0.001817  16.6 steps/s  ETA 12min
+step  49000/60000  loss=0.0212  p=0.00540  lr=0.001667  16.6 steps/s  ETA 11min
+step  49500/60000  loss=0.0384  p=0.00547  lr=0.001523  16.6 steps/s  ETA 11min
+step  50000/60000  loss=0.0244  p=0.00554  lr=0.001384  16.6 steps/s  ETA 10min
+  >>> EVAL LER at p=0.007: 0.027800
+  >>> Saved best model (LER=0.027800)
+step  50500/60000  loss=0.0320  p=0.00561  lr=0.001252  16.6 steps/s  ETA 10min
+step  51000/60000  loss=0.0431  p=0.00569  lr=0.001126  16.6 steps/s  ETA 9min
+step  51500/60000  loss=0.0434  p=0.00576  lr=0.001007  16.6 steps/s  ETA 9min
+step  52000/60000  loss=0.0283  p=0.00583  lr=0.000894  16.6 steps/s  ETA 8min
+step  52500/60000  loss=0.0382  p=0.00591  lr=0.000787  16.6 steps/s  ETA 8min
+step  53000/60000  loss=0.0427  p=0.00598  lr=0.000687  16.6 steps/s  ETA 7min
+step  53500/60000  loss=0.0463  p=0.00605  lr=0.000593  16.6 steps/s  ETA 7min
+step  54000/60000  loss=0.0525  p=0.00613  lr=0.000506  16.7 steps/s  ETA 6min
+step  54500/60000  loss=0.0507  p=0.00620  lr=0.000426  16.7 steps/s  ETA 6min
+step  55000/60000  loss=0.0370  p=0.00627  lr=0.000352  16.7 steps/s  ETA 5min
+  >>> EVAL LER at p=0.007: 0.029100
+step  55500/60000  loss=0.0556  p=0.00634  lr=0.000286  16.7 steps/s  ETA 4min
+step  56000/60000  loss=0.0370  p=0.00642  lr=0.000226  16.7 steps/s  ETA 4min
+step  56500/60000  loss=0.0405  p=0.00649  lr=0.000173  16.7 steps/s  ETA 3min
+step  57000/60000  loss=0.0456  p=0.00656  lr=0.000127  16.7 steps/s  ETA 3min
+step  57500/60000  loss=0.0513  p=0.00664  lr=0.000088  16.7 steps/s  ETA 2min
+step  58000/60000  loss=0.0624  p=0.00671  lr=0.000057  16.7 steps/s  ETA 2min
+step  58500/60000  loss=0.0539  p=0.00678  lr=0.000032  16.7 steps/s  ETA 1min
+step  59000/60000  loss=0.0518  p=0.00685  lr=0.000014  16.7 steps/s  ETA 1min
+step  59500/60000  loss=0.0534  p=0.00693  lr=0.000004  16.7 steps/s  ETA 0min
+
+Final LER at p=0.007: 0.026520
+Best LER: 0.027800
+Total time: 3585s
