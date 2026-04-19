@@ -1,0 +1,5 @@
+Equivariant Decoder: d=5, H=256, L=5, 335,873 params
+step      0/80000  loss=0.6537  1.0 s/s  ETA 1333min
+step    500/80000  loss=0.1604  6.4 s/s  ETA 206min
+step   1000/80000  loss=0.2401  6.4 s/s  ETA 204min
+step   1500/80000  loss=0.4341  6.3 s/s  ETA 207min

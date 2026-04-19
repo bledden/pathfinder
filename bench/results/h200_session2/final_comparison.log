@@ -1,0 +1,35 @@
+
+=== d=5 p=0.001 ===
+Traceback (most recent call last):
+  File "/workspace/final_comparison.py", line 171, in <module>
+    main()
+  File "/workspace/final_comparison.py", line 144, in main
+    mods["original"] = load_pf(f"/workspace/pathfinder/train/checkpoints/{'best_model.pt' if d == 3 else ('d5_muon/best_model.pt' if d == 5 else 'd7_final/best_model.pt')}")
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/final_comparison.py", line 54, in load_pf
+    ck = torch.load(path, weights_only=False, map_location=device)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/dist-packages/torch/serialization.py", line 1471, in load
+    return _load(
+           ^^^^^^
+  File "/usr/local/lib/python3.11/dist-packages/torch/serialization.py", line 1964, in _load
+    result = unpickler.load()
+             ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/dist-packages/torch/serialization.py", line 1928, in persistent_load
+    typed_storage = load_tensor(
+                    ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/dist-packages/torch/serialization.py", line 1900, in load_tensor
+    wrap_storage=restore_location(storage, location),
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/dist-packages/torch/serialization.py", line 1806, in restore_location
+    return default_restore_location(storage, str(map_location))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/dist-packages/torch/serialization.py", line 693, in default_restore_location
+    result = fn(storage, location)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/dist-packages/torch/serialization.py", line 631, in _deserialize
+    device = _validate_device(location, backend_name)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/dist-packages/torch/serialization.py", line 600, in _validate_device
+    raise RuntimeError(
+RuntimeError: Attempting to deserialize object on a CUDA device but torch.cuda.is_available() is False. If you are running on a CPU-only machine, please use torch.load with map_location=torch.device('cpu') to map your storages to the CPU.

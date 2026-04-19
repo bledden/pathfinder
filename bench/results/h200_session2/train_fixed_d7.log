@@ -1,0 +1,7 @@
+Model: d=7, H=256, L=7, 500,225 params
+Pre-compiling 41 samplers at curriculum rates (with proper noise model)...
+/usr/local/lib/python3.11/dist-packages/torch/amp/grad_scaler.py:132: UserWarning: torch.cuda.amp.GradScaler is enabled, but CUDA is not available.  Disabling.
+  warnings.warn(
+/usr/local/lib/python3.11/dist-packages/torch/amp/autocast_mode.py:266: UserWarning: User provided device_type of 'cuda', but CUDA is not available. Disabling
+  warnings.warn(
+step      0/80000  loss=0.6864  p=0.00070  0.0 s/s  ETA 102784min

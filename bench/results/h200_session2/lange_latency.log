@@ -1,0 +1,29 @@
+Lange GNN latency on H200
+ d      p     B    ms/call     us/syn
+Traceback (most recent call last):
+  File "/workspace/bench_lange_latency.py", line 96, in <module>
+    main()
+  File "/workspace/bench_lange_latency.py", line 84, in main
+    m = build_lange(d, d)
+        ^^^^^^^^^^^^^^^^^
+  File "/workspace/bench_lange_latency.py", line 15, in build_lange
+    hidden_channels_MLP=[256, 128, 64], num_classes=1).to(device)
+                                                       ^^^^^^^^^^
+  File "/usr/local/lib/python3.11/dist-packages/torch/nn/modules/module.py", line 1343, in to
+    return self._apply(convert)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/dist-packages/torch/nn/modules/module.py", line 903, in _apply
+    module._apply(fn)
+  File "/usr/local/lib/python3.11/dist-packages/torch/nn/modules/module.py", line 903, in _apply
+    module._apply(fn)
+  File "/usr/local/lib/python3.11/dist-packages/torch/nn/modules/module.py", line 903, in _apply
+    module._apply(fn)
+  File "/usr/local/lib/python3.11/dist-packages/torch/nn/modules/module.py", line 930, in _apply
+    param_applied = fn(param)
+                    ^^^^^^^^^
+  File "/usr/local/lib/python3.11/dist-packages/torch/nn/modules/module.py", line 1329, in convert
+    return t.to(
+           ^^^^^
+  File "/usr/local/lib/python3.11/dist-packages/torch/cuda/__init__.py", line 319, in _lazy_init
+    torch._C._cuda_init()
+RuntimeError: No CUDA GPUs are available

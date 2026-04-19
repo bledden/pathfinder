@@ -1,0 +1,81 @@
+Model: d=5, H=512, L=5, 1,500,161 params (3.00 MB FP16)
+Dataset: mixed noise log-uniform [0.001, 0.015], 60-point grid
+Optimizers: ['SingleDeviceMuon', 'AdamW']
+step      0/150000  loss=0.6852  p=0.00379  lr=0.00000  1.0 s/s  ETA 2500min
+step    500/150000  loss=0.2624  p=0.00138  lr=0.00500  9.4 s/s  ETA 266min
+step   1000/150000  loss=0.6884  p=0.01500  lr=0.01000  9.9 s/s  ETA 250min
+step   1500/150000  loss=0.6523  p=0.00826  lr=0.01500  10.2 s/s  ETA 244min
+step   2000/150000  loss=0.5048  p=0.00415  lr=0.02000  10.6 s/s  ETA 233min
+step   2500/150000  loss=0.7255  p=0.01307  lr=0.02000  10.6 s/s  ETA 231min
+step   3000/150000  loss=0.5539  p=0.00499  lr=0.02000  10.6 s/s  ETA 231min
+step   3500/150000  loss=0.6651  p=0.01139  lr=0.01999  10.6 s/s  ETA 231min
+step   4000/150000  loss=0.6665  p=0.01192  lr=0.01999  10.7 s/s  ETA 227min
+step   4500/150000  loss=0.6531  p=0.01088  lr=0.01999  10.7 s/s  ETA 226min
+step   5000/150000  loss=0.4271  p=0.00362  lr=0.01998  10.7 s/s  ETA 226min
+  >>> EVAL LER p=0.001 0.05900  p=0.007 0.28780  p=0.015 0.42370
+  >>> Saved best (ler@p=0.007=0.28780)
+step   5500/150000  loss=0.6319  p=0.00865  lr=0.01997  10.6 s/s  ETA 226min
+step   6000/150000  loss=0.5896  p=0.00754  lr=0.01996  10.7 s/s  ETA 223min
+step   6500/150000  loss=0.6692  p=0.01088  lr=0.01995  10.3 s/s  ETA 232min
+step   7000/150000  loss=0.2993  p=0.00173  lr=0.01994  10.0 s/s  ETA 239min
+step   7500/150000  loss=0.6154  p=0.00754  lr=0.01993  9.7 s/s  ETA 244min
+step   8000/150000  loss=0.3894  p=0.00199  lr=0.01992  9.8 s/s  ETA 241min
+step   8500/150000  loss=0.5817  p=0.00455  lr=0.01990  9.9 s/s  ETA 238min
+step   9000/150000  loss=0.6638  p=0.01139  lr=0.01989  10.0 s/s  ETA 235min
+step   9500/150000  loss=0.6829  p=0.01433  lr=0.01987  10.1 s/s  ETA 232min
+step  10000/150000  loss=0.2809  p=0.00151  lr=0.01986  10.2 s/s  ETA 229min
+  >>> EVAL LER p=0.001 0.05490  p=0.007 0.28560  p=0.015 0.41710
+  >>> Saved best (ler@p=0.007=0.28560)
+step  10500/150000  loss=0.6384  p=0.00992  lr=0.01984  10.2 s/s  ETA 227min
+step  11000/150000  loss=0.6048  p=0.00948  lr=0.01982  10.3 s/s  ETA 225min
+step  11500/150000  loss=0.2760  p=0.00275  lr=0.01980  10.2 s/s  ETA 226min
+step  12000/150000  loss=0.6382  p=0.01039  lr=0.01978  10.0 s/s  ETA 230min
+step  12500/150000  loss=0.4457  p=0.00546  lr=0.01975  9.9 s/s  ETA 233min
+step  13000/150000  loss=0.1402  p=0.00173  lr=0.01973  9.7 s/s  ETA 235min
+step  13500/150000  loss=0.4594  p=0.00657  lr=0.01970  9.6 s/s  ETA 238min
+step  14000/150000  loss=0.1892  p=0.00173  lr=0.01968  9.4 s/s  ETA 240min
+step  14500/150000  loss=0.1881  p=0.00218  lr=0.01965  9.3 s/s  ETA 242min
+step  15000/150000  loss=0.6266  p=0.01088  lr=0.01962  9.2 s/s  ETA 244min
+  >>> EVAL LER p=0.001 0.02690  p=0.007 0.23440  p=0.015 0.40210
+  >>> Saved best (ler@p=0.007=0.23440)
+step  15500/150000  loss=0.5252  p=0.00992  lr=0.01959  9.1 s/s  ETA 246min
+step  16000/150000  loss=0.5280  p=0.00905  lr=0.01956  9.0 s/s  ETA 247min
+step  16500/150000  loss=0.2317  p=0.00250  lr=0.01953  8.9 s/s  ETA 249min
+step  17000/150000  loss=0.5644  p=0.01039  lr=0.01950  8.9 s/s  ETA 249min
+step  17500/150000  loss=0.5805  p=0.00992  lr=0.01946  8.8 s/s  ETA 250min
+step  18000/150000  loss=0.3200  p=0.00434  lr=0.01943  8.8 s/s  ETA 251min
+step  18500/150000  loss=0.2647  p=0.00362  lr=0.01939  8.6 s/s  ETA 253min
+step  19000/150000  loss=0.1225  p=0.00126  lr=0.01936  8.5 s/s  ETA 256min
+step  19500/150000  loss=0.0876  p=0.00105  lr=0.01932  8.4 s/s  ETA 258min
+step  20000/150000  loss=0.3173  p=0.00455  lr=0.01928  8.4 s/s  ETA 259min
+  >>> EVAL LER p=0.001 0.04430  p=0.007 0.22780  p=0.015 0.38700
+  >>> Saved best (ler@p=0.007=0.22780)
+step  20500/150000  loss=0.3885  p=0.00546  lr=0.01924  8.3 s/s  ETA 260min
+step  21000/150000  loss=0.1678  p=0.00208  lr=0.01920  8.2 s/s  ETA 261min
+step  21500/150000  loss=0.3246  p=0.00434  lr=0.01916  8.2 s/s  ETA 262min
+step  22000/150000  loss=0.2842  p=0.00455  lr=0.01911  8.1 s/s  ETA 264min
+step  22500/150000  loss=0.3507  p=0.00546  lr=0.01907  8.0 s/s  ETA 265min
+step  23000/150000  loss=0.6646  p=0.01500  lr=0.01902  8.0 s/s  ETA 265min
+step  23500/150000  loss=0.1550  p=0.00190  lr=0.01898  8.0 s/s  ETA 262min
+step  24000/150000  loss=0.6223  p=0.01500  lr=0.01893  8.1 s/s  ETA 260min
+step  24500/150000  loss=0.3453  p=0.00476  lr=0.01888  8.1 s/s  ETA 257min
+step  25000/150000  loss=0.5588  p=0.01039  lr=0.01883  8.2 s/s  ETA 254min
+  >>> EVAL LER p=0.001 0.04550  p=0.007 0.24810  p=0.015 0.39560
+step  25500/150000  loss=0.2820  p=0.00434  lr=0.01878  8.2 s/s  ETA 252min
+step  26000/150000  loss=0.2394  p=0.00379  lr=0.01873  8.3 s/s  ETA 250min
+step  26500/150000  loss=0.2482  p=0.00362  lr=0.01868  8.3 s/s  ETA 247min
+step  27000/150000  loss=0.3085  p=0.00572  lr=0.01862  8.4 s/s  ETA 245min
+step  27500/150000  loss=0.3963  p=0.00657  lr=0.01857  8.4 s/s  ETA 243min
+step  28000/150000  loss=0.0953  p=0.00110  lr=0.01852  8.4 s/s  ETA 242min
+step  28500/150000  loss=0.4375  p=0.00754  lr=0.01846  8.4 s/s  ETA 242min
+step  29000/150000  loss=0.5644  p=0.01248  lr=0.01840  8.3 s/s  ETA 243min
+step  29500/150000  loss=0.3150  p=0.00599  lr=0.01834  8.2 s/s  ETA 244min
+step  30000/150000  loss=0.5434  p=0.01192  lr=0.01829  8.2 s/s  ETA 244min
+  >>> EVAL LER p=0.001 0.04050  p=0.007 0.21910  p=0.015 0.38100
+  >>> Saved best (ler@p=0.007=0.21910)
+step  30500/150000  loss=0.0587  p=0.00100  lr=0.01823  8.1 s/s  ETA 245min
+step  31000/150000  loss=0.3256  p=0.00522  lr=0.01816  8.1 s/s  ETA 246min
+step  31500/150000  loss=0.2585  p=0.00345  lr=0.01810  8.0 s/s  ETA 246min
+step  32000/150000  loss=0.1439  p=0.00208  lr=0.01804  8.0 s/s  ETA 246min
+step  32500/150000  loss=0.6331  p=0.01368  lr=0.01798  7.9 s/s  ETA 247min
+step  33000/150000  loss=0.4598  p=0.00905  lr=0.01791  7.9 s/s  ETA 247min
