@@ -1,0 +1,74 @@
+
+d=3 p=0.001: 3 seeds × 20000 shots
+  seed=2000: pm_errs=15  pf_errs=14  lange_errs=646  n_trivial=16915
+  seed=2001: pm_errs=15  pf_errs=13  lange_errs=624  n_trivial=16887
+  seed=2002: pm_errs=14  pf_errs=15  lange_errs=655  n_trivial=16813
+  SUMMARY: PF=0.0700% [0.0518,0.0946]  Lange=3.2083% [3.0703,3.3524]  PM=0.0733% [0.0546,0.0984]
+
+d=3 p=0.002: 3 seeds × 20000 shots
+  seed=2000: pm_errs=62  pf_errs=62  lange_errs=1246  n_trivial=14181
+  seed=2001: pm_errs=53  pf_errs=48  lange_errs=1240  n_trivial=14239
+  seed=2002: pm_errs=59  pf_errs=64  lange_errs=1182  n_trivial=14241
+  SUMMARY: PF=0.2900% [0.2500,0.3363]  Lange=6.1133% [5.9244,6.3079]  PM=0.2900% [0.2500,0.3363]
+
+d=3 p=0.003: 3 seeds × 20000 shots
+  seed=2000: pm_errs=132  pf_errs=119  lange_errs=1801  n_trivial=12095
+  seed=2001: pm_errs=127  pf_errs=109  lange_errs=1806  n_trivial=12097
+  seed=2002: pm_errs=132  pf_errs=105  lange_errs=1801  n_trivial=12131
+  SUMMARY: PF=0.5550% [0.4986,0.6177]  Lange=9.0133% [8.7868,9.2451]  PM=0.6517% [0.5904,0.7193]
+
+d=3 p=0.005: 3 seeds × 20000 shots
+  seed=2000: pm_errs=382  pf_errs=350  lange_errs=2943  n_trivial=8471
+  seed=2001: pm_errs=337  pf_errs=327  lange_errs=2878  n_trivial=8576
+  seed=2002: pm_errs=353  pf_errs=327  lange_errs=2800  n_trivial=8504
+  SUMMARY: PF=1.6733% [1.5737,1.7791]  Lange=14.3683% [14.0899,14.6513]  PM=1.7867% [1.6837,1.8958]
+
+d=5 p=0.001: 3 seeds × 20000 shots
+  seed=2000: pm_errs=6  pf_errs=3  lange_errs=1305  n_trivial=8482
+  seed=2001: pm_errs=0  pf_errs=0  lange_errs=1319  n_trivial=8400
+  seed=2002: pm_errs=3  pf_errs=1  lange_errs=1216  n_trivial=8506
+  SUMMARY: PF=0.0067% [0.0026,0.0171]  Lange=6.4000% [6.2069,6.5986]  PM=0.0150% [0.0079,0.0285]
+
+d=5 p=0.002: 3 seeds × 20000 shots
+  seed=2000: pm_errs=27  pf_errs=16  lange_errs=2548  n_trivial=3574
+  seed=2001: pm_errs=19  pf_errs=8  lange_errs=2650  n_trivial=3542
+  seed=2002: pm_errs=22  pf_errs=12  lange_errs=2531  n_trivial=3668
+  SUMMARY: PF=0.0600% [0.0433,0.0830]  Lange=12.8817% [12.6160,13.1521]  PM=0.1133% [0.0894,0.1436]
+
+d=5 p=0.003: 3 seeds × 20000 shots
+  seed=2000: pm_errs=65  pf_errs=43  lange_errs=3712  n_trivial=1515
+  seed=2001: pm_errs=64  pf_errs=51  lange_errs=3772  n_trivial=1530
+  seed=2002: pm_errs=62  pf_errs=43  lange_errs=3776  n_trivial=1608
+  SUMMARY: PF=0.2283% [0.1932,0.2698]  Lange=18.7667% [18.4562,19.0811]  PM=0.3183% [0.2763,0.3667]
+
+d=5 p=0.005: 3 seeds × 20000 shots
+  seed=2000: pm_errs=273  pf_errs=221  lange_errs=5505  n_trivial=263
+  seed=2001: pm_errs=297  pf_errs=230  lange_errs=5671  n_trivial=254
+  seed=2002: pm_errs=235  pf_errs=203  lange_errs=5557  n_trivial=284
+  SUMMARY: PF=1.0900% [1.0100,1.1763]  Lange=27.8883% [27.5309,28.2486]  PM=1.3417% [1.2527,1.4369]
+
+d=7 p=0.001: 3 seeds × 20000 shots
+  seed=2000: pm_errs=0  pf_errs=0  lange_errs=2206  n_trivial=1733
+  seed=2001: pm_errs=1  pf_errs=0  lange_errs=2144  n_trivial=1792
+  seed=2002: pm_errs=0  pf_errs=0  lange_errs=2063  n_trivial=1813
+  SUMMARY: PF=0.0000% [0.0000,0.0064]  Lange=10.6883% [10.4436,10.9381]  PM=0.0017% [0.0003,0.0094]
+
+d=7 p=0.002: 3 seeds × 20000 shots
+  seed=2000: pm_errs=8  pf_errs=6  lange_errs=4060  n_trivial=134
+  seed=2001: pm_errs=4  pf_errs=3  lange_errs=3996  n_trivial=136
+  seed=2002: pm_errs=3  pf_errs=5  lange_errs=3999  n_trivial=127
+  SUMMARY: PF=0.0233% [0.0139,0.0392]  Lange=20.0917% [19.7730,20.4142]  PM=0.0250% [0.0152,0.0412]
+
+d=7 p=0.003: 3 seeds × 20000 shots
+  seed=2000: pm_errs=20  pf_errs=23  lange_errs=5534  n_trivial=17
+  seed=2001: pm_errs=26  pf_errs=24  lange_errs=5425  n_trivial=15
+  seed=2002: pm_errs=24  pf_errs=18  lange_errs=5474  n_trivial=9
+  SUMMARY: PF=0.1083% [0.0850,0.1380]  Lange=27.3883% [27.0330,27.7466]  PM=0.1167% [0.0924,0.1474]
+
+d=7 p=0.005: 3 seeds × 20000 shots
+  seed=2000: pm_errs=212  pf_errs=211  lange_errs=7309  n_trivial=0
+  seed=2001: pm_errs=195  pf_errs=219  lange_errs=7045  n_trivial=0
+  seed=2002: pm_errs=199  pf_errs=184  lange_errs=7185  n_trivial=0
+  SUMMARY: PF=1.0233% [0.9459,1.1071]  Lange=35.8983% [35.5154,36.2831]  PM=1.0100% [0.9331,1.0932]
+
+=== wrote /workspace/run_lange_vs_pathfinder_results.json ===

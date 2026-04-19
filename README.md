@@ -2,7 +2,9 @@
 
 A direction-aware neural decoder for quantum error correction that outperforms minimum-weight perfect matching (MWPM) on surface codes.
 
-**First open-source decoder to beat PyMatching.** 24 out of 24 evaluation points across code distances d=3, 5, 7 and physical error rates p=0.0005 to p=0.015. 19 us inference latency. $65 total GPU cost.
+Wins or ties PyMatching at 24/24 evaluation points across d=3, 5, 7 and p=0.0005 to 0.015 in the measurements reported here (13/24 show non-overlapping 95% Wilson CIs; see paper §5.1). 6.12 μs/syn inference latency at d=7 B=1024 on NVIDIA H200 with a custom Triton kernel, sustaining the 7-μs superconducting cycle-time budget.
+
+**A note on priority.** [Lange et al. (Phys. Rev. Research 7, 023181, 2025)](https://github.com/LangeMoritz/GNN_decoder) previously released an open-source GNN decoder that also outperforms PyMatching on rotated surface codes under circuit-level noise. Pathfinder is **not** the first open-source decoder to beat PyMatching on this task. Pathfinder's distinct contributions are (1) extending the tested operational noise range to p ∈ {0.007, 0.010, 0.015}, which Lange et al. did not cover; (2) identifying the Muon optimizer as the dominant factor in decoder accuracy (+72% LER without it); (3) a custom Triton kernel that sustains the d=7 cycle-time budget on H200 GPUs; (4) an ensemble with PyMatching that exploits their near-disjoint failure modes. A rigorous head-to-head comparison with Lange et al. at matched noise model is pending (see paper §5.11).
 
 ## Results
 
@@ -37,12 +39,15 @@ FP16 quantization: zero accuracy loss (verified on 50K shots).
 
 | Decoder | Beats PM? | Latency | Open Source |
 |---------|-----------|---------|-------------|
-| **Pathfinder (this work)** | **Yes, 24/24 points** | **19 us** | **Yes** |
+| **Pathfinder (this work)** | **Yes, 24/24 points (Table 1)** | **6.12 us (H200 + Triton)** | **Yes** |
+| Lange et al. (PRR 2025) | Yes (first, d=3-9) | not measured here | Yes |
 | AlphaQubit (Google) | Yes (~6%) | 63 us | No |
 | Gu et al. (Harvard) | Yes (17x on Gross codes) | ~40 us | No |
 | Astrea (Georgia Tech) | No (same as PM) | 1 ns | No |
-| PyMatching v2 | Baseline | ~5 us | Yes |
+| PyMatching v2 | Baseline | ~5-10 us (noise-dependent) | Yes |
 | Union-Find | No (7-30x worse) | ~20 us | Yes |
+
+Head-to-head with Lange at matched noise model: Lange wins 19/21 points on their own evaluation harness (Pathfinder is OOD on their 4-parameter noise model). See paper §5.11.
 
 ## Architecture
 

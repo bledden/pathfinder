@@ -7,3 +7,6 @@ __pycache__/
 .DS_Store
 *.egg-info/
 dist/
+
+# Orphaned copy of the repo pulled off the training pod (22 MB of session2 checkpoints)
+bench/results/h200_session2/pathfinder/

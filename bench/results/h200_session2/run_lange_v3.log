@@ -1,0 +1,54 @@
+
+=== d=3 p=0.007 ===
+  seed=2000: pm_err=650  pf_err=598  lange_err=553  n_triv=5975
+  seed=2001: pm_err=649  pf_err=637  lange_err=554  n_triv=6125
+  seed=2002: pm_err=668  pf_err=635  lange_err=579  n_triv=6057
+  SUMMARY: Path=3.1167% [2.9806,3.2587]  Lange=2.8100% [2.6808,2.9453]  PM=3.2783% [3.1388,3.4238]
+
+=== d=3 p=0.01 ===
+  seed=2000: pm_err=1242  pf_err=1201  lange_err=1109  n_triv=3556
+  seed=2001: pm_err=1134  pf_err=1097  lange_err=998  n_triv=3632
+  seed=2002: pm_err=1147  pf_err=1107  lange_err=1028  n_triv=3647
+  SUMMARY: Path=5.6750% [5.4927,5.8630]  Lange=5.2250% [5.0498,5.4059]  PM=5.8717% [5.6864,6.0626]
+
+=== d=3 p=0.015 ===
+  seed=2000: pm_err=2392  pf_err=2335  lange_err=2214  n_triv=1578
+  seed=2001: pm_err=2262  pf_err=2199  lange_err=2064  n_triv=1586
+  seed=2002: pm_err=2287  pf_err=2204  lange_err=2096  n_triv=1574
+  SUMMARY: Path=11.2300% [10.9798,11.4851]  Lange=10.6233% [10.3793,10.8724]  PM=11.5683% [11.3149,11.8267]
+
+=== d=5 p=0.007 ===
+  seed=2000: pm_err=683  pf_err=579  lange_err=489  n_triv=47
+  seed=2001: pm_err=680  pf_err=577  lange_err=488  n_triv=50
+  seed=2002: pm_err=691  pf_err=606  lange_err=515  n_triv=41
+  SUMMARY: Path=2.9367% [2.8046,3.0748]  Lange=2.4867% [2.3651,2.6143]  PM=3.4233% [3.2808,3.5718]
+
+=== d=5 p=0.01 ===
+  seed=2000: pm_err=1626  pf_err=1490  lange_err=1356  n_triv=2
+  seed=2001: pm_err=1686  pf_err=1593  lange_err=1373  n_triv=4
+  seed=2002: pm_err=1690  pf_err=1537  lange_err=1391  n_triv=1
+  SUMMARY: Path=7.7000% [7.4894,7.9160]  Lange=6.8667% [6.6671,7.0718]  PM=8.3367% [8.1181,8.5605]
+
+=== d=5 p=0.015 ===
+  seed=2000: pm_err=3882  pf_err=3932  lange_err=3588  n_triv=0
+  seed=2001: pm_err=3995  pf_err=3952  lange_err=3666  n_triv=0
+  seed=2002: pm_err=3883  pf_err=3922  lange_err=3627  n_triv=0
+  SUMMARY: Path=19.6767% [19.3605,19.9967]  Lange=18.1350% [17.8287,18.4453]  PM=19.6000% [19.2843,19.9196]
+
+=== d=7 p=0.007 ===
+  seed=2000: pm_err=731  pf_err=833  lange_err=615  n_triv=0
+  seed=2001: pm_err=634  pf_err=803  lange_err=574  n_triv=0
+  seed=2002: pm_err=697  pf_err=794  lange_err=573  n_triv=0
+  SUMMARY: Path=4.0500% [3.8952,4.2107]  Lange=2.9367% [2.8046,3.0748]  PM=3.4367% [3.2939,3.5854]
+
+=== d=7 p=0.01 ===
+  seed=2000: pm_err=2083  pf_err=2663  lange_err=2081  n_triv=0
+  seed=2001: pm_err=2056  pf_err=2711  lange_err=2077  n_triv=0
+  seed=2002: pm_err=2016  pf_err=2686  lange_err=2120  n_triv=0
+  SUMMARY: Path=13.4333% [13.1628,13.7085]  Lange=10.4633% [10.2209,10.7108]  PM=10.2583% [10.0181,10.5037]
+
+=== d=7 p=0.015 ===
+  seed=2000: pm_err=5454  pf_err=6743  lange_err=6066  n_triv=0
+  seed=2001: pm_err=5406  pf_err=6644  lange_err=6076  n_triv=0
+  seed=2002: pm_err=5289  pf_err=6538  lange_err=6054  n_triv=0
+  SUMMARY: Path=33.2083% [32.8326,33.5862]  Lange=30.3267% [29.9601,30.6957]  PM=26.9150% [26.5616,27.2714]
