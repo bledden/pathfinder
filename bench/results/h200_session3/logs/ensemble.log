@@ -1,0 +1,122 @@
+
+=== d3_p0.003 ===
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/d3_muon/best_model.pt
+  seed=3000: pf=116  lange=108  pm=132  maj=113  all3=87
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/d3_muon/best_model.pt
+  seed=3001: pf=106  lange=99  pm=129  maj=98  all3=76
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/d3_muon/best_model.pt
+  seed=3002: pf=127  lange=114  pm=138  maj=122  all3=96
+  -> PF=0.5817% Lange=0.5350% PM=0.6650% Majority=0.5550% OracleLB=0.4317%
+  [incremental save: 1 points to /workspace/persist/results/ensemble_results.json]
+
+=== d3_p0.005 ===
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/d3_muon/best_model.pt
+  seed=3000: pf=338  lange=305  pm=369  maj=326  all3=251
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/d3_muon/best_model.pt
+  seed=3001: pf=286  lange=280  pm=331  maj=288  all3=211
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/d3_muon/best_model.pt
+  seed=3002: pf=333  lange=311  pm=379  maj=326  all3=249
+  -> PF=1.5950% Lange=1.4933% PM=1.7983% Majority=1.5667% OracleLB=1.1850%
+  [incremental save: 2 points to /workspace/persist/results/ensemble_results.json]
+
+=== d3_p0.007 ===
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/d3_muon/best_model.pt
+  seed=3000: pf=558  lange=527  pm=637  maj=537  all3=399
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/d3_muon/best_model.pt
+  seed=3001: pf=587  lange=527  pm=630  maj=546  all3=404
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/d3_muon/best_model.pt
+  seed=3002: pf=609  lange=574  pm=656  maj=603  all3=436
+  -> PF=2.9233% Lange=2.7133% PM=3.2050% Majority=2.8100% OracleLB=2.0650%
+  [incremental save: 3 points to /workspace/persist/results/ensemble_results.json]
+
+=== d3_p0.01 ===
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/d3_muon/best_model.pt
+  seed=3000: pf=1129  lange=1036  pm=1186  maj=1081  all3=815
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/d3_muon/best_model.pt
+  seed=3001: pf=1053  lange=976  pm=1119  maj=996  all3=748
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/d3_muon/best_model.pt
+  seed=3002: pf=1138  lange=1072  pm=1206  maj=1108  all3=801
+  -> PF=5.5333% Lange=5.1400% PM=5.8517% Majority=5.3083% OracleLB=3.9400%
+  [incremental save: 4 points to /workspace/persist/results/ensemble_results.json]
+
+=== d5_p0.003 ===
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/d5_muon/best_model.pt
+  seed=3000: pf=52  lange=36  pm=61  maj=40  all3=25
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/d5_muon/best_model.pt
+  seed=3001: pf=44  lange=36  pm=68  maj=39  all3=23
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/d5_muon/best_model.pt
+  seed=3002: pf=56  lange=43  pm=75  maj=49  all3=24
+  -> PF=0.2533% Lange=0.1917% PM=0.3400% Majority=0.2133% OracleLB=0.1200%
+  [incremental save: 5 points to /workspace/persist/results/ensemble_results.json]
+
+=== d5_p0.005 ===
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/d5_muon/best_model.pt
+  seed=3000: pf=218  lange=182  pm=274  maj=188  all3=103
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/d5_muon/best_model.pt
+  seed=3001: pf=225  lange=203  pm=281  maj=204  all3=112
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/d5_muon/best_model.pt
+  seed=3002: pf=225  lange=189  pm=302  maj=202  all3=115
+  -> PF=1.1133% Lange=0.9567% PM=1.4283% Majority=0.9900% OracleLB=0.5500%
+  [incremental save: 6 points to /workspace/persist/results/ensemble_results.json]
+
+=== d5_p0.007 ===
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/d5_muon/best_model.pt
+  seed=3000: pf=612  lange=531  pm=724  maj=536  all3=337
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/d5_muon/best_model.pt
+  seed=3001: pf=607  lange=521  pm=725  maj=529  all3=302
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/d5_muon/best_model.pt
+  seed=3002: pf=542  lange=496  pm=679  maj=496  all3=260
+  -> PF=2.9350% Lange=2.5800% PM=3.5467% Majority=2.6017% OracleLB=1.4983%
+  [incremental save: 7 points to /workspace/persist/results/ensemble_results.json]
+
+=== d5_p0.01 ===
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/d5_muon/best_model.pt
+  seed=3000: pf=1530  lange=1364  pm=1681  maj=1347  all3=721
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/d5_muon/best_model.pt
+  seed=3001: pf=1566  lange=1376  pm=1655  maj=1341  all3=749
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/d5_muon/best_model.pt
+  seed=3002: pf=1541  lange=1323  pm=1628  maj=1313  all3=691
+  -> PF=7.7283% Lange=6.7717% PM=8.2733% Majority=6.6683% OracleLB=3.6017%
+  [incremental save: 8 points to /workspace/persist/results/ensemble_results.json]
+
+=== d7_p0.003 ===
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/d7_final/best_model.pt
+  seed=3000: pf=25  lange=18  pm=31  maj=21  all3=9
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/d7_final/best_model.pt
+  seed=3001: pf=17  lange=17  pm=29  maj=13  all3=5
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/d7_final/best_model.pt
+  seed=3002: pf=20  lange=17  pm=29  maj=16  all3=9
+  -> PF=0.1033% Lange=0.0867% PM=0.1483% Majority=0.0833% OracleLB=0.0383%
+  [incremental save: 9 points to /workspace/persist/results/ensemble_results.json]
+
+=== d7_p0.005 ===
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/d7_final/best_model.pt
+  seed=3000: pf=218  lange=153  pm=198  maj=138  all3=61
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/d7_final/best_model.pt
+  seed=3001: pf=222  lange=137  pm=190  maj=131  all3=58
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/d7_final/best_model.pt
+  seed=3002: pf=209  lange=161  pm=203  maj=137  all3=57
+  -> PF=1.0817% Lange=0.7517% PM=0.9850% Majority=0.6767% OracleLB=0.2933%
+  [incremental save: 10 points to /workspace/persist/results/ensemble_results.json]
+
+=== d7_p0.007 ===
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/d7_final/best_model.pt
+  seed=3000: pf=793  lange=577  pm=679  maj=512  all3=198
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/d7_final/best_model.pt
+  seed=3001: pf=816  lange=591  pm=671  maj=522  all3=230
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/d7_final/best_model.pt
+  seed=3002: pf=797  lange=596  pm=656  maj=504  all3=206
+  -> PF=4.0100% Lange=2.9400% PM=3.3433% Majority=2.5633% OracleLB=1.0567%
+  [incremental save: 11 points to /workspace/persist/results/ensemble_results.json]
+
+=== d7_p0.01 ===
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/d7_final/best_model.pt
+  seed=3000: pf=2645  lange=2183  pm=2071  maj=1887  all3=696
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/d7_final/best_model.pt
+  seed=3001: pf=2720  lange=2085  pm=2019  maj=1817  all3=692
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/d7_final/best_model.pt
+  seed=3002: pf=2780  lange=2225  pm=2090  maj=1913  all3=733
+  -> PF=13.5750% Lange=10.8217% PM=10.3000% Majority=9.3617% OracleLB=3.5350%
+  [incremental save: 12 points to /workspace/persist/results/ensemble_results.json]
+
+Saved to /workspace/persist/results/ensemble_results.json

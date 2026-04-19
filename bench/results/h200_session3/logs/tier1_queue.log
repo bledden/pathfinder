@@ -1,0 +1,8 @@
+[Sun Apr 19 17:43:45 UTC 2026] === Tier 1 start === 
+[Sun Apr 19 17:43:45 UTC 2026] 1/3 ensemble eval (12 points, 60K shots/point)
+[Sun Apr 19 17:44:27 UTC 2026] ensemble rc=0
+[Sun Apr 19 17:44:27 UTC 2026] 2/3 ablation_adamw_d3 (20K steps)
+[Sun Apr 19 17:47:05 UTC 2026] ablation_d3 rc=0
+[Sun Apr 19 17:47:05 UTC 2026] 3/3 ablation_adamw_d7 (80K steps)
+[Sun Apr 19 18:27:44 UTC 2026] ablation_d7 rc=0
+[Sun Apr 19 18:27:44 UTC 2026] === Tier 1 DONE ===
