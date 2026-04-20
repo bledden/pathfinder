@@ -1,0 +1,19 @@
+[Mon Apr 20 15:26:11 UTC 2026] === Phase 3 start: distill-as-fine-tune ===
+[Mon Apr 20 15:26:11 UTC 2026] 1/3 distill_finetune_d7 (init d7_final, Lange teacher, 40K steps)
+[Mon Apr 20 16:10:49 UTC 2026] distill_finetune_d7 rc=0
+[Mon Apr 20 16:10:49 UTC 2026] 2/3 distill_finetune_d5
+[Mon Apr 20 16:35:27 UTC 2026] distill_finetune_d5 rc=0
+[Mon Apr 20 16:35:28 UTC 2026] 3/3 ensemble with best-of-everything Pathfinder per distance
+  d=3 finetune_d3: ler=0.02560
+  d=3 distill_d3: ler=0.13440
+  d=3 selected: finetune_d3 (ler=0.02560)
+  d=5 finetune_d5: ler=0.02550
+  d=5 distill_d5: ler=0.03070
+  d=5 distill_finetune_d5: ler=0.02920
+  d=5 selected: finetune_d5 (ler=0.02550)
+  d=7 finetune_d7: ler=0.03310
+  d=7 distill_d7: ler=0.02960
+  d=7 distill_finetune_d7: ler=0.03660
+  d=7 selected: distill_d7 (ler=0.02960)
+[Mon Apr 20 16:36:14 UTC 2026] ensemble_phase3 rc=0
+[Mon Apr 20 16:36:14 UTC 2026] === Phase 3 DONE ===
