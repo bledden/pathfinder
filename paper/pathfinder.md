@@ -405,7 +405,7 @@ A from-scratch 80,000-step retrain at 4-parameter noise (script: `bench/results/
 
 ### 5.12 Three-Way Majority-Vote Ensemble (Pathfinder + Lange + PyMatching)
 
-Given the three decoders' different inductive biases — Pathfinder's lattice-aware 3D convolution, Lange's graph-of-defects message passing [14], and PyMatching's combinatorial minimum-weight matching [2] — their failure modes are largely independent (§5.6). A simple majority-vote ensemble of the three decoders was evaluated at matched 4-parameter noise using the same harness as §5.11: 60,000 shots per point (3 seeds × 20,000 shots), 12 (d, p) points, ensemble prediction is the elementwise majority of the three binary outputs. For Pathfinder I use the fine-tuned checkpoints (`finetune_d5/best_model.pt`, `finetune_d7/best_model.pt`) described in the §5.11 update above — the same Pathfinder as the headline §5.11 comparison. For d=3 (no fine-tuned checkpoint), I use the 3-parameter Table-1 checkpoint (`d3_muon/best_model.pt`) evaluated out-of-distribution at 4-parameter noise. Raw data: `bench/results/h200_session3/tuned/ensemble_results_tuned.json`; harness: `bench/results/h200_session3/ensemble_pf_lange.py`.
+Given the three decoders' different inductive biases — Pathfinder's lattice-aware 3D convolution, Lange's graph-of-defects message passing [14], and PyMatching's combinatorial minimum-weight matching [2] — their failure modes are largely independent (§5.6). A simple majority-vote ensemble of the three decoders was evaluated at matched 4-parameter noise using the same harness as §5.11: 60,000 shots per point (3 seeds × 20,000 shots), 12 (d, p) points, ensemble prediction is the elementwise majority of the three binary outputs. For the Pathfinder vote I use the best-available Pathfinder checkpoint at each distance: the fine-tuned `finetune_d5` at d=5 (§5.11 update), the distilled `distill_d7` at d=7 (trained with Lange as a soft-target teacher; see §5.13 below), and the 3-parameter Table-1 `d3_muon` checkpoint at d=3 (evaluated out-of-distribution at 4-parameter noise, no fine-tune was run for d=3). Raw data: `bench/results/h200_session3/distill/ensemble_results_distill.json`; harness: `bench/results/h200_session3/ensemble_pf_lange.py`.
 
 **Table 10: 3-way majority vote (PF+Lange+PM) vs individual decoders (LER %, 60K shots)**
 
@@ -419,21 +419,49 @@ Given the three decoders' different inductive biases — Pathfinder's lattice-aw
 | 5 | 0.005 | 1.142 | 0.957 | 1.428 | 1.010 | 0.550 | Lange |
 | 5 | 0.007 | 3.040 | 2.580 | 3.547 | 2.657 | 1.498 | Lange |
 | 5 | 0.010 | 7.657 | 6.772 | 8.273 | **6.660** | 3.602 | **Majority** |
-| 7 | 0.003 | 0.120 | 0.087 | 0.148 | 0.092 | 0.038 | Lange |
-| 7 | 0.005 | 0.965 | 0.752 | 0.985 | **0.680** | 0.295 | **Majority** |
-| 7 | 0.007 | 3.343 | 2.940 | 3.343 | **2.417** | 1.075 | **Majority** |
-| 7 | 0.010 | 11.937 | 10.822 | 10.300 | **9.092** | 3.682 | **Majority** |
+| 7 | 0.003 | 0.103 | 0.087 | 0.148 | **0.085** | 0.033 | **Majority** |
+| 7 | 0.005 | 0.817 | 0.752 | 0.985 | **0.660** | 0.230 | **Majority** |
+| 7 | 0.007 | 3.090 | 2.940 | 3.343 | **2.495** | 1.143 | **Majority** |
+| 7 | 0.010 | 11.132 | 10.822 | 10.300 | **9.087** | 3.853 | **Majority** |
 
 "Oracle-LB" = fraction of shots where all three decoders are simultaneously wrong, a lower bound on any ensemble's LER. "Winner" = strict winner among the four columns.
 
 **Findings.**
-1. **Majority vote strictly beats every individual decoder at 4 of 12 points**, concentrated at d=7 (p ∈ {0.005, 0.007, 0.010}) and at d=5 p=0.010. At d=7, p=0.007 the majority vote's 2.42% is a 17.8% relative reduction over Lange alone (2.94%) and the 95% Wilson confidence intervals are **strictly non-overlapping** ([2.30, 2.54] vs. [2.81, 3.08]) — a statistically significant ensemble win. At d=7 p=0.010 the majority's 9.09% is a 16.0% reduction over Lange (10.82%) and 11.7% over PM (10.30%), also non-overlapping CIs. At d=7 p=0.005, majority 0.68% vs Lange 0.75%.
+1. **Majority vote strictly beats every individual decoder at 5 of 12 points**, sweeping all four d=7 operational noise rates (p ∈ {0.003, 0.005, 0.007, 0.010}) plus d=5 p=0.010. At d=7 p=0.007 the majority vote's 2.50% is a 15.1% relative reduction over Lange alone (2.94%) with strictly non-overlapping 95% Wilson CIs ([2.37, 2.62] vs. [2.81, 3.08]) — a statistically significant ensemble win. At d=7 p=0.010 the majority's 9.09% is a 16.0% reduction over Lange (10.82%) and 11.7% over PM (10.30%), also non-overlapping CIs. At d=7 p=0.005, majority 0.66% vs Lange 0.75% (11.9% relative). At d=7 p=0.003 the margin is tight (0.085% vs 0.087%) with overlapping CIs — reported as a soft win.
 2. At d=3 and the low-noise end of d=5, majority vote does not strictly beat Lange alone — in the easy-decoding regime the individual decoders are already close to the ensemble limit, and the combinatorial-optimality gap between Lange and the majority vote is too small to recover.
-3. The oracle lower bound at d=7 p=0.007 is 1.08%, so majority vote (2.42%) captures roughly (2.94 − 2.42) / (2.94 − 1.08) ≈ 28% of the available ensemble headroom over Lange. A learned meta-decoder (or per-noise-rate gating) could plausibly close more.
+3. The oracle lower bound at d=7 p=0.007 is 1.14%, so majority vote (2.50%) captures roughly (2.94 − 2.50) / (2.94 − 1.14) ≈ 25% of the available ensemble headroom over Lange. A learned meta-decoder (or per-noise-rate gating) could plausibly close more.
 4. Confidence-thresholded gating (use Pathfinder's prediction when |logit| > T, else Lange) was also tested at T ∈ {1, 2, 3, 4} and never strictly beat Lange alone in this evaluation; the 3-way majority vote is a strict improvement over that confidence-gating scheme.
-5. Fine-tuning the Pathfinder checkpoint (§5.11 update) strengthens the majority-vote win at d=7: at p=0.007 the ensemble moves from 2.56% (OOD Pathfinder) to 2.42% (fine-tuned), widening the gap over Lange from 12.9% relative to 17.8% and crossing from overlapping CIs to strictly non-overlapping.
+5. The choice of Pathfinder variant matters. Using distilled-from-Lange `distill_d7` at d=7 (lower individual LER: 3.09% vs fine-tuned 3.34%) produces an additional strict ensemble win at d=7 p=0.003 and a tighter margin at p=0.005, but a slightly weaker margin at p=0.007 (majority 2.50% vs. 2.42% with fine-tuned Pathfinder) because the student correlates with the Lange teacher, reducing ensemble independence. Using fine-tuned `finetune_d7` at d=7 gives majority 2.42% at p=0.007 (17.8% relative) but loses the strict win at p=0.003. Table 10 uses distilled at d=7 because distilled wins 3 of 4 d=7 points (p=0.003, 0.005, 0.010) and produces the lower standalone-Pathfinder LER; the §5.13 discussion below covers the correlation tradeoff.
 
-**Contribution.** Section 5.11 established that Lange et al. individually outperforms Pathfinder at matched noise even after fine-tuning; this section establishes that a simple, computable-in-parallel 3-way majority vote of (Pathfinder, Lange, PyMatching) *strictly* beats Lange alone at d=7 across operational noise rates, with statistically significant CI separation at p=0.007 and p=0.010. That is a novel contribution on top of Lange's priority: the cheapest way to lower the best-known open-source LER at d=7 p ∈ {0.005, 0.007, 0.010} is not a better decoder, it is running these three existing decoders in parallel and taking the majority. The ensemble requires running all three decoders concurrently, so end-to-end latency is bounded by the slowest (PyMatching at high noise); deployments for which this is acceptable — offline protocol verification, post-selection in repeat-until-success, or any non-real-time QEC application — gain a 16–18% LER reduction over Lange alone at d=7 operational noise rates for essentially zero additional ML effort.
+**Contribution.** Section 5.11 established that Lange et al. individually outperforms Pathfinder at matched noise even after fine-tuning; this section establishes that a simple, computable-in-parallel 3-way majority vote of (Pathfinder, Lange, PyMatching) *strictly* beats Lange alone across all four tested d=7 operational noise rates, with statistically significant CI separation at p=0.007 and p=0.010. That is a novel contribution on top of Lange's priority: the cheapest way to lower the best-known open-source LER at d=7 operational noise is not a better decoder, it is running these three existing decoders in parallel and taking the majority. The ensemble requires running all three decoders concurrently, so end-to-end latency is bounded by the slowest (PyMatching at high noise); deployments for which this is acceptable — offline protocol verification, post-selection in repeat-until-success, or any non-real-time QEC application — gain a 12–16% LER reduction over Lange alone at d=7 operational noise rates for essentially zero additional ML effort.
+
+### 5.13 Distillation from Lange and the Independence-Accuracy Tradeoff
+
+To close the Pathfinder–Lange individual-decoder gap at matched 4-parameter noise (§5.11), I trained Pathfinder students with Lange as a soft-target teacher. Script: `bench/results/h200_session3/train_finetune_4param.py` for the fine-tune baseline, and `bench/results/h200_session2/train_distill_lange.py` for the distillation. The distillation loss is `0.3 · BCE(student_logit, label) + 0.7 · T² · KL(σ(student/T), σ(teacher/T))` with T=2.0, 80,000 steps, Muon lr=0.02, AdamW lr=3e-3 on 1D params, curriculum noise annealing from 0.1p_target to p_target. Teacher is the Lange GNN (`d{d}_d_t_{d_t}.pt` pre-trained weights from the Lange repo), frozen.
+
+**Table 11: Pathfinder variants at p=0.007 (60K-shot eval, 4-parameter noise)**
+
+| Distance | Variant | Individual LER | Ensemble LER (as PF voter) |
+|----------|---------|----------------|----------------------------|
+| d=5 | Table-1 OOD | 2.94% | 2.60% |
+| d=5 | Fine-tune from Table-1 | 3.04% | 2.66% |
+| d=5 | Distilled from scratch | ≈3.3% (10K eval drift)* | — |
+| d=7 | Table-1 OOD | 4.01% | 2.56% |
+| d=7 | Fine-tune from Table-1 | 3.34% | **2.42%** |
+| d=7 | Distilled from scratch | **3.09%** | 2.50% |
+
+*The d=5 distillation run's best 10K-shot evaluation during training was 3.07%, but end-of-training LER drifted higher. A 60K-shot ensemble evaluation with the best-checkpoint-during-training gave individual LER ≈3.3% — no net improvement over fine-tune. Reported here as "not materially different from fine-tune"; the distillation result at d=5 is neither a clear success nor a clear failure.
+
+**Interpretation — independence vs. individual accuracy.** At d=7 the two approaches trade off cleanly:
+
+- **Distilled Pathfinder** has *better* individual LER (3.09% vs. 3.34% for fine-tuned) because the Lange teacher provides a stronger training signal than hard labels alone.
+- **Fine-tuned Pathfinder** produces a *better* 3-way ensemble at p=0.007 (majority 2.42% vs. 2.50%) because its predictions are less correlated with Lange's — the majority vote needs the voters to disagree on the *right* shots to extract the oracle-bound headroom.
+
+Concretely: distilled_d7 and Lange agree on 96.7% of shots at d=7 p=0.007, versus fine-tuned_d7 and Lange agreeing on 95.9% — roughly 80 additional shots per 10K where distilled agrees with Lange but fine-tuned diverges. When fine-tuned diverges AND PyMatching votes with it, the majority flips a Lange error into a correct prediction; the distilled variant's over-agreement with the teacher suppresses that signal. This is the "correlation cost" of teacher-student training for ensemble use.
+
+**Which Pathfinder to ship.** For standalone neural decoding at d=7, the distilled Pathfinder is the right default — lower LER than fine-tune, closer to Lange. For the 3-way ensemble (which is the LER-minimizing configuration overall), fine-tuned is the right default at p=0.007 specifically, but distilled wins at p ∈ {0.003, 0.005, 0.010}. Table 10 uses distilled because it wins 3 of 4 d=7 points and gives the better standalone decoder. Ensemble-oriented deployments at p=0.007 should use fine-tuned instead; cross-noise generalization of either choice is open.
+
+**Negative result worth naming.** Distilling without a strong initialization is risky: the student's LER during training drifts non-monotonically (see `bench/results/h200_session3/distill/distill_d5.log`), and the best-checkpoint-during-training is not always representative of the end-of-training model. A distill-as-fine-tune recipe (initialize from Table-1 checkpoint, then add Lange teacher for the fine-tune phase) was not run for scheduling reasons but is the most plausible way to recover both signals; it is left as future work.
 
 ---
 
