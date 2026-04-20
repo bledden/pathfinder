@@ -26,7 +26,11 @@ This work presents Pathfinder, a CNN decoder that:
 1. **Outperforms or matches MWPM** at every tested noise rate (p=0.0005 to p=0.015) and code distance (d=3, 5, 7) under circuit-level depolarizing noise — wins or ties at all 24 evaluation points; 13/24 show non-overlapping 95% Wilson confidence intervals (Section 5.1).
 2. **Achieves faster error suppression scaling** than MWPM with increasing code distance at operational noise rates (p ≥ 0.003), consistent with the waterfall regime identified by Gu et al. At the lowest tested noise (p=0.001) the scaling comparison is confounded by small-number statistics in 100K-shot trials (Section 5.2).
 3. **Runs at 7.86 μs per syndrome** at throughput-optimal batching on a single NVIDIA H200 GPU with `torch.compile(max-autotune)` + FP16, or **6.12 μs per syndrome with a custom Triton kernel** for DirectionalConv3d. The Triton kernel sustains the d=7 surface-code cycle-time budget (7 μs) with 13% positive margin, whereas both unoptimized Pathfinder *and* PyMatching on single-core CPU fail to sustain it at p ≥ 0.007 (measured PM d=7 p=0.007: 9.65 μs/syn on Apple M4; Section 5.3).
-4. **Is fully open-source** — all model code, trained checkpoints, training data generation, evaluation scripts, and the Triton kernel are publicly available.
+4. **Yields a Muon-optimizer ablation with a clear depth dependence** (Section 6.2): removing Muon costs +17% LER at d=3, +72% at d=5, and is catastrophic at d=7 (1.04% → 34.8% LER in the same training budget).
+5. **Produces a three-way majority-vote ensemble (Pathfinder + Lange + PyMatching) that strictly beats every individual decoder at d=7 operational noise rates**, with statistically significant non-overlapping 95% CIs at p=0.007 and p=0.010 (Section 5.12). Majority vote 2.50% vs. Lange alone 2.94% at d=7, p=0.007 — a 15.1% relative reduction for zero new ML training.
+6. **Reports the distillation / ensemble-independence tradeoff as an empirical finding** (Section 5.13): distilling Lange into Pathfinder reduces the student's individual LER (3.34% → 3.09% at d=7, p=0.007) but correlates the student with the teacher, costing ensemble margin at some operating points. Reported as a design choice rather than a uniformly positive result.
+7. **Rules out a fully-modern-primitives hybrid (CNN + RMSNorm + SwiGLU + 3D-RoPE attention + Flash Attention) as a Pathfinder replacement at this data scale** (Section 5.14): the 4.36 M-parameter hybrid trained from scratch at d=7 lands at 4.76% LER, *worse* than the 500 K-parameter Pathfinder on every recipe. Reported as a negative result supporting the original architecture choice.
+8. **Is fully open-source** — all model code, trained checkpoints (including the fine-tuned, distilled, and hybrid variants from Sections 5.11–5.14), training data generation, evaluation scripts, and the Triton kernel are publicly available.
 
 Training the models reported here required approximately 28 GPU-hours on AMD MI300X instances (~$65 USD in cloud compute). Benchmarking on NVIDIA H200 for apples-to-apples comparison with Gu et al., plus custom Triton kernel development, distillation training, and narrower-model Pareto studies, added approximately 10 hours of H200 compute (~$35). Including ablations and abandoned runs during development, the total exploration cost was approximately $100 over 6 days of elapsed time by a single engineer.
 
@@ -542,9 +546,11 @@ At d=3 the architecture is shallow enough (L=3, 252K parameters) that AdamW reac
 
 ## 8. Conclusion
 
-Pathfinder is an open-source reference implementation that composes ideas developed by the broader quantum error correction and deep learning research communities. None of its ingredients are novel in isolation: the direction-specific convolution architecture follows Gu et al. [8]; PyMatching [2] defines what it means to "beat MWPM" and is the reason a rigorous comparison was possible; Stim [10] makes syndrome generation tractable at the scale required for training; Muon [11] provides the optimizer that, as the ablation reveals, is responsible for the majority of the accuracy advantage (removing Muon increases LER by 72%); AlphaQubit [5] established that neural decoders could beat MWPM on real hardware; and Willow [1] established that the surface code regime addressed here is experimentally relevant. Pathfinder's contribution is to assemble these pieces into an open-source decoder that outperforms MWPM across all tested conditions, to empirically identify the Muon optimizer as the dominant factor in neural decoder accuracy, to add a custom Triton kernel that makes d=7 decoding real-time at operational noise rates on a single H200 GPU, and to demonstrate that the full work is reproducible on commodity cloud hardware for approximately $100 in total compute over six days of elapsed time by a single engineer.
+Pathfinder is an open-source reference implementation that composes ideas developed by the broader quantum error correction and deep learning research communities. None of its ingredients are novel in isolation: the direction-specific convolution architecture follows Gu et al. [8]; PyMatching [2] defines what it means to "beat MWPM" and is the reason a rigorous comparison was possible; Stim [10] makes syndrome generation tractable at the scale required for training; Muon [11] provides the optimizer that, as the ablation reveals, dominates decoder accuracy at d ≥ 5 and is essential at d=7 (Section 6.2); AlphaQubit [5] established that neural decoders could beat MWPM on real hardware; Lange et al. [14] established the first open-source GNN decoder to beat PyMatching on rotated surface codes; and Willow [1] established that the surface code regime addressed here is experimentally relevant.
 
-Every design principle underlying this decoder existed before this work. What did not exist was an open implementation that made them reproducible together. The intent of this release is to give that to the research community so the next improvements can build on a shared foundation rather than start over. Real-time *single-shot* (batch=1) latency remains the principal open problem: the 201-μs per-syndrome latency achievable with the Triton kernel is still two orders of magnitude above the 1-μs superconducting cycle time, and closing this gap will require custom GPU kernels at the bottleneck-block level (not just DirectionalConv3d) or an FPGA implementation. That is the most important next step.
+Pathfinder's contribution is to assemble these pieces into an open-source decoder that outperforms MWPM across all tested conditions (§5.1); to empirically identify the Muon optimizer as the dominant factor in neural-decoder accuracy and to show the effect is depth-dependent (§6.2); to add a custom Triton kernel that makes d=7 decoding real-time at operational noise rates on a single H200 GPU (§5.3); to provide a direct head-to-head comparison with Lange et al. at matched noise model (§5.11) including a fine-tuning recipe that closes most of the architectural gap; to demonstrate a three-way majority-vote ensemble (Pathfinder + Lange + PyMatching) that strictly beats every individual decoder at d=7 operational noise rates with statistically significant non-overlapping CIs (§5.12); to characterize the distillation / ensemble-independence tradeoff that arises from teacher-student training between neural decoders (§5.13); to report a negative result on a fully-modern-primitives hybrid architecture (§5.14); and to demonstrate that the full work is reproducible on commodity cloud hardware for approximately $150 in total compute over nine days of elapsed time by a single engineer.
+
+Every design principle underlying this decoder existed before this work. What did not exist was an open implementation that made them reproducible together and a quantitative study of how they combine — which optimizer matters where, what fine-tuning recovers, where the ensemble and the teacher-student tradeoffs land. The intent of this release is to give that to the research community so the next improvements can build on a shared foundation rather than start over. Three open problems remain. Real-time *single-shot* (batch=1) latency is the first: the 201-μs per-syndrome latency achievable with the Triton kernel is two orders of magnitude above the 1-μs superconducting cycle time, and closing this gap will require custom GPU kernels at the bottleneck-block level (not just DirectionalConv3d) or an FPGA implementation. Closing the remaining individual-LER gap to Lange (≈14% relative at d=5 and d=7 after fine-tuning) is the second; a distill-as-fine-tune recipe (init from the 3-parameter Pathfinder checkpoint, then add Lange as teacher for the fine-tune phase) is the most plausible path and is left as future work. Extending all of the above to d=9 and d=11 is the third, and is blocked only by compute budget.
 
 ---
 
@@ -663,14 +669,14 @@ print(f'{(time.perf_counter()-t0)*1e6/5000:.2f} us/syn single-syndrome')
 "
 ```
 
-### A.5 Reproducing the ensemble results (Table 5, Section 5.6)
+### A.5 Reproducing the Pathfinder+PM ensemble results (Table 5, Section 5.6)
 
 ```bash
 python bench/ensemble_test.py
 # Outputs neural-alone, PM-alone, OR-oracle, and confidence-thresholded ensemble LERs at p in {0.003, 0.005, 0.007, 0.010}
 ```
 
-### A.6 Reproducing the distillation results (Section 5.10)
+### A.6 Reproducing the narrow-student distillation results (Section 5.10)
 
 ```bash
 # Narrow H=128 student from full H=256 teacher (~60 min on H200)
@@ -682,26 +688,89 @@ python train/train_h192_distill.py
 
 Both scripts require the full-teacher checkpoint at `train/checkpoints/d7_final/best_model.pt`.
 
-### A.7 Hardware used in this paper
+### A.7 Reproducing the Lange head-to-head and 4-parameter results (Sections 5.11–5.14)
 
-Training was performed on a rented AMD Instinct MI300X (192 GB HBM3) via ROCm; model correctness was verified on Apple M4 CPU (d=3 only — CPU is too slow for d≥5 training). Latency benchmarks reported in Section 5.3 were collected on a rented NVIDIA H200 SXM (141 GB HBM3e) via CUDA, selected for apples-to-apples comparison with Gu et al. [8]. PyMatching latency benchmarks were collected on an Apple M4 CPU (single core).
+Sections 5.11 (head-to-head with Lange et al.), 5.12 (3-way majority-vote ensemble), 5.13 (distillation / independence tradeoff), and 5.14 (hybrid architecture negative result) use a separate family of scripts stored under `bench/results/h200_session{2,3}/`. These were developed on a rented H200 SXM pod with a persistent network volume mounted at `/workspace/persist`; adapt paths as needed.
+
+```bash
+# 0. Clone Lange's repo (required for §5.11, §5.12, §5.13)
+git clone https://github.com/LangeMoritz/GNN_decoder
+# Additional deps: torch-geometric + torch-cluster matching your torch/CUDA
+pip install torch-geometric
+pip install torch-cluster -f https://data.pyg.org/whl/torch-2.4.1+cu124.html
+
+# §5.11 head-to-head (Pathfinder vs. Lange vs. PM, 4-parameter noise, 60K shots)
+python bench/results/h200_session2/run_lange_v3.py
+# Output: bench/results/h200_lange_headtohead_{low,high}_p.json
+
+# §5.11 4-parameter fine-tune (from Table-1 checkpoint, 40K steps, ~20 min)
+python bench/results/h200_session3/train_finetune_4param.py \
+  --distance 7 --steps 40000 --batch 256 --noise_rate 0.007 \
+  --muon_lr 0.005 --adam_lr 1e-3 \
+  --init train/checkpoints/d7_final/best_model.pt \
+  --ckpt checkpoints/finetune_d7
+
+# §5.11 4-parameter from-scratch retrain (80K steps; NB: fails catastrophically
+# at d=7, reported as a negative result)
+python bench/results/h200_session2/train_fixed_noise.py \
+  --distance 5 --hidden_dim 256 --steps 80000 --batch 256 --noise_rate 0.007 \
+  --ckpt checkpoints/fixed_d5
+
+# §5.12 3-way majority-vote ensemble (uses fine-tuned / distilled ckpts)
+python bench/results/h200_session3/ensemble_pf_lange.py \
+  --distances 3 5 7 --noise-rates 0.003 0.005 0.007 0.010 \
+  --n-per-seed 20000 --n-seeds 3 \
+  --output results/ensemble_results.json
+
+# §5.13 distillation from Lange teacher (80K steps, ~50 min at d=7)
+python bench/results/h200_session2/train_distill_lange.py \
+  --distance 7 --steps 80000 --batch 256 --noise_rate 0.007 \
+  --alpha_bce 0.3 --alpha_kl 0.7 --temperature 2.0 \
+  --ckpt checkpoints/distill_d7
+
+# §5.14 hybrid CNN+attention (80K steps, ~2 hr at d=7)
+python bench/results/h200_session3/hybrid/train_hybrid.py \
+  --distance 7 --hidden_dim 192 --n_blocks 7 --n_heads 8 --attn_every 2 \
+  --steps 80000 --batch 256 --noise_rate 0.007 \
+  --ckpt checkpoints/hybrid_d7
+```
+
+The §6.2 Muon ablation at d=3 and d=7 is reproduced with:
+
+```bash
+python bench/results/h200_session3/train_muon_ablation.py --distance 3 --steps 20000 --batch 512 --ckpt checkpoints/ablation_adamw_d3
+python bench/results/h200_session3/train_muon_ablation.py --distance 7 --steps 80000 --batch 256 --ckpt checkpoints/ablation_adamw_d7
+```
+
+Raw training / evaluation JSONs and logs from the actual runs used for Sections 5.11–5.14 and §6.2 are preserved at `bench/results/h200_session3/{tuned,distill,hybrid,logs,checkpoints}/` and `bench/results/h200_session2/`.
+
+### A.8 Hardware used in this paper
+
+Table-1 training was performed on a rented AMD Instinct MI300X (192 GB HBM3) via ROCm; model correctness was verified on Apple M4 CPU (d=3 only — CPU is too slow for d≥5 training). Latency benchmarks (Section 5.3), the Sections 5.11–5.14 experiments, and the Muon ablations (§6.2) were collected on a rented NVIDIA H200 SXM (141 GB HBM3e) via CUDA with PyTorch 2.4/2.6; the H200 was selected for apples-to-apples comparison with Gu et al. [8]. PyMatching latency benchmarks were collected on an Apple M4 CPU (single core).
 
 Pathfinder's PyTorch model code (`train/model.py`) has no vendor-specific dependencies and runs on CUDA, ROCm, MPS, and CPU. The Triton kernel (`bench/triton_directional.py`) is NVIDIA-specific (Triton 3.2+ on Hopper); it is *not* imported by the training or evaluation scripts and does not affect the core repository's AMD/CPU compatibility.
 
-### A.8 Trained checkpoints
+### A.9 Trained checkpoints
 
-All checkpoints are distributed in `train/checkpoints/`:
+All checkpoints are distributed under `train/checkpoints/` and `bench/results/h200_session3/`:
 
 | Path | Architecture | Purpose |
 |------|--------------|---------|
-| `d7_final/best_model.pt` | H=256, L=7, 500K params | The primary d=7 model producing Table 1 results |
-| `d7_narrow/best_model.pt` | H=128, L=7, 126K params | Narrow variant (Section 5.9) |
-| `d7_distill/best_model.pt` | H=128, L=7, 126K params | Narrow distilled from full teacher (Section 5.10) |
-| `d7_h192_distill/best_model.pt` | H=192, L=7, 282K params | Intermediate distilled variant (Section 5.10) |
-| `d7_p01/`, `d7_p015/`, `d7_mixed/` | H=256, L=7 | Noise-target specializations (Section 4.5) |
-| `d5_muon/`, `d5/`, `d5_gpu/` | H=256, L=5 | d=5 models |
-| `best_model.pt` (top-level) | H=256, L=3 | d=3 model |
-| `ablation_stdconv_d5/`, `ablation_nocurriculum_d5/` | d=5 ablations | Section 5.4 |
+| `train/checkpoints/d7_final/best_model.pt` | H=256, L=7, 500K params | Primary d=7 model producing Table 1 results |
+| `train/checkpoints/d7_narrow/best_model.pt` | H=128, L=7, 126K params | Narrow variant (Section 5.9) |
+| `train/checkpoints/d7_distill/best_model.pt` | H=128, L=7, 126K params | Narrow distilled from full teacher (Section 5.10) |
+| `train/checkpoints/d7_h192_distill/best_model.pt` | H=192, L=7, 282K params | Intermediate distilled variant (Section 5.10) |
+| `train/checkpoints/d7_p01/`, `d7_p015/`, `d7_mixed/` | H=256, L=7 | Noise-target specializations (Section 4.5) |
+| `train/checkpoints/d5_muon/`, `d5/`, `d5_gpu/` | H=256, L=5 | d=5 models |
+| `train/checkpoints/best_model.pt` (top-level) | H=256, L=3 | d=3 model |
+| `train/checkpoints/ablation_stdconv_d5/`, `ablation_nocurriculum_d5/` | d=5 | Section 5.4 ablations |
+| `bench/results/h200_session3/checkpoints/ablation_adamw_d3/best_model.pt` | d=3, H=256, L=3, 252K params | §6.2 d=3 Muon ablation |
+| `bench/results/h200_session3/checkpoints/ablation_adamw_d7/best_model.pt` | d=7, H=256, L=7, 500K params | §6.2 d=7 Muon ablation |
+| `bench/results/h200_session3/tuned/finetune_d5/best_model.pt` | d=5, H=256, L=5, 376K params | §5.11 fine-tune_d5 |
+| `bench/results/h200_session3/tuned/finetune_d7/best_model.pt` | d=7, H=256, L=7, 500K params | §5.11 fine-tune_d7 |
+| `bench/results/h200_session3/distill/distill_d5/best_model.pt` | d=5, H=256, L=5, 376K params | §5.13 distill_d5 |
+| `bench/results/h200_session3/distill/distill_d7/best_model.pt` | d=7, H=256, L=7, 500K params | §5.13 distill_d7 |
+| `bench/results/h200_session3/hybrid/hybrid_d7/best_model.pt` | d=7, H=192, L=7, 4.36M params | §5.14 hybrid (negative) |
 
 Each checkpoint stores `model_state_dict`, a `DecoderConfig` instance, and (for most) training metadata. Loading example:
 
