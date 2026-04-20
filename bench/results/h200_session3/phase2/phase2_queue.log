@@ -1,0 +1,18 @@
+[Mon Apr 20 07:46:03 UTC 2026] === Phase 2 start ===
+[Mon Apr 20 07:46:03 UTC 2026] 1/4 finetune_d3 from Table-1
+[Mon Apr 20 07:58:37 UTC 2026] finetune_d3 rc=0
+[Mon Apr 20 07:58:37 UTC 2026] 2/4 distill_d3
+[Mon Apr 20 08:31:13 UTC 2026] distill_d3 rc=0
+[Mon Apr 20 08:31:13 UTC 2026] 3/4 Lange latency benchmark
+[Mon Apr 20 08:31:19 UTC 2026] 4/4 ensemble with fully-tuned Pathfinder
+  d=3 distill_d3: ler=0.13440
+  d=3 finetune_d3: ler=0.02560
+  d=3 selected: finetune_d3 (ler=0.02560)
+  d=5 distill_d5: ler=0.03070
+  d=5 finetune_d5: ler=0.02550
+  d=5 selected: finetune_d5 (ler=0.02550)
+  d=7 distill_d7: ler=0.02960
+  d=7 finetune_d7: ler=0.03310
+  d=7 selected: distill_d7 (ler=0.02960)
+[Mon Apr 20 08:32:05 UTC 2026] ensemble_final rc=0
+[Mon Apr 20 08:32:05 UTC 2026] === Phase 2 DONE ===

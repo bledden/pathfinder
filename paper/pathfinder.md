@@ -396,7 +396,8 @@ Bold = lowest LER in the row. Under this evaluation Lange's GNN has the lowest L
 
 **Update — fine-tuning at matched noise largely closes the gap.** Fine-tuning the Table-1 checkpoints on the 4-parameter noise model (40,000 steps at p=0.007, lower LR: `muon_lr=0.005`, `adam_lr=1e-3`, no curriculum; script: `bench/results/h200_session3/train_finetune_4param.py`) converges to:
 
-- **d=5 fine-tuned: 3.04% at p=0.007** (vs. 2.935% for the OOD Table-1 checkpoint and 2.58% for Lange). Non-overlapping 95% Wilson CIs: Lange still strictly wins at d=5 (~15% relative gap).
+- **d=3 fine-tuned: 2.77% at p=0.007** (vs. 2.92% for the OOD Table-1 checkpoint and 2.71% for Lange). Closest to Lange of any distance (~2% relative gap) but still a Lange win at d=3.
+- **d=5 fine-tuned: 3.04% at p=0.007** (vs. 2.94% for the OOD Table-1 checkpoint and 2.58% for Lange). Non-overlapping 95% Wilson CIs: Lange still strictly wins at d=5 (~15% relative gap).
 - **d=7 fine-tuned: 3.34% at p=0.007** (vs. 4.01% for the OOD Table-1 checkpoint and 2.94% for Lange). Non-overlapping 95% CIs: Lange still strictly wins at d=7, but the gap is now ~14% relative instead of the ~36% gap with the OOD checkpoint.
 
 A from-scratch 80,000-step retrain at 4-parameter noise (script: `bench/results/h200_session2/train_fixed_noise.py`) was also tried: at d=5 it converged to 11.7% — markedly worse than either the OOD Table-1 checkpoint (2.94%) or the fine-tuned checkpoint (3.04%) — and at d=7 it failed catastrophically (stuck at ≈40% LER throughout the run). Training logs and both sets of checkpoints are preserved under `bench/results/h200_session3/`. The lesson: for Pathfinder's recipe at this scale, a from-scratch run on the harder 4-parameter noise is unreliable; initializing from a 3-parameter checkpoint and short fine-tuning is a reliable recovery.
@@ -407,24 +408,33 @@ A from-scratch 80,000-step retrain at 4-parameter noise (script: `bench/results/
 
 **Ensemble opportunity.** The three-way LER numbers also suggest that Pathfinder + Lange is a potentially complementary ensemble — the two decoders use fundamentally different inductive biases (lattice-aware convolution vs. graph-of-defects message passing) and their failure modes may be as independent as Pathfinder and PyMatching's (§5.6). This is tested below in §5.12.
 
+**Lange latency — measured on the same H200 hardware (new).** For a concrete latency comparison, I timed Lange's GNN decoder on the same NVIDIA H200 SXM used for Pathfinder's Section 5.3 benchmarks (5-rep median after 2 warmup calls; script: `bench/results/h200_session3/phase2/bench_lange_latency.py`). Representative numbers at d=7:
+
+| Decoder (d=7, p=0.007) | B=1 latency | B=1024 throughput |
+|------------------------|-------------|-------------------|
+| Pathfinder + Triton | **201 μs** | **6.12 μs/syn** |
+| Lange GNN | 1,918 μs | 71.67 μs/syn |
+
+Lange is ≈9.5× slower at B=1 and ≈12× slower at B=1024 than Pathfinder + Triton on identical hardware and the same noise operating point. Interpretation: Lange's per-syndrome latency at high noise is dominated by KNN graph construction and multi-layer graph convolution, which both scale with the number of defects; Pathfinder's latency is fixed by the convolution grid size and is noise-rate-independent. Lange does not sustain the 7-μs d=7 cycle-time budget in any configuration tested; its per-syndrome throughput is in the same range as PyMatching's single-core CPU measurement (9.65 μs/syn at B=1 single-syndrome; Table 3c). This adds Pathfinder's real-time-sustainability finding to the §5.11 priority picture: Lange's architecture is more accurate but fundamentally slower on present GPU hardware. Full Lange latency table (all distances and noise rates) is at `bench/results/h200_session3/phase2/lange_latency.json`.
+
 ### 5.12 Three-Way Majority-Vote Ensemble (Pathfinder + Lange + PyMatching)
 
-Given the three decoders' different inductive biases — Pathfinder's lattice-aware 3D convolution, Lange's graph-of-defects message passing [14], and PyMatching's combinatorial minimum-weight matching [2] — their failure modes are largely independent (§5.6). A simple majority-vote ensemble of the three decoders was evaluated at matched 4-parameter noise using the same harness as §5.11: 60,000 shots per point (3 seeds × 20,000 shots), 12 (d, p) points, ensemble prediction is the elementwise majority of the three binary outputs. For the Pathfinder vote I use the best-available Pathfinder checkpoint at each distance: the fine-tuned `finetune_d5` at d=5 (§5.11 update), the distilled `distill_d7` at d=7 (trained with Lange as a soft-target teacher; see §5.13 below), and the 3-parameter Table-1 `d3_muon` checkpoint at d=3 (evaluated out-of-distribution at 4-parameter noise, no fine-tune was run for d=3). Raw data: `bench/results/h200_session3/distill/ensemble_results_distill.json`; harness: `bench/results/h200_session3/ensemble_pf_lange.py`.
+Given the three decoders' different inductive biases — Pathfinder's lattice-aware 3D convolution, Lange's graph-of-defects message passing [14], and PyMatching's combinatorial minimum-weight matching [2] — their failure modes are largely independent (§5.6). A simple majority-vote ensemble of the three decoders was evaluated at matched 4-parameter noise using the same harness as §5.11: 60,000 shots per point (3 seeds × 20,000 shots), 12 (d, p) points, ensemble prediction is the elementwise majority of the three binary outputs. For the Pathfinder vote I use the best-available Pathfinder checkpoint at each distance: the fine-tuned `finetune_d3` at d=3 and `finetune_d5` at d=5 (§5.11 update), and the distilled `distill_d7` at d=7 (trained with Lange as a soft-target teacher; see §5.13 below). Raw data: `bench/results/h200_session3/phase2/ensemble_results_final.json`; harness: `bench/results/h200_session3/ensemble_pf_lange.py`.
 
 **Table 10: 3-way majority vote (PF+Lange+PM) vs individual decoders (LER %, 60K shots)**
 
 | d | p | PF | Lange | PM | **Majority** | Oracle-LB | Winner |
 |---|---|-----|-------|-----|-------------|-----------|--------|
-| 3 | 0.003 | 0.582 | 0.535 | 0.665 | 0.555 | 0.432 | Lange |
-| 3 | 0.005 | 1.595 | 1.493 | 1.798 | 1.567 | 1.185 | Lange |
-| 3 | 0.007 | 2.923 | 2.713 | 3.205 | 2.810 | 2.065 | Lange |
-| 3 | 0.010 | 5.533 | 5.140 | 5.852 | 5.308 | 3.940 | Lange |
-| 5 | 0.003 | 0.240 | 0.192 | 0.340 | 0.207 | 0.120 | Lange |
-| 5 | 0.005 | 1.142 | 0.957 | 1.428 | 1.010 | 0.550 | Lange |
-| 5 | 0.007 | 3.040 | 2.580 | 3.547 | 2.657 | 1.498 | Lange |
-| 5 | 0.010 | 7.657 | 6.772 | 8.273 | **6.660** | 3.602 | **Majority** |
-| 7 | 0.003 | 0.103 | 0.087 | 0.148 | **0.085** | 0.033 | **Majority** |
-| 7 | 0.005 | 0.817 | 0.752 | 0.985 | **0.660** | 0.230 | **Majority** |
+| 3 | 0.003 | 0.572 | 0.535 | 0.665 | 0.557 | 0.427 | Lange |
+| 3 | 0.005 | 1.527 | 1.493 | 1.798 | 1.537 | 1.155 | Lange |
+| 3 | 0.007 | 2.817 | 2.713 | 3.205 | 2.757 | 2.042 | Lange |
+| 3 | 0.010 | 5.302 | 5.140 | 5.852 | 5.180 | 3.913 | Lange |
+| 5 | 0.003 | 0.240 | 0.192 | 0.340 | 0.207 | 0.122 | Lange |
+| 5 | 0.005 | 1.142 | 0.957 | 1.428 | 1.010 | 0.565 | Lange |
+| 5 | 0.007 | 3.040 | 2.580 | 3.547 | 2.657 | 1.572 | Lange |
+| 5 | 0.010 | 7.657 | 6.772 | 8.273 | **6.660** | 3.615 | **Majority** |
+| 7 | 0.003 | 0.103 | 0.087 | 0.148 | **0.085** | 0.047 | **Majority** |
+| 7 | 0.005 | 0.817 | 0.752 | 0.985 | **0.660** | 0.313 | **Majority** |
 | 7 | 0.007 | 3.090 | 2.940 | 3.343 | **2.495** | 1.143 | **Majority** |
 | 7 | 0.010 | 11.132 | 10.822 | 10.300 | **9.087** | 3.853 | **Majority** |
 
@@ -465,7 +475,7 @@ Concretely: distilled_d7 and Lange agree on 96.7% of shots at d=7 p=0.007, versu
 
 **Which Pathfinder to ship.** For standalone neural decoding at d=7, the distilled Pathfinder is the right default — lower LER than fine-tune, closer to Lange. For the 3-way ensemble (which is the LER-minimizing configuration overall), fine-tuned is the right default at p=0.007 specifically, but distilled wins at p ∈ {0.003, 0.005, 0.010}. Table 10 uses distilled because it wins 3 of 4 d=7 points and gives the better standalone decoder. Ensemble-oriented deployments at p=0.007 should use fine-tuned instead; cross-noise generalization of either choice is open.
 
-**Negative result worth naming.** Distilling without a strong initialization is risky: the student's LER during training drifts non-monotonically (see `bench/results/h200_session3/distill/distill_d5.log`), and the best-checkpoint-during-training is not always representative of the end-of-training model. A distill-as-fine-tune recipe (initialize from Table-1 checkpoint, then add Lange teacher for the fine-tune phase) was not run for scheduling reasons but is the most plausible way to recover both signals; it is left as future work.
+**Negative result worth naming.** Distilling without a strong initialization is risky: the student's LER during training drifts non-monotonically (see `bench/results/h200_session3/distill/distill_d5.log`), and the best-checkpoint-during-training is not always representative of the end-of-training model. The failure mode is more severe at d=3 than at d=5 / d=7: a from-scratch d=3 distillation (same recipe, 80,000 steps, p=0.007) converges to LER 13.4% at d=3 — catastrophically worse than either the d=3 fine-tune result (2.77%) or the OOD Table-1 checkpoint (2.92%). The depth-independent KL-weighted training apparently does not work for the shallow d=3 architecture, which is paradoxical given that d=3 is the easiest decoding task. A distill-as-fine-tune recipe (initialize from Table-1 checkpoint, then add Lange teacher for the fine-tune phase) was not run for scheduling reasons but is the most plausible way to recover both signals; it is left as future work.
 
 ### 5.14 Modern-Architecture Ablation (Negative Result)
 
