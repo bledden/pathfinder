@@ -463,6 +463,23 @@ Concretely: distilled_d7 and Lange agree on 96.7% of shots at d=7 p=0.007, versu
 
 **Negative result worth naming.** Distilling without a strong initialization is risky: the student's LER during training drifts non-monotonically (see `bench/results/h200_session3/distill/distill_d5.log`), and the best-checkpoint-during-training is not always representative of the end-of-training model. A distill-as-fine-tune recipe (initialize from Table-1 checkpoint, then add Lange teacher for the fine-tune phase) was not run for scheduling reasons but is the most plausible way to recover both signals; it is left as future work.
 
+### 5.14 Modern-Architecture Ablation (Negative Result)
+
+To test whether Pathfinder's relatively simple CNN architecture is leaving accuracy on the table, I trained a hybrid CNN+attention variant at d=7 incorporating architectural primitives developed since Pathfinder's original design: RMSNorm (pre-norm throughout), SwiGLU feed-forward blocks, global multi-head self-attention with 3D Rotary Positional Embeddings interleaved every 2 blocks, Flash Attention via `F.scaled_dot_product_attention`, and the Muon + AdamW split. The DirectionalConv3d backbone is preserved. Architecture script: `bench/results/h200_session3/hybrid/train_hybrid.py`; checkpoint: `bench/results/h200_session3/hybrid/hybrid_d7/best_model.pt`. Configuration: H=192, L=7 blocks, 8 attention heads, 4.36 M parameters, 80,000 steps, batch 256, 4-parameter circuit-level noise from scratch, same curriculum as Pathfinder.
+
+**Result.** Final 50,000-shot LER at d=7, p=0.007: **4.76%**. This is *worse* than every other Pathfinder variant tested in this work:
+
+| Pathfinder variant at d=7, p=0.007 | Params | LER |
+|------------------------------------|--------|-----|
+| Table-1 OOD (3-param ckpt on 4-param eval) | 500K | 4.01% |
+| **Hybrid (CNN + attention + RMSNorm + SwiGLU + RoPE-3D)** | **4.36M** | **4.76%** |
+| Fine-tune (Table-1 init, 40K steps at 4-param) | 500K | 3.34% |
+| Distilled from Lange teacher (80K steps at 4-param) | 500K | 3.09% |
+
+Under this training budget the 9× parameter increase and the full set of modern primitives make the model *worse*, not better. The training loss curve converges fine (loss ≈ 0.1 at end, similar to Pathfinder) and there is no obvious failure mode — the architecture just doesn't generalize as well under the same 80,000-step / batch-256 training envelope as the simpler CNN. Whether longer training (e.g. 250,000+ steps) or a different optimizer regime would flip the ranking is untested; at this level of compute, the finding is that the original direction-specific-CNN design is already well-tuned for this data scale.
+
+This is reported as a negative result: the paper does not claim the hybrid variant as a contribution, but the checkpoint and full training log are released for researchers exploring the architecture space. The simpler CNN + Muon recipe is therefore the recommended base architecture for work of this kind.
+
 ---
 
 ## 6. Discussion
