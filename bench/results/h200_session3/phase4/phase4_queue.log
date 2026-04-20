@@ -1,0 +1,6 @@
+[Mon Apr 20 16:50:15 UTC 2026] === Phase 4 start: α_kl sweep for distill-as-fine-tune ===
+[Mon Apr 20 16:50:15 UTC 2026] d=7 distill-ft with α_kl=0.3 α_bce=0.7
+[Mon Apr 20 17:32:29 UTC 2026] d=7 α_kl=0.3 rc=0
+[Mon Apr 20 17:32:29 UTC 2026] d=7 distill-ft with α_kl=0.5 α_bce=0.5
+[Mon Apr 20 18:14:49 UTC 2026] d=7 α_kl=0.5 rc=0
+[Mon Apr 20 18:14:49 UTC 2026] === Phase 4 DONE ===

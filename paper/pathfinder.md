@@ -485,7 +485,17 @@ Concretely: distilled_d7 and Lange agree on 96.7% of shots at d=7 p=0.007, versu
 | Pure distill (from scratch + teacher KL) | 3.07% | **2.96%** |
 | Distill-as-fine-tune (init + BCE + teacher KL) | 2.92% | 3.66% |
 
-At **d=5** the combined recipe underperforms pure fine-tune (2.92% vs. 2.55%); at **d=7** it underperforms pure distillation (3.66% vs. 2.96%). It never dominates either pure technique at either distance. My interpretation: the KL loss with α_kl=0.7 and a strong init pulls the student in two directions — the init's Table-1 features are already competent under the 3-parameter noise model, and a heavy KL target against Lange partially undoes that specialization without fully settling into Lange's solution. The 40,000-step budget is not enough to reach either attractor. A smaller α_kl or longer training might help, but this is outside the scope of this paper; the honest finding at equivalent compute is that *the naive combination is strictly dominated by either pure method.*
+At **d=5** the combined recipe underperforms pure fine-tune (2.92% vs. 2.55%); at **d=7** it underperforms pure distillation (3.66% vs. 2.96%). It never dominates either pure technique at either distance. My interpretation: the KL loss with α_kl=0.7 and a strong init pulls the student in two directions — the init's Table-1 features are already competent under the 3-parameter noise model, and a heavy KL target against Lange partially undoes that specialization without fully settling into Lange's solution. The 40,000-step budget is not enough to reach either attractor.
+
+**α_kl sweep at d=7 (does a gentler teacher help?).** I additionally swept α_kl ∈ {0.3, 0.5, 0.7} at d=7 (α_bce = 1 − α_kl; same init, same 40K-step budget; checkpoints under `bench/results/h200_session3/phase4/distill_ft_d7_akl{0.3,0.5,0.7}/`):
+
+| α_kl | α_bce | d=7 LER |
+|------|-------|---------|
+| 0.3 | 0.7 | 3.27% |
+| 0.5 | 0.5 | 3.83% |
+| 0.7 | 0.3 | 3.66% |
+
+The best point (α_kl=0.3, 3.27%) marginally edges pure fine-tune (3.31%) but still loses to pure distill (2.96%) and the margin over fine-tune is within single-seed noise. The sweep is non-monotonic in α_kl (0.5 is worse than 0.3 or 0.7), likely reflecting run-to-run variance rather than a true curve. The conclusion is the same at every setting tested: *distill-as-fine-tune is not the best recipe at d=7 — pure distill is.*
 
 **What the paper therefore recommends.** For the lowest individual-decoder LER, use pure distillation (`distill_d{d}`). For the tightest 3-way majority-vote ensemble, use pure fine-tune for d=5 and pure distill for d=7 (Table 10). Combining the two recipes is not an improvement at this compute budget. Checkpoints from the distill-as-fine-tune runs are preserved under `bench/results/h200_session3/phase3/` for reproducibility.
 
