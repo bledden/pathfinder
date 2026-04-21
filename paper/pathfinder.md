@@ -540,7 +540,12 @@ At d=3 the architecture is shallow enough (L=3, 252K parameters) that AdamW reac
 
 ### 6.3 Limitations
 
-**Code distances.** The evaluation is limited to d=3, 5, 7; Gu et al. evaluate up to d=13. Extending to d=9, 11 would require larger models (likely H=512), longer training, and is left as future work. The error-suppression scaling trends (Section 5.2) suggest Pathfinder's accuracy advantage grows with distance, but this is extrapolation.
+**Code distances.** The evaluation is limited to d=3, 5, 7; Gu et al. evaluate up to d=13. I attempted a d=9 extension in two ways, both of which failed within a 1-2 H200-hour training budget and are reported here as negative results:
+
+- **d=9 pure distillation from scratch** (Lange d=9 GNN as soft-target teacher, α_kl=0.7, T=2.0, 80K steps at p=0.007, 4-parameter noise). Training loss stuck at ≈0.67 (random chance), eval LER stuck at 46% throughout. The same recipe that converged at d=7 (distill_d7 → 2.96% LER) does not converge at d=9.
+- **d=9 Pathfinder from scratch at 3-parameter noise** (Table-1 recipe: `train/train.py`, H=256, L=9, 624K params, muon_lr=0.02, curriculum noise annealing, 80K steps). Killed at step 64K after best-eval LER plateaued at 42% through both curriculum stages 1 and 2 and into stage 3 with no improvement — the same failure mode that blocked the 4-parameter fixed_d7 retrain in §5.11. Final checkpoint preserved at `bench/results/h200_session3/phase5/d9_table1/best_model.pt`.
+
+Two plausible explanations for the consistent d≥9 / non-fine-tune failure: (a) the noise-rate curriculum and Muon-lr=0.02 combination produces a training trajectory whose stage-2-to-stage-3 transition is too aggressive for deeper networks to follow, and (b) 624K parameters at L=9 may be capacity-constrained for the d=9 task, requiring H≥384 or L>d to leave enough slack. The paper's Table 1 d=7 result (§5.1) likely succeeded via the noise-rate specialization of §4.5 (four models at different target noise rates); a similar approach was not attempted for d=9 due to compute budget. Extending to d=9/11 is a real open problem, not a trivial scale-up. The fixed_d7 failure (§5.11) and the d=9 failures here are the two points where this paper's recipe clearly doesn't generalize.
 
 **Noise models.** Evaluation is on circuit-level depolarizing noise and (for generalization) phenomenological noise. Real quantum hardware exhibits device-specific correlated noise that may differ from these models; AlphaQubit [5] was validated on experimental Sycamore data, a comparison this work does not make.
 

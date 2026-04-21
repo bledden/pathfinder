@@ -1,0 +1,2 @@
+[Tue Apr 21 00:32:19 UTC 2026] === Phase 5b: d=9 via 3-param training + 4-param fine-tune ===
+[Tue Apr 21 00:32:19 UTC 2026] 1/3 d=9 Table-1 training (3-param, 80K steps)
