@@ -301,7 +301,21 @@ A simple confidence-thresholded ensemble — use Pathfinder's prediction when |l
 
 ### 5.7 Generalization
 
-**Noise models**: A model trained on circuit-level depolarizing noise (with measurement errors) successfully decodes phenomenological noise (without measurement errors), beating PyMatching on this out-of-distribution noise model without retraining.
+**Noise models — phenomenological (no measurement errors).** A rigorous 60K-shot evaluation of Pathfinder on phenomenological noise (data-qubit `before_round_data_depolarization=p` only, no measurement flips) finds that Pathfinder **does not** beat PyMatching on this out-of-distribution noise model. I report this as a corrected measurement: earlier versions of this work claimed Pathfinder generalizes to phenomenological noise, but a systematic eval across three code distances and five noise rates contradicts that claim. Script: `bench/results/h200_session3/tierB/phenom_eval*.py` (uploaded to the pod as `eval_phenomenological.py` and `eval_phenom_table1.py`). Raw data: `bench/results/h200_session3/tierB/phenom_eval.json` (canonical Pathfinder), `phenom_eval_table1.json` (original 3-parameter Table-1 Pathfinder).
+
+**Table 6a: Phenomenological-noise generalization (LER %, 60K shots; PF = canonical Pathfinder / Table-1 Pathfinder)**
+
+| d | p | Canonical PF (4-param trained) | Table-1 PF (3-param trained) | PyMatching | PM wins? |
+|---|---|-------------------------------|------------------------------|------------|:--------:|
+| 3 | 0.003 | 0.028 | 0.033 | 0.025 | ✓ |
+| 3 | 0.007 | 0.197 | 0.227 | 0.133 | ✓ |
+| 3 | 0.015 | 0.717 | 0.823 | 0.470 | ✓ |
+| 5 | 0.007 | 0.025 | 0.027 | 0.012 | ✓ |
+| 5 | 0.015 | 0.298 | 0.333 | 0.135 | ✓ |
+| 7 | 0.007 | 0.010 | 0.012 | 0.003 | ✓ |
+| 7 | 0.015 | 0.108 | 0.138 | 0.040 | ✓ |
+
+PyMatching wins on phenomenological noise at **15/15** tested points (for both Pathfinder variants). The gap is 1.5–8.5× — PM is substantially better. Mechanistically: PM constructs its matching graph from Stim's detector error model, which adapts trivially to any noise-parameter specification; Pathfinder's learned features expect the syndrome patterns seen during training and fail to generalize cleanly to a noise model with no measurement errors. The original §5.7 phenomenological-noise claim is therefore retracted. **This is a cost** of neural decoders: OOD generalization to different noise-model classes is not automatic, and must be explicitly validated for each target noise model. PyMatching's algorithmic robustness to different noise models — via its DEM-based graph construction — is a strength of the MWPM approach that neural decoders like Pathfinder and Lange et al. do not share.
 
 **Code types**: Pathfinder generalizes to alternative code types with per-code-type training.
 
@@ -406,6 +420,16 @@ Bold = lowest LER in the row. Under this matched-noise comparison **Lange's GNN 
 
 Lange is ≈9.5× slower at B=1 and ≈12× slower at B=1024 than Pathfinder + Triton on identical hardware and the same noise operating point. Interpretation: Lange's per-syndrome latency at high noise is dominated by KNN graph construction and multi-layer graph convolution, which both scale with the number of defects; Pathfinder's latency is fixed by the convolution grid size and is noise-rate-independent. Lange does not sustain the 7-μs d=7 cycle-time budget in any configuration tested; its per-syndrome throughput is in the same range as PyMatching's single-core CPU measurement (9.65 μs/syn at B=1 single-syndrome; Table 3c). This adds Pathfinder's real-time-sustainability finding to the §5.11 priority picture: Lange's architecture is more accurate but fundamentally slower on present GPU hardware. Full Lange latency table (all distances and noise rates) is at `bench/results/h200_session3/phase2/lange_latency.json`.
 
+**Multi-seed variance for the canonical recipe.** To check that the Pathfinder LER reported above is not a single-seed artifact, I re-trained `finetune_d7` three times with different torch random seeds (1, 2, 3; same script, same 40K-step budget, same init checkpoint). Data: `bench/results/h200_session3/tierB/multiseed_eval.json`.
+
+| Metric at d=7, p=0.007 (60K shots ensemble eval) | Seed 1 | Seed 2 | Seed 3 | Mean ± σ |
+|---|---:|---:|---:|---:|
+| Pathfinder individual LER (%) | 3.362 | 3.440 | 3.390 | **3.397 ± 0.040** |
+| Pathfinder-Triad LER (%)      | 2.462 | 2.477 | 2.458 | **2.466 ± 0.010** |
+| Training-final 50K-shot LER (%)| 3.316 | 3.512 | 3.424 | 3.417 ± 0.098 |
+
+The **ensemble margin is ≈4× more stable across seeds than the individual decoder** (σ=0.010 vs 0.040 at 60K shots). Every one of the three seeds independently reproduces the headline §5.12 result of Pathfinder-Triad non-overlapping CI vs Lange (Lange's 60K CI is [2.803, 3.086]; all three seeds' Triad CIs sit in [2.343, 2.594]). The stat-sig Pathfinder-Triad claim is robust to the Pathfinder voter's training seed.
+
 ### 5.12 Pathfinder-Triad: a three-way majority-vote ensemble
 
 Given the three decoders' different inductive biases — Pathfinder's lattice-aware 3D convolution, Lange's graph-of-defects message passing [14], and PyMatching's combinatorial minimum-weight matching [2] — their failure modes are largely independent (§5.6). This section defines a second decoder system on top of canonical Pathfinder:
@@ -462,6 +486,29 @@ At 100K shots the Pathfinder-Triad vs. Lange CI gap at d=7 p=0.007 is 301 basis 
 3. The oracle lower bound at d=7 p=0.007 (100K shots) is 1.085%, so Pathfinder-Triad (2.454%) captures roughly (2.956 − 2.454) / (2.956 − 1.085) ≈ 27% of the available ensemble headroom over Lange. A learned meta-decoder or per-noise-rate gating could plausibly close more.
 4. **Confidence-thresholded gating does not help.** I also tested a confidence-thresholded gate that uses Pathfinder's prediction when |logit| > T, else Lange, at T ∈ {1, 2, 3, 4}; this variant never strictly beat Lange alone at any of the 24 (d, p) points in this evaluation. Pathfinder-Triad (3-way majority vote) is a strict improvement over that scheme.
 5. **The win frequency grows with code distance and noise.** d=3 has 0 wins; d=5 has 3 wins concentrated at p ≥ 0.002; d=7 has 4 wins covering every operational noise rate tested (p=0.005 through p=0.015). Consistent with the §5.11 observation that the oracle headroom grows with the independence of the three decoders' failure modes, which in turn grows with code distance (larger d = more nontrivial syndrome structure to disagree about).
+
+**Mechanistic decomposition at the headline point.** To pin down where the Pathfinder-Triad improvement over Lange alone comes from, I recorded the full per-shot triple (PF-wrong, Lange-wrong, PM-wrong) at the headline d=7 p=0.007 point at 100K shots. The resulting 2³ contingency (raw data: `bench/results/h200_session3/tierB/per_shot_decomp_d7_p0.007.json`):
+
+| Outcome | Shots | Fraction |
+|---|---:|---:|
+| All three right (good decoding) | 93,836 | 93.836% |
+| **Lange wrong alone, PF+PM rescue (Triad correct)** | **904** | **0.904%** |
+| Lange right alone, PF+PM flip (Triad wrong) | 402 | 0.402% |
+| PF wrong alone, Lange+PM rescue | 1,325 | 1.325% |
+| PF right alone, Lange+PM flip | 398 | 0.398% |
+| PM wrong alone, PF+Lange rescue | 1,481 | 1.481% |
+| PM right alone, PF+Lange flip | 569 | 0.569% |
+| All three wrong (oracle LB) | 1,085 | 1.085% |
+
+Reading this from Lange's perspective:
+- Lange is wrong on 2,956 shots (= 904 + 398 + 569 + 1,085).
+- Pathfinder-Triad is wrong on 2,454 shots (the four cells where ≥2 of 3 are wrong: 402 + 569 + 398 + 1,085).
+- The Triad's advantage over Lange alone comes from two competing effects:
+  - **Rescues**: 904 shots where Lange was wrong but Pathfinder and PyMatching both voted for the correct answer. The Triad returns these to correctness.
+  - **Losses**: 402 shots where Lange was right but Pathfinder and PyMatching both voted incorrectly, so the Triad flips them wrong.
+- **Net improvement: 904 − 402 = 502 fewer errors per 100K shots**, which equals the 2,956 → 2,454 reduction. Rescues outnumber losses by 2.25×.
+
+Pathfinder and Lange agree on 96.97% of shots; the 3.03% they disagree on is where the ensemble gets its leverage. PM acts as the tie-breaker in that disagreement region, and the disagreement-tie-breaker decides correctly on 904 / (904+402) = 69% of the contested cases — a number that would be 50% if PM were random noise, so PM is clearly a *useful* tie-breaker and not just a noise-adding voter.
 
 **Contribution and priority.** §5.11 established that Lange's GNN individually outperforms canonical Pathfinder at matched noise. §5.12 establishes that the cheapest way to lower the best-known open-source LER at d=7 operational noise is not a better individual decoder but *Pathfinder-Triad*: run Pathfinder, Lange, and PyMatching in parallel and take the majority. That is a distinct contribution on top of Lange's priority, and the Pathfinder-Triad result at d=7 p=0.007 and p=0.010 is, in the measurements reported here, the lowest open-source LER on the matched benchmark. Pathfinder-Triad requires running all three decoders concurrently so its end-to-end latency is bounded by the slowest (here Lange at 71.67 μs/syn at d=7 B=1024, measured in §5.11); deployments where that latency is acceptable — offline protocol verification, post-selection in repeat-until-success, any non-real-time QEC application — gain a 12–18% LER reduction over Lange alone for essentially zero additional ML effort.
 

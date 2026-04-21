@@ -1,0 +1,17 @@
+{
+  "N": 100000,
+  "cells": {
+    "PFright_Laright_PMright": {"count": 93836, "frac_of_N": 0.93836},
+    "PFright_Laright_PMwrong": {"count": 1481, "frac_of_N": 0.01481},
+    "PFright_Lawrong_PMright": {"count": 904, "frac_of_N": 0.00904},
+    "PFright_Lawrong_PMwrong": {"count": 398, "frac_of_N": 0.00398},
+    "PFwrong_Laright_PMright": {"count": 1325, "frac_of_N": 0.01325},
+    "PFwrong_Laright_PMwrong": {"count": 402, "frac_of_N": 0.00402},
+    "PFwrong_Lawrong_PMright": {"count": 569, "frac_of_N": 0.00569},
+    "PFwrong_Lawrong_PMwrong": {"count": 1085, "frac_of_N": 0.01085}
+  },
+  "pf_ler": 0.03381,
+  "lange_ler": 0.02956,
+  "pm_ler": 0.03366,
+  "majority_ler": 0.02454
+}
