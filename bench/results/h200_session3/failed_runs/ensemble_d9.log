@@ -1,0 +1,134 @@
+
+=== d3_p0.003 ===
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/fixed_d3/best_model.pt
+  seed=3000: pf=110  lange=108  pm=132  maj=109  all3=83
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/fixed_d3/best_model.pt
+  seed=3001: pf=108  lange=99  pm=129  maj=104  all3=77
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/fixed_d3/best_model.pt
+  seed=3002: pf=125  lange=114  pm=138  maj=121  all3=96
+  -> PF=0.5717% Lange=0.5350% PM=0.6650% Majority=0.5567% OracleLB=0.4267%
+  [incremental save: 1 points to /workspace/persist/results/ensemble_results_d9.json]
+
+=== d3_p0.005 ===
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/fixed_d3/best_model.pt
+  seed=3000: pf=326  lange=305  pm=369  maj=323  all3=243
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/fixed_d3/best_model.pt
+  seed=3001: pf=281  lange=280  pm=331  maj=282  all3=213
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/fixed_d3/best_model.pt
+  seed=3002: pf=309  lange=311  pm=379  maj=317  all3=237
+  -> PF=1.5267% Lange=1.4933% PM=1.7983% Majority=1.5367% OracleLB=1.1550%
+  [incremental save: 2 points to /workspace/persist/results/ensemble_results_d9.json]
+
+=== d3_p0.007 ===
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/fixed_d3/best_model.pt
+  seed=3000: pf=550  lange=527  pm=637  maj=536  all3=397
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/fixed_d3/best_model.pt
+  seed=3001: pf=544  lange=527  pm=630  maj=533  all3=393
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/fixed_d3/best_model.pt
+  seed=3002: pf=596  lange=574  pm=656  maj=585  all3=435
+  -> PF=2.8167% Lange=2.7133% PM=3.2050% Majority=2.7567% OracleLB=2.0417%
+  [incremental save: 3 points to /workspace/persist/results/ensemble_results_d9.json]
+
+=== d3_p0.01 ===
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/fixed_d3/best_model.pt
+  seed=3000: pf=1076  lange=1036  pm=1186  maj=1056  all3=808
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/fixed_d3/best_model.pt
+  seed=3001: pf=1010  lange=976  pm=1119  maj=974  all3=735
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/fixed_d3/best_model.pt
+  seed=3002: pf=1095  lange=1072  pm=1206  maj=1078  all3=805
+  -> PF=5.3017% Lange=5.1400% PM=5.8517% Majority=5.1800% OracleLB=3.9133%
+  [incremental save: 4 points to /workspace/persist/results/ensemble_results_d9.json]
+
+=== d5_p0.003 ===
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/fixed_d5/best_model.pt
+  seed=3000: pf=44  lange=36  pm=61  maj=38  all3=24
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/fixed_d5/best_model.pt
+  seed=3001: pf=46  lange=36  pm=68  maj=40  all3=23
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/fixed_d5/best_model.pt
+  seed=3002: pf=54  lange=43  pm=75  maj=46  all3=26
+  -> PF=0.2400% Lange=0.1917% PM=0.3400% Majority=0.2067% OracleLB=0.1217%
+  [incremental save: 5 points to /workspace/persist/results/ensemble_results_d9.json]
+
+=== d5_p0.005 ===
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/fixed_d5/best_model.pt
+  seed=3000: pf=219  lange=182  pm=274  maj=191  all3=107
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/fixed_d5/best_model.pt
+  seed=3001: pf=232  lange=203  pm=281  maj=210  all3=118
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/fixed_d5/best_model.pt
+  seed=3002: pf=234  lange=189  pm=302  maj=205  all3=114
+  -> PF=1.1417% Lange=0.9567% PM=1.4283% Majority=1.0100% OracleLB=0.5650%
+  [incremental save: 6 points to /workspace/persist/results/ensemble_results_d9.json]
+
+=== d5_p0.007 ===
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/fixed_d5/best_model.pt
+  seed=3000: pf=608  lange=531  pm=724  maj=542  all3=349
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/fixed_d5/best_model.pt
+  seed=3001: pf=627  lange=521  pm=725  maj=540  all3=312
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/fixed_d5/best_model.pt
+  seed=3002: pf=589  lange=496  pm=679  maj=512  all3=282
+  -> PF=3.0400% Lange=2.5800% PM=3.5467% Majority=2.6567% OracleLB=1.5717%
+  [incremental save: 7 points to /workspace/persist/results/ensemble_results_d9.json]
+
+=== d5_p0.01 ===
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/fixed_d5/best_model.pt
+  seed=3000: pf=1515  lange=1364  pm=1681  maj=1336  all3=727
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/fixed_d5/best_model.pt
+  seed=3001: pf=1567  lange=1376  pm=1655  maj=1362  all3=743
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/fixed_d5/best_model.pt
+  seed=3002: pf=1512  lange=1323  pm=1628  maj=1298  all3=699
+  -> PF=7.6567% Lange=6.7717% PM=8.2733% Majority=6.6600% OracleLB=3.6150%
+  [incremental save: 8 points to /workspace/persist/results/ensemble_results_d9.json]
+
+=== d7_p0.003 ===
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/fixed_d7/best_model.pt
+  seed=3000: pf=19  lange=18  pm=31  maj=18  all3=9
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/fixed_d7/best_model.pt
+  seed=3001: pf=22  lange=17  pm=29  maj=14  all3=9
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/fixed_d7/best_model.pt
+  seed=3002: pf=21  lange=17  pm=29  maj=19  all3=10
+  -> PF=0.1033% Lange=0.0867% PM=0.1483% Majority=0.0850% OracleLB=0.0467%
+  [incremental save: 9 points to /workspace/persist/results/ensemble_results_d9.json]
+
+=== d7_p0.005 ===
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/fixed_d7/best_model.pt
+  seed=3000: pf=167  lange=153  pm=198  maj=138  all3=63
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/fixed_d7/best_model.pt
+  seed=3001: pf=152  lange=137  pm=190  maj=119  all3=62
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/fixed_d7/best_model.pt
+  seed=3002: pf=171  lange=161  pm=203  maj=139  all3=63
+  -> PF=0.8167% Lange=0.7517% PM=0.9850% Majority=0.6600% OracleLB=0.3133%
+  [incremental save: 10 points to /workspace/persist/results/ensemble_results_d9.json]
+
+=== d7_p0.007 ===
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/fixed_d7/best_model.pt
+  seed=3000: pf=602  lange=577  pm=679  maj=493  all3=215
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/fixed_d7/best_model.pt
+  seed=3001: pf=621  lange=591  pm=671  maj=504  all3=250
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/fixed_d7/best_model.pt
+  seed=3002: pf=631  lange=596  pm=656  maj=500  all3=221
+  -> PF=3.0900% Lange=2.9400% PM=3.3433% Majority=2.4950% OracleLB=1.1433%
+  [incremental save: 11 points to /workspace/persist/results/ensemble_results_d9.json]
+
+=== d7_p0.01 ===
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/fixed_d7/best_model.pt
+  seed=3000: pf=2222  lange=2183  pm=2071  maj=1823  all3=778
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/fixed_d7/best_model.pt
+  seed=3001: pf=2197  lange=2085  pm=2019  maj=1752  all3=723
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/fixed_d7/best_model.pt
+  seed=3002: pf=2260  lange=2225  pm=2090  maj=1877  all3=811
+  -> PF=11.1317% Lange=10.8217% PM=10.3000% Majority=9.0867% OracleLB=3.8533%
+  [incremental save: 12 points to /workspace/persist/results/ensemble_results_d9.json]
+
+=== d9_p0.003 ===
+Traceback (most recent call last):
+  File "/workspace/ensemble_pf_lange.py", line 284, in <module>
+    main()
+  File "/workspace/ensemble_pf_lange.py", line 237, in main
+    r = run_point(d, p, args.pathfinder_dir, args.n_per_seed, seed)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/ensemble_pf_lange.py", line 166, in run_point
+    pf_model, pf_src = load_pathfinder(d, ckpt_dir)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/ensemble_pf_lange.py", line 146, in load_pathfinder
+    raise FileNotFoundError(f"No Pathfinder checkpoint found for d={d} in {ckpt_dir}")
+FileNotFoundError: No Pathfinder checkpoint found for d=9 in /workspace/pathfinder/train/checkpoints

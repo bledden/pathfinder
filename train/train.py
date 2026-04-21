@@ -13,7 +13,14 @@ import torch
 import torch.nn.functional as F
 import numpy as np
 from pathlib import Path
-from torch.optim import Muon, AdamW
+try:
+    from torch.optim import Muon, AdamW
+except ImportError:
+    # Fallback for stock PyTorch builds that do not ship Muon in torch.optim
+    from muon import SingleDeviceMuon
+    import torch.optim
+    torch.optim.Muon = SingleDeviceMuon
+    from torch.optim import Muon, AdamW
 
 sys.path.insert(0, os.path.dirname(__file__))
 from model import NeuralDecoder, DecoderConfig
