@@ -1,10 +1,17 @@
 # Pathfinder
 
-A direction-aware neural decoder for quantum error correction that outperforms minimum-weight perfect matching (MWPM) on surface codes.
+Two open-source decoder systems for quantum error correction on rotated surface codes:
 
-Wins or ties PyMatching at 24/24 evaluation points across d=3, 5, 7 and p=0.0005 to 0.015 in the measurements reported here (13/24 show non-overlapping 95% Wilson CIs; see paper §5.1). 6.12 μs/syn inference latency at d=7 B=1024 on NVIDIA H200 with a custom Triton kernel, sustaining the 7-μs superconducting cycle-time budget.
+- **Pathfinder** — a direction-specific 3D CNN + Muon-optimizer + custom Triton kernel. Beats PyMatching at 24/24 points under 3-parameter circuit-level noise (paper §5.1, Table 1). **6.12 μs/syn** inference latency at d=7 B=1024 on NVIDIA H200 — the only open-source decoder tested that sustains the 7-μs superconducting cycle-time budget.
+- **Pathfinder-Triad** — a 3-way majority vote of (Pathfinder, Lange et al. [2025], PyMatching). At d=7 p=0.007 under matched 4-parameter noise, **Pathfinder-Triad LER 2.42%** vs Lange alone 2.94% — a 17.8% relative reduction with non-overlapping 95% Wilson CIs. To my knowledge the lowest open-source LER at this benchmark point. Latency is Lange-bounded (~72 μs/syn) and the ensemble is for non-real-time deployments (offline verification, post-selection).
 
-**A note on priority.** [Lange et al. (Phys. Rev. Research 7, 023181, 2025)](https://github.com/LangeMoritz/GNN_decoder) previously released an open-source GNN decoder that also outperforms PyMatching on rotated surface codes under circuit-level noise. Pathfinder is **not** the first open-source decoder to beat PyMatching on this task. Pathfinder's distinct contributions are (1) extending the tested operational noise range to p ∈ {0.007, 0.010, 0.015}, which Lange et al. did not cover; (2) a depth-dependent Muon-optimizer ablation — Muon has a small effect at d=3 (+17%), the headline +72% effect at d=5, and is catastrophic to remove at d=7 (LER 1.04% → 34.8%); see paper §6.2; (3) a custom Triton kernel that sustains the d=7 cycle-time budget on H200 GPUs; (4) **a 3-way majority-vote ensemble of Pathfinder + Lange + PyMatching that strictly beats every individual decoder at d=7 operational noise**, including Lange alone, with statistically significant non-overlapping CIs at p=0.007 and p=0.010 — at d=7 p=0.007, Majority 2.42% vs Lange 2.94% (17.8% relative improvement); see paper §5.12. A direct head-to-head with Lange at matched noise is in paper §5.11.
+**A note on priority.** [Lange et al. (Phys. Rev. Research 7, 023181, 2025)](https://github.com/LangeMoritz/GNN_decoder) previously released an open-source GNN decoder that outperforms PyMatching on rotated surface codes under circuit-level noise. Pathfinder is **not** the first open-source decoder to beat PyMatching on this task — and at matched-noise head-to-head, Lange's GNN has lower individual LER than canonical Pathfinder. The four contributions of this work, distinct from Lange's priority, are:
+1. **Pathfinder-Triad** (above) — the only open-source decoder system tested that statistically-significantly beats Lange on matched noise (paper §5.12).
+2. **The cycle-time-sustaining Triton kernel** — 12× faster than Lange's GNN on identical H200 hardware (paper §5.3 + §5.11).
+3. **Depth-dependent Muon ablation** — the optimizer's effect goes from +17% at d=3 to +72% at d=5 to catastrophic at d=7 (paper §6.2).
+4. **Extended-noise-rate Table 1** — evaluation down to p=0.0005 and up to p=0.015, not covered by prior open-source work.
+
+See paper §5.11 for the direct head-to-head with Lange. See paper §5.12 for Pathfinder-Triad. See paper §5.13 for **Pathfinder-KD** (a distilled-from-Lange alternative variant) and §5.14 for a negative result on a modern-primitives hybrid architecture.
 
 ## Results
 

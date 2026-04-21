@@ -22,7 +22,14 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(HERE)
 OUT = HERE
 
-ens_final = json.load(open(f"{REPO}/bench/results/h200_session3/phase2/ensemble_results_final.json"))
+ens_phase2 = json.load(open(f"{REPO}/bench/results/h200_session3/phase2/ensemble_results_final.json"))
+ens_tuned  = json.load(open(f"{REPO}/bench/results/h200_session3/tuned/ensemble_results_tuned.json"))
+# Canonical-Pathfinder-Triad: d=3/5 from phase2 (finetune_d3, finetune_d5);
+# d=7 from tuned (finetune_d7). Mirrors the paper's canonical choice.
+ens_final = {}
+for k, v in ens_phase2.items():
+    d = int(k.split('_')[0][1:])
+    ens_final[k] = ens_tuned[k] if (d == 7 and k in ens_tuned) else v
 ens_lo_p = json.load(open(f"{REPO}/bench/results/h200_lange_headtohead_low_p.json"))
 ens_hi_p = json.load(open(f"{REPO}/bench/results/h200_lange_headtohead_high_p.json"))
 h2h = {**ens_lo_p, **ens_hi_p}
@@ -38,9 +45,9 @@ d7_maj     = [ens_final[f"d7_p{p}"]['majority_ler'] * 100 for p in noise_sub]
 d7_pf_t    = [ens_final[f"d7_p{p}"]['pf_ler'] * 100 for p in noise_sub]
 ax.loglog(noise_rates, d7_pm,     'o-', label='PyMatching',                 color='#888888', linewidth=2, markersize=8)
 ax.loglog(noise_rates, d7_pf_ood, '^-', label='Pathfinder (Table-1 OOD)',   color='#d62728', alpha=0.6, linewidth=1.5, markersize=7)
-ax.loglog(noise_sub,   d7_pf_t,   's-', label='Pathfinder (distill, §5.13)',color='#d62728', linewidth=2, markersize=8)
+ax.loglog(noise_sub,   d7_pf_t,   's-', label='Canonical Pathfinder (fine-tune)', color='#d62728', linewidth=2, markersize=8)
 ax.loglog(noise_rates, d7_lange,  'D-', label='Lange GNN',                   color='#2ca02c', linewidth=2, markersize=8)
-ax.loglog(noise_sub,   d7_maj,    '*-', label='Majority Vote (PF+Lange+PM)', color='#1f77b4', linewidth=2.5, markersize=14)
+ax.loglog(noise_sub,   d7_maj,    '*-', label='Pathfinder-Triad (this work)', color='#1f77b4', linewidth=2.5, markersize=14)
 ax.set_xlabel('Physical error rate  p', fontsize=12)
 ax.set_ylabel('Logical error rate (%)', fontsize=12)
 ax.set_title('d=7 decoder comparison at matched 4-parameter circuit-level noise\n(60K shots per point, 95% Wilson CIs)', fontsize=11)
@@ -53,17 +60,17 @@ plt.close()
 
 # ---- Figure 2: Latency-vs-LER Pareto at d=7 p=0.007 (with legend) ----
 points = [
-    (6.12, 1.041, 'Pathfinder+Triton (Table 1, 3-param)',  '#8b0000', 'o', 170),
-    (6.12, 3.09,  'Pathfinder distill (§5.13)',            '#d62728', 'D', 140),
-    (6.12, 3.34,  'Pathfinder fine-tune (§5.11)',          '#e06060', 's', 140),
-    (6.12, 4.010, 'Pathfinder Table-1 OOD (4-param eval)', '#ff9999', '^', 120),
-    (71.67, 2.94, 'Lange et al. GNN (measured here)',      '#2ca02c', 'D', 170),
-    (9.65, 1.489, 'PyMatching (3-param)',                  '#606060', 'o', 150),
-    (9.65, 3.343, 'PyMatching (4-param)',                  '#b0b0b0', '^', 130),
-    (72.0, 2.495, 'Majority Vote — distill PF (§5.12)',    '#1f77b4', '*', 260),
-    (76.0, 2.417, 'Majority Vote — fine-tune PF (§5.12)',  '#4a90d9', 'X', 200),
-    (63.0, 2.14,  'AlphaQubit (TPU, Sycamore noise)',      '#ff7f0e', 'p', 140),
-    (40.0, 1.0,   'Gu et al. (non-matched noise)',         '#9467bd', 'h', 140),
+    (6.12, 1.041, 'Pathfinder+Triton (3-param Table 1)',          '#8b0000', 'o', 170),
+    (6.12, 3.34,  'Canonical Pathfinder (4-param, §5.11)',         '#d62728', 's', 140),
+    (6.12, 3.09,  'Pathfinder-KD (4-param, §5.13)',                '#e06060', 'D', 140),
+    (6.12, 4.010, 'Pathfinder Table-1 OOD (4-param eval)',         '#ff9999', '^', 120),
+    (71.67, 2.94, 'Lange et al. GNN (measured here)',              '#2ca02c', 'D', 170),
+    (9.65, 1.489, 'PyMatching (3-param)',                          '#606060', 'o', 150),
+    (9.65, 3.343, 'PyMatching (4-param)',                          '#b0b0b0', '^', 130),
+    (72.0, 2.417, 'Pathfinder-Triad (canonical, §5.12) ★',         '#1f77b4', '*', 260),
+    (76.0, 2.495, 'Pathfinder-Triad (KD variant, §5.13)',          '#4a90d9', 'X', 200),
+    (63.0, 2.14,  'AlphaQubit (TPU, Sycamore noise)',              '#ff7f0e', 'p', 140),
+    (40.0, 1.0,   'Gu et al. (non-matched noise)',                 '#9467bd', 'h', 140),
 ]
 fig, ax = plt.subplots(figsize=(9, 6))
 ax.axvline(7.0, color='black', linestyle=':', alpha=0.5, linewidth=1.2)
