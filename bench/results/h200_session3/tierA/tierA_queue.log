@@ -1,0 +1,6 @@
+[Tue Apr 21 04:30:19 UTC 2026] === Tier A3+A4 start ===
+[Tue Apr 21 04:30:19 UTC 2026] 1/2 Tier A3: ensemble at extended noise rates
+[Tue Apr 21 04:30:56 UTC 2026] A3 rc=0
+[Tue Apr 21 04:30:56 UTC 2026] 2/2 Tier A4: 100K-shot refresh at d=7 p=0.007 and p=0.010
+[Tue Apr 21 04:31:21 UTC 2026] A4 rc=0
+[Tue Apr 21 04:31:21 UTC 2026] === Tier A DONE ===
