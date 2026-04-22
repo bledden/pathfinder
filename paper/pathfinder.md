@@ -539,12 +539,15 @@ An obvious way to try to close the Pathfinder–Lange individual-LER gap in §5.
 | d=7 | Table-1 OOD | 500K | 4.01% | — | 2.56% | loses |
 | d=7 | **Canonical Pathfinder** (fine-tune) | 500K | 3.34% | [3.20, 3.49] | **2.417%** | loses (non-overlap) |
 | d=7 | Pathfinder-KD (distill) | 500K | 3.09% | — | 2.495% | loses (non-overlap) |
-| d=7 | **Pathfinder-Wide** (distill, H=384, new) | **1.09M** | **2.995%** | [2.862, 3.134] | **2.475%** | **tied (CI overlap!)** |
+| d=7 | **Pathfinder-Wide** (distill, H=384, new) | **1.09M** | **2.995%** | [2.862, 3.134] | **2.475%** | **tied (CI overlap)** |
+| d=7 | Pathfinder-XL (distill, H=512, new) | 1.99M | 3.063% | [2.928, 3.204] | 2.492% | tied (CI overlap) |
 | d=7 | *Lange GNN (reference)* | 1.36M | 2.940% | [2.808, 3.078] | — | baseline |
 
 *The d=5 distillation's training-time evals were non-monotonic; the best 10K-shot eval was 3.07% but end-of-training drifted to ~3.3%. See `bench/results/h200_session3/distill/distill_d5.log`.
 
 **Pathfinder-Wide result (d=7 p=0.007, p=0.010).** Increasing Pathfinder's hidden dimension from H=256 (500K params) to H=384 (1.09M params) — approaching Lange's 1.36M parameter count — and training with Lange-teacher distillation for 80,000 steps at `muon_lr=0.005` produces a **statistically-tied result with Lange at d=7 p=0.007** (Pathfinder-Wide 2.995% vs. Lange 2.940%, overlapping 95% Wilson CIs). At d=7 p=0.010 Pathfinder-Wide slightly out-performs Lange (10.688% vs. 10.822%, also overlapping CIs). Pathfinder-Wide is **the first Pathfinder variant tested whose 95% CI includes Lange's point estimate** — i.e., the first variant where the paper cannot reject the hypothesis that Pathfinder and Lange have equal individual LER at matched 4-parameter noise. Training script: `bench/results/h200_session3/train_distill_lange_lowlr.py`; checkpoint: `bench/results/h200_session3/tierC1/pathfinder_wide_d7/best_model.pt`.
+
+**Pathfinder-XL — capacity ceiling.** Doubling parameters from Pathfinder-Wide to Pathfinder-XL (H=512, 1.99M params, 47% more parameters than Lange) and training with the same recipe yields LER 3.063% at d=7 p=0.007 — *slightly worse* than Pathfinder-Wide's 2.995% (60K-shot evals). Both variants tie Lange within overlapping CIs but additional capacity past H=384 does not improve the individual decoder. Interpretation: the matched-noise distillation recipe is capacity-saturated around H=384 / 1.1 M parameters for d=7. Further individual-LER improvements require a different training regime (longer schedule, multi-noise-mixture distillation, or a better teacher loss) or a different inductive bias (the GNN representation that Lange uses; future work). Pathfinder-XL is preserved at `bench/results/h200_session3/tierC1/pathfinder_xl_d7/best_model.pt`.
 
 **Why canonical Pathfinder uses fine-tune, not distill.** Three independent reasons:
 
