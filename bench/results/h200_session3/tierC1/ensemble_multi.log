@@ -1,0 +1,6 @@
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/fixed_d7/best_model.pt
+d=7 p=0.003 MULTI: PF=0.1000% [0.0777,0.1287]  Lange=0.0867% [0.0661,0.1136]  Maj=0.0850%  overlap
+d=7 p=0.005 MULTI: PF=0.8333% [0.7637,0.9093]  Lange=0.7517% [0.6856,0.8240]  Maj=0.6683%  overlap
+d=7 p=0.007 MULTI: PF=2.9983% [2.8649,3.1378]  Lange=2.9400% [2.8078,3.0782]  Maj=2.4483%  overlap
+d=7 p=0.01 MULTI: PF=10.8550% [10.6086,11.1064]  Lange=10.8217% [10.5756,11.0728]  Maj=9.0167%  overlap
+Saved

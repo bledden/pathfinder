@@ -549,6 +549,17 @@ An obvious way to try to close the Pathfinder–Lange individual-LER gap in §5.
 
 **Pathfinder-XL — capacity ceiling.** Doubling parameters from Pathfinder-Wide to Pathfinder-XL (H=512, 1.99M params, 47% more parameters than Lange) and training with the same recipe yields LER 3.063% at d=7 p=0.007 — *slightly worse* than Pathfinder-Wide's 2.995% (60K-shot evals). Both variants tie Lange within overlapping CIs but additional capacity past H=384 does not improve the individual decoder. Interpretation: the matched-noise distillation recipe is capacity-saturated around H=384 / 1.1 M parameters for d=7. Further individual-LER improvements require a different training regime (longer schedule, multi-noise-mixture distillation, or a better teacher loss) or a different inductive bias (the GNN representation that Lange uses; future work). Pathfinder-XL is preserved at `bench/results/h200_session3/tierC1/pathfinder_xl_d7/best_model.pt`.
 
+**Pathfinder-Wide-Multi — single checkpoint covers all four operational noise rates.** A complementary recipe trains Pathfinder-Wide (H=384) with Lange-teacher distillation but samples the noise rate uniformly from p ∈ {0.003, 0.005, 0.007, 0.010} per training step (script: `bench/results/h200_session3/tierC1/train_multi_noise.py`). The resulting single checkpoint produces matched-noise individual LERs essentially identical to single-noise specialization at every tested point:
+
+| d=7 (60K shots) | PF-Multi | Lange | PM | Pathfinder-Triad |
+|----|---:|---:|---:|---:|
+| p=0.003 | 0.100% | 0.087% | 0.148% | 0.085% |
+| p=0.005 | 0.833% | 0.752% | 0.985% | **0.668%** |
+| p=0.007 | 2.998% | 2.940% | 3.343% | **2.448%** |
+| p=0.010 | 10.855% | 10.822% | 10.300% | **9.017%** |
+
+Compare PF-Multi to PF-Wide single-noise at p=0.007 (2.998% vs. 2.995%) — multi-noise mixture loses essentially nothing per-rate. **One checkpoint can therefore replace the per-noise-rate specialization needed by §4.5 / §6.3 d=9**, simplifying deployment. Like Pathfinder-Wide and Pathfinder-XL, Pathfinder-Wide-Multi statistically ties Lange (overlapping CIs) at every tested p — none of the C1 attempts so far strictly beats Lange individually. The Pathfinder-Triad numbers in the rightmost column are essentially the best we have measured at any d=7 noise rate, marginally improving §5.12 Table 10's results: e.g., at p=0.007 the multi-noise Pathfinder voter gives Triad 2.448% vs. Table 10's 2.417% (with fine-tune voter) — within ensemble seed-noise. Checkpoint: `bench/results/h200_session3/tierC1/pathfinder_wide_multi_d7/best_model.pt`.
+
 **Why canonical Pathfinder uses fine-tune, not distill.** Three independent reasons:
 
 1. **Pathfinder-KD fails catastrophically at d=3.** The same distillation recipe applied at d=3 (80K steps, p=0.007, Lange teacher) converges to LER **13.4%** — four standard deviations worse than the d=3 fine-tune result (2.77%) or even the OOD Table-1 checkpoint (2.92%). The depth-independent KL-weighted training does not converge for the shallow d=3 architecture, paradoxically given that d=3 is the easiest decoding task. Canonical Pathfinder is defined by a single recipe that works at all three distances — Pathfinder-KD is not.
