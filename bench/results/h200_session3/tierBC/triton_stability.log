@@ -1,0 +1,7 @@
+[fp32] p=0.003: disagreements=0/20K  max|diff|=0.148108  mean_rel_diff=1.29e-04  LER ref=0.065% tri=0.065%
+[fp16] p=0.003: disagreements=0/20K  max|diff|=0.164062  mean_rel_diff=1.59e-03  LER ref=0.070% tri=0.070%
+[fp32] p=0.007: disagreements=1/20K  max|diff|=0.200611  mean_rel_diff=2.13e-03  LER ref=3.340% tri=3.345%
+[fp16] p=0.007: disagreements=2/20K  max|diff|=0.244141  mean_rel_diff=3.87e-03  LER ref=3.345% tri=3.345%
+[fp32] p=0.015: disagreements=10/20K  max|diff|=0.127922  mean_rel_diff=7.28e-03  LER ref=31.135% tri=31.115%
+[fp16] p=0.015: disagreements=21/20K  max|diff|=0.275391  mean_rel_diff=3.71e-01  LER ref=31.145% tri=31.170%
+Saved

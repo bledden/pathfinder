@@ -1,0 +1,72 @@
+{
+  "fp32": {
+    "p0.003": {
+      "p": 0.003,
+      "prediction_disagreements_per_20K": 0,
+      "disagreement_rate_per_10K": 0.0,
+      "max_abs_logit_diff": 0.14810752868652344,
+      "mean_rel_logit_diff": 0.0001286363389226608,
+      "pf_ref_wrong": 13,
+      "pf_tri_wrong": 13,
+      "ler_ref_pct": 0.065,
+      "ler_tri_pct": 0.065
+    },
+    "p0.007": {
+      "p": 0.007,
+      "prediction_disagreements_per_20K": 1,
+      "disagreement_rate_per_10K": 0.5,
+      "max_abs_logit_diff": 0.20061111450195312,
+      "mean_rel_logit_diff": 0.0021308663330273704,
+      "pf_ref_wrong": 668,
+      "pf_tri_wrong": 669,
+      "ler_ref_pct": 3.34,
+      "ler_tri_pct": 3.345
+    },
+    "p0.015": {
+      "p": 0.015,
+      "prediction_disagreements_per_20K": 10,
+      "disagreement_rate_per_10K": 5.0,
+      "max_abs_logit_diff": 0.12792205810546875,
+      "mean_rel_logit_diff": 0.007276355870999396,
+      "pf_ref_wrong": 6227,
+      "pf_tri_wrong": 6223,
+      "ler_ref_pct": 31.135,
+      "ler_tri_pct": 31.115
+    }
+  },
+  "fp16": {
+    "p0.003": {
+      "p": 0.003,
+      "prediction_disagreements_per_20K": 0,
+      "disagreement_rate_per_10K": 0.0,
+      "max_abs_logit_diff": 0.1640625,
+      "mean_rel_logit_diff": 0.001593922358006239,
+      "pf_ref_wrong": 14,
+      "pf_tri_wrong": 14,
+      "ler_ref_pct": 0.06999999999999999,
+      "ler_tri_pct": 0.06999999999999999
+    },
+    "p0.007": {
+      "p": 0.007,
+      "prediction_disagreements_per_20K": 2,
+      "disagreement_rate_per_10K": 1.0,
+      "max_abs_logit_diff": 0.244140625,
+      "mean_rel_logit_diff": 0.003869951330125332,
+      "pf_ref_wrong": 669,
+      "pf_tri_wrong": 669,
+      "ler_ref_pct": 3.345,
+      "ler_tri_pct": 3.345
+    },
+    "p0.015": {
+      "p": 0.015,
+      "prediction_disagreements_per_20K": 21,
+      "disagreement_rate_per_10K": 10.5,
+      "max_abs_logit_diff": 0.275390625,
+      "mean_rel_logit_diff": 0.3706069609615952,
+      "pf_ref_wrong": 6229,
+      "pf_tri_wrong": 6234,
+      "ler_ref_pct": 31.145,
+      "ler_tri_pct": 31.169999999999998
+    }
+  }
+}

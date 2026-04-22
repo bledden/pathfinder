@@ -1,0 +1,9 @@
+[Wed Apr 22 01:50:19 UTC 2026] p005_ft done, running ensemble
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/fixed_d9/best_model.pt
+d=9 p=0.003 (PF ckpt=p003_lowlr): PF=0.3783%  Lange=0.0167% [0.0091,0.0307]  PM=0.0467%  Maj=0.0217% [0.0127,0.0371]  overlap
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/fixed_d9/best_model.pt
+d=9 p=0.005 (PF ckpt=p005_ft): PF=1.4817%  Lange=0.4300% [0.3807,0.4856]  PM=0.6450%  Maj=0.4383% [0.3886,0.4945]  overlap
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/fixed_d9/best_model.pt
+d=9 p=0.007 (PF ckpt=p005_ft): PF=7.0517%  Lange=2.5917% [2.4675,2.7219]  PM=3.1400%  Maj=2.5033% [2.3813,2.6314]  overlap
+Saved
+[Wed Apr 22 01:51:02 UTC 2026] === d9 followup DONE ===
