@@ -1,0 +1,6 @@
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/fixed_d9/best_model.pt
+d=9 p=0.007 (p007_ft): PF=5.8517%  Lange=2.5917% [2.4675,2.7219]  PM=3.1400%  Maj=2.4550% [2.3342,2.5819]
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/fixed_d7/best_model.pt
+d=7 p=0.007 Pathfinder-Wide (H=384): PF=2.9950% [2.8616,3.1344]  Lange=2.9400% [2.8078,3.0782]  Maj=2.4750%  CI=overlap
+d=7 p=0.01 Pathfinder-Wide (H=384): PF=10.6883% [10.4436,10.9381]  Lange=10.8217% [10.5756,11.0728]  Maj=9.0000%  CI=overlap
+Saved

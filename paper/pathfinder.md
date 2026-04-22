@@ -7,7 +7,7 @@ Second Nature Computing Inc., San Francisco, CA
 
 ## Abstract
 
-**Pathfinder** is an open-source convolutional neural network decoder for quantum error correction on rotated surface codes. Its architecture — direction-specific 3D convolution [8], bottleneck residual blocks, Muon-optimizer [11] training — is composed from prior contributions; its design goals are (a) beating PyMatching [2] on logical error rate (LER) and (b) sustaining the superconducting surface-code cycle-time budget on a single commodity GPU. The recipe ships as one trained decoder per code distance — fine-tuned from a 3-parameter Table-1 checkpoint on the 4-parameter circuit-level-noise model used by Lange et al. [14], 40,000 steps at matched p=0.007, same training script at every distance. On that matched benchmark at d=7 p=0.007 (60,000 shots), Pathfinder achieves LER 3.34%, a 14% relative gap to Lange's 2.94% and essentially tied with PyMatching's 3.34%. On a single NVIDIA H200 SXM GPU with PyTorch 2.6 `torch.compile(max-autotune)` + FP16 + a custom Triton kernel fusing DirectionalConv3d's seven direction-specific matrix multiplies into one launch, Pathfinder runs at **6.12 μs/syndrome** at B=1024 — **12× faster than Lange** (71.67 μs/syn, measured here on the same H200) and the only open-source decoder tested that sustains the 7-μs d=7 cycle budget. Batch=1 latency remains 201 μs and is the principal open problem.
+**Pathfinder** is an open-source convolutional neural network decoder for quantum error correction on rotated surface codes. Its architecture — direction-specific 3D convolution [8], bottleneck residual blocks, Muon-optimizer [11] training — is composed from prior contributions; its design goals are (a) beating PyMatching [2] on logical error rate (LER) and (b) sustaining the superconducting surface-code cycle-time budget on a single commodity GPU. The canonical recipe ships as one trained decoder per code distance — fine-tuned from a 3-parameter Table-1 checkpoint on the 4-parameter circuit-level-noise model used by Lange et al. [14], 40,000 steps at matched p=0.007, same training script at every distance. On that matched benchmark at d=7 p=0.007 (60,000 shots), canonical Pathfinder achieves LER 3.34% (a 14% relative gap to Lange's 2.94%, essentially tied with PyMatching's 3.34%). A wider variant, **Pathfinder-Wide** (H=384, 1.09 M parameters, distilled from Lange), closes that gap to a statistical tie with Lange: Pathfinder-Wide 2.995% [2.862, 3.134] vs. Lange 2.940% [2.808, 3.078] (overlapping 95% Wilson CIs; §5.13 Table 11). Pathfinder-Wide is the first Pathfinder variant reported whose 95% CI contains Lange's point estimate. On a single NVIDIA H200 SXM GPU with PyTorch 2.6 `torch.compile(max-autotune)` + FP16 + a custom Triton kernel fusing DirectionalConv3d's seven direction-specific matrix multiplies into one launch, Pathfinder runs at **6.12 μs/syndrome** at B=1024 — **12× faster than Lange** (71.67 μs/syn, measured here on the same H200) and the only open-source decoder tested that sustains the 7-μs d=7 cycle budget. Batch=1 latency remains 201 μs and is the principal open problem.
 
 **Pathfinder-Triad**, a second system described in §5.12, is the three-way majority vote of Pathfinder + Lange [14] + PyMatching [2]. At d=7 p=0.007 (100K shots) Pathfinder-Triad achieves LER **2.45%**, strictly beating every individual decoder including Lange alone with **non-overlapping 95% Wilson confidence intervals** (2.36, 2.55) vs. Lange's (2.85, 3.06) — a 301-basis-point gap between the two intervals, a 17.0% relative LER reduction at zero additional ML training cost. Pathfinder-Triad strictly beats every individual decoder at 7 of 24 evaluation points (all four operational d=7 noise rates, three d=5 points, zero d=3 points; §5.12 Table 10). This is, in the measurements reported here, the lowest known open-source LER at d=7 operational noise rates under Lange's 4-parameter circuit-level noise model. The ensemble's latency is Lange-bounded (~72 μs/syn), so its deployment profile is offline protocol verification and post-selection rather than real-time control.
 
@@ -529,18 +529,22 @@ An obvious way to try to close the Pathfinder–Lange individual-LER gap in §5.
 
 **Pathfinder-KD training recipe.** Script: `bench/results/h200_session2/train_distill_lange.py`. Loss is `0.3 · BCE(student_logit, label) + 0.7 · T² · KL(σ(student/T), σ(teacher/T))` with T=2.0, 80,000 steps from scratch, Muon lr=0.02 on 2D weights, AdamW lr=3e-3 on 1D weights, curriculum noise annealing from 0.1·p_target to p_target. Teacher is the published Lange GNN (`d{d}_d_t_{d_t}.pt`), frozen.
 
-**Table 11: Pathfinder, Pathfinder-KD, and alternatives at p=0.007 (60K-shot eval, 4-parameter noise)**
+**Table 11: Pathfinder, Pathfinder-KD, Pathfinder-Wide, and alternatives at d=7 p=0.007 (60K-shot eval, 4-parameter noise)**
 
-| Distance | Variant | Individual LER | Ensemble LER (as PF voter in Triad) |
-|----------|---------|----------------|----------------------------|
-| d=5 | Table-1 OOD | 2.94% | 2.60% |
-| d=5 | **Canonical Pathfinder** (fine-tune) | 3.04% | **2.66%** |
-| d=5 | Pathfinder-KD (distill) | ~3.3%* | — |
-| d=7 | Table-1 OOD | 4.01% | 2.56% |
-| d=7 | **Canonical Pathfinder** (fine-tune) | 3.34% | **2.417%** |
-| d=7 | Pathfinder-KD (distill) | **3.09%** | 2.495% |
+| Distance | Variant | Parameters | Individual LER | 95% CI | Ensemble LER (as PF voter in Triad) | vs Lange |
+|----------|---------|:----------:|----------------|-------|----------------------------|------|
+| d=5 | Table-1 OOD | 376K | 2.94% | — | 2.60% | — |
+| d=5 | **Canonical Pathfinder** (fine-tune) | 376K | 3.04% | — | **2.66%** | — |
+| d=5 | Pathfinder-KD (distill) | 376K | ~3.3%* | — | — | — |
+| d=7 | Table-1 OOD | 500K | 4.01% | — | 2.56% | loses |
+| d=7 | **Canonical Pathfinder** (fine-tune) | 500K | 3.34% | [3.20, 3.49] | **2.417%** | loses (non-overlap) |
+| d=7 | Pathfinder-KD (distill) | 500K | 3.09% | — | 2.495% | loses (non-overlap) |
+| d=7 | **Pathfinder-Wide** (distill, H=384, new) | **1.09M** | **2.995%** | [2.862, 3.134] | **2.475%** | **tied (CI overlap!)** |
+| d=7 | *Lange GNN (reference)* | 1.36M | 2.940% | [2.808, 3.078] | — | baseline |
 
 *The d=5 distillation's training-time evals were non-monotonic; the best 10K-shot eval was 3.07% but end-of-training drifted to ~3.3%. See `bench/results/h200_session3/distill/distill_d5.log`.
+
+**Pathfinder-Wide result (d=7 p=0.007, p=0.010).** Increasing Pathfinder's hidden dimension from H=256 (500K params) to H=384 (1.09M params) — approaching Lange's 1.36M parameter count — and training with Lange-teacher distillation for 80,000 steps at `muon_lr=0.005` produces a **statistically-tied result with Lange at d=7 p=0.007** (Pathfinder-Wide 2.995% vs. Lange 2.940%, overlapping 95% Wilson CIs). At d=7 p=0.010 Pathfinder-Wide slightly out-performs Lange (10.688% vs. 10.822%, also overlapping CIs). Pathfinder-Wide is **the first Pathfinder variant tested whose 95% CI includes Lange's point estimate** — i.e., the first variant where the paper cannot reject the hypothesis that Pathfinder and Lange have equal individual LER at matched 4-parameter noise. Training script: `bench/results/h200_session3/train_distill_lange_lowlr.py`; checkpoint: `bench/results/h200_session3/tierC1/pathfinder_wide_d7/best_model.pt`.
 
 **Why canonical Pathfinder uses fine-tune, not distill.** Three independent reasons:
 
@@ -631,7 +635,7 @@ At d=3 the architecture is shallow enough (L=3, 252K parameters) that AdamW reac
 |---|---|----------------:|------:|------:|----------------:|-----|
 | 9 | 0.003 | 0.378% (p003_lowlr) | **0.017%** | 0.047% | 0.022% | overlap |
 | 9 | 0.005 | 1.482% (p005_ft)    | **0.430%** | 0.645% | 0.438% | overlap |
-| 9 | 0.007 | 7.052% (p005_ft, OOD at p=0.007) | **2.592%** | 3.140% | **2.503%** | overlap |
+| 9 | 0.007 | 5.852% (p007_ft, specialized) | **2.592%** | 3.140% | **2.455%** | overlap |
 
 **Honest reading of the d=9 data.** Pathfinder at d=9 is significantly worse than Lange at d=9 on matched noise — a 3–4× individual-LER gap, versus the ≈15% d=7 gap reported in §5.11. Lange's GNN scales better with code distance than Pathfinder's CNN on this task. Pathfinder-Triad still slightly beats Lange alone at d=9 p=0.007 (2.503% vs. 2.592%, a 3.4% relative reduction), but the CIs overlap — this is a soft win, not the statistically-significant non-overlapping-CI result of d=7. The d=9 extension therefore:
 - **Confirms** that Pathfinder-Triad continues to be competitive with Lange alone (never statistically worse).

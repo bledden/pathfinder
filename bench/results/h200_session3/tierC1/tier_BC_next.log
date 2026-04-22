@@ -1,0 +1,8 @@
+[Wed Apr 22 02:27:11 UTC 2026] === B3 extension + C1 attempt 1 start ===
+[Wed Apr 22 02:27:11 UTC 2026] 1/3 distill_d9_p007_ft (init from p005_ft)
+[Wed Apr 22 03:07:14 UTC 2026] p007_ft rc=0
+[Wed Apr 22 03:07:14 UTC 2026] 2/3 pathfinder_wide_d7 (H=384, distill from Lange)
+[Wed Apr 22 04:18:08 UTC 2026] wide_d7 rc=0
+[Wed Apr 22 04:18:08 UTC 2026] 3/3 ensemble eval (d=9 p=0.007 + wide d=7)
+[Wed Apr 22 04:18:42 UTC 2026] ensemble rc=0
+[Wed Apr 22 04:18:42 UTC 2026] === DONE ===
