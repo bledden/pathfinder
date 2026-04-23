@@ -1,0 +1,5 @@
+  loading Pathfinder from /workspace/pathfinder/train/checkpoints/fixed_d7/best_model.pt
+d=7 p=0.005 XLONG (100K): PF=0.7270% [0.6762,0.7816]  Lange=0.7270% [0.6762,0.7816]  Maj=0.6340%  overlap by 0.1054pp
+d=7 p=0.007 XLONG (100K): PF=2.7980% [2.6976,2.9020]  Lange=2.9560% [2.8528,3.0628]  Maj=2.4350%  overlap by 0.0492pp
+d=7 p=0.01 XLONG (100K): PF=10.2440% [10.0576,10.4335]  Lange=10.7640% [10.5734,10.9576]  Maj=8.8590%  NON-OVERLAP-PF-WINS!
+Saved

@@ -543,6 +543,7 @@ An obvious way to try to close the Pathfinder–Lange individual-LER gap in §5.
 | d=7 | Pathfinder-XL (distill, H=512, 80K) | 1.99M | 3.063% | [2.928, 3.204] | 2.492% | tied (CI overlap) |
 | d=7 | Pathfinder-Wide-Multi (H=384, multi-noise, 80K) | 1.09M | 2.998% | [2.864, 3.137] | 2.448% | tied (CI overlap) |
 | d=7 | **Pathfinder-Wide-Long (H=384, single-noise, 160K)** | **1.09M** | **2.800%** ★ | [2.700, 2.904] | **2.470%** | **point estimate beats Lange (CI 5bp overlap)** |
+| d=7 | Pathfinder-Wide-XLong (H=384, 240K total = +80K from Wide-Long) | 1.09M | 2.798% | [2.698, 2.902] | 2.435% | identical to Wide-Long; saturated |
 | d=7 | *Lange GNN (reference)* | 1.36M | 2.956% | [2.853, 3.063] | — | baseline (100K shots) |
 
 *The d=5 distillation's training-time evals were non-monotonic; the best 10K-shot eval was 3.07% but end-of-training drifted to ~3.3%. See `bench/results/h200_session3/distill/distill_d5.log`.
