@@ -1,0 +1,5 @@
+Loaded 3 seeded models
+d=7 p=0.005 MULTI-SEED-AVG (3 PF seeds) (100K shots): PF-avg=0.6570% [0.6088,0.7090]  Lange=0.7270% [0.6762,0.7816]  Maj=0.6210%  overlap_or_close (0.0328pp)
+d=7 p=0.007 MULTI-SEED-AVG (3 PF seeds) (100K shots): PF-avg=2.4920% [2.3972,2.5905]  Lange=2.9560% [2.8528,3.0628]  Maj=2.3840%  NON-OVERLAP-PF-WINS!
+d=7 p=0.01 MULTI-SEED-AVG (3 PF seeds) (100K shots): PF-avg=9.1730% [8.9957,9.3535]  Lange=10.7640% [10.5734,10.9576]  Maj=8.6890%  NON-OVERLAP-PF-WINS!
+Saved
