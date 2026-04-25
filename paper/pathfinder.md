@@ -172,6 +172,19 @@ Correlated PyMatching (two-pass matching with edge reweighting) produces identic
 
 Figure 1 visualizes the d=7 row of this data alongside the §5.11 Lange comparison and the §5.12 ensemble (see Section 5.12 for the 4-parameter noise numbers); Figure 3 shows the error-suppression scaling from d=3 to d=7 at p=0.007 for every decoder reported in this paper.
 
+**Table 1b: PFWL3S (Pathfinder-Wide-Long-3seed) cross-evaluated on 3-parameter noise — applying the headline §5.13 multi-seed ckpts (trained on Lange's 4-parameter noise model at p=0.007) directly to the §5.1 3-parameter circuit-level noise without retraining (LER %, 100K shots).**
+
+| p | d=3 PFWL3S | d=3 PM | vs PM | d=5 PFWL3S | d=5 PM | vs PM | d=7 PFWL3S | d=7 PM | vs PM |
+|---|---:|---:|:---:|---:|---:|:---:|---:|---:|:---:|
+| 0.001 | **0.056** | 0.064 | overlap | **0.006** | 0.008 | overlap | 0.000 | 0.001 | overlap |
+| 0.003 | **0.484** | 0.492 | overlap | **0.171** | 0.273 | **PF strict** | **0.056** | 0.118 | **PF strict** |
+| 0.005 | 1.371 | 1.371 | overlap (tie) | **0.748** | 1.172 | **PF strict** | **0.475** | 0.754 | **PF strict** |
+| 0.007 | **2.499** | 2.553 | overlap | **1.934** | 2.807 | **PF strict** | **1.868** | 2.566 | **PF strict** |
+| 0.010 | **4.644** | 4.717 | overlap | **5.241** | 6.645 | **PF strict** | **7.019** | 8.106 | **PF strict** |
+| 0.015 | **9.228** | 9.258 | overlap | **14.033** | 16.157 | **PF strict** | **22.470** | 22.785 | overlap |
+
+PFWL3S — trained on Lange's 4-parameter circuit-level noise — strictly beats PyMatching on the §5.1 3-parameter noise model at **9 of the 18 evaluation points**: 5 of 6 d=5 points (every operational rate p ∈ {0.003, 0.005, 0.007, 0.010, 0.015}) and 4 of 6 d=7 points (p ∈ {0.003, 0.005, 0.007, 0.010}; p=0.015 is a soft win with overlapping CIs by 26 bp). At d=3 PFWL3S and PM are statistically tied at every noise rate (PM is already near-optimal at d=3 — the canonical Pathfinder of Table 1 above also wins by single-digit basis points there). Note that PFWL3S's per-rate LER on this OOD 3-parameter noise is **higher** than the canonical Pathfinder of Table 1 above at every distance/rate (e.g., at d=7 p=0.007 PFWL3S 1.87% vs canonical 1.04%) — this is expected, since canonical Pathfinder was trained directly on the 3-parameter noise model whereas PFWL3S was trained on a different (4-parameter) noise model. The headline finding is the *direction* of the comparison: even the OOD PFWL3S strictly beats PyMatching, confirming that the §5.13 PFWL3S recipe transfers across noise models without retraining. Data: `bench/results/h200_session3/tierC1/pfwl3s_table1_3param.json`; eval log: `eval_pfwl3s_table1_3param.log`. **Practical implication**: deployments targeting 3-parameter noise can use either the canonical Pathfinder of Table 1 (best per-rate accuracy at the trained noise model) or the PFWL3S of Table 11 (best 4-parameter accuracy + this OOD strict-PM-win on 3-parameter noise) depending on the priority. The §5.13 multi-seed ensemble is therefore robust enough to ship across both noise models the paper evaluates.
+
 ### 5.2 Error Suppression Scaling
 
 The error suppression ratio Λ = LER(d)/LER(d+2) quantifies how effectively the code suppresses errors as distance increases. Table 2 shows that Pathfinder achieves higher suppression ratios than PyMatching at operational noise rates (p ≥ 0.003), indicating that its advantage grows with increasing code distance in the regime that matters for real hardware.
