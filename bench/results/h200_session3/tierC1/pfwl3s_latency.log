@@ -1,0 +1,6 @@
+Loading 3 PFWL3S ckpts at d=7...
+Loaded 3 models
+B=   1: 1-seed=3.137 ms (3137.30 us/syn) | 3-seed=9.242 ms (9241.73 us/syn) | 3-seed/1-seed = 2.95x
+B=  64: 1-seed=4.169 ms (65.13 us/syn) | 3-seed=12.464 ms (194.74 us/syn) | 3-seed/1-seed = 2.99x
+B=1024: 1-seed=53.789 ms (52.53 us/syn) | 3-seed=161.123 ms (157.35 us/syn) | 3-seed/1-seed = 3.00x
+Saved /workspace/persist/results/pfwl3s_latency.json

@@ -1,0 +1,13 @@
+d=3: 3 PF model(s)
+  /workspace/persist/checkpoints/pathfinder_wide_long_d3_rescue_seed0/best_model.pt
+  /workspace/persist/checkpoints/pathfinder_wide_long_d3_rescue_seed1/best_model.pt
+  /workspace/persist/checkpoints/pathfinder_wide_long_d3_rescue_seed2/best_model.pt
+  d=3 p=0.0005: PF=0.0100% [0.0054,0.0184]  Lange=0.0140% [0.0083,0.0235]  PM=0.0130%  Maj=0.0110%  PFvsLange=overlap  MajvsLange=overlap
+  d=3 p=0.001: PF=0.0730% [0.0581,0.0918]  Lange=0.0650% [0.0510,0.0828]  PM=0.0780%  Maj=0.0650%  PFvsLange=overlap  MajvsLange=overlap
+  d=3 p=0.002: PF=0.2500% [0.2209,0.2829]  Lange=0.2150% [0.1881,0.2457]  PM=0.2880%  Maj=0.2280%  PFvsLange=overlap  MajvsLange=overlap
+  d=3 p=0.003: PF=0.6400% [0.5924,0.6914]  Lange=0.5170% [0.4744,0.5634]  PM=0.6590%  Maj=0.5490%  PFvsLange=Lange<<PF  MajvsLange=overlap
+  d=3 p=0.005: PF=1.6890% [1.6110,1.7707]  Lange=1.4600% [1.3875,1.5362]  PM=1.7280%  Maj=1.5140%  PFvsLange=Lange<<PF  MajvsLange=overlap
+  d=3 p=0.007: PF=3.1810% [3.0740,3.2916]  Lange=2.7820% [2.6819,2.8858]  PM=3.2280%  Maj=2.8530%  PFvsLange=Lange<<PF  MajvsLange=overlap
+  d=3 p=0.01: PF=5.7870% [5.6440,5.9334]  Lange=5.1330% [4.9979,5.2715]  PM=5.8210%  Maj=5.3010%  PFvsLange=Lange<<PF  MajvsLange=overlap
+  d=3 p=0.015: PF=11.5580% [11.3613,11.7576]  Lange=10.5270% [10.3383,10.7187]  PM=11.5230%  Maj=10.6970%  PFvsLange=Lange<<PF  MajvsLange=overlap
+Saved

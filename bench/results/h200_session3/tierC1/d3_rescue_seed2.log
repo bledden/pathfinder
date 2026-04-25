@@ -1,0 +1,183 @@
+Student (Pathfinder): d=3, H=384, 566,017 params
+Teacher (Lange GNN d=3 d_t=3) loaded and frozen
+Dataset: p=0.007, batch=256
+step      0/160000  bce=0.6721  kl=2.7508  1.0 s/s  ETA 2667min
+step   1000/160000  bce=0.1900  kl=2.4025  42.7 s/s  ETA 62min
+step   2000/160000  bce=0.1690  kl=2.2894  43.6 s/s  ETA 60min
+step   3000/160000  bce=0.1849  kl=2.4778  43.9 s/s  ETA 60min
+step   4000/160000  bce=0.2355  kl=2.3594  44.1 s/s  ETA 59min
+step   5000/160000  bce=0.1832  kl=2.4390  44.2 s/s  ETA 58min
+step   6000/160000  bce=0.2311  kl=2.5192  44.3 s/s  ETA 58min
+step   7000/160000  bce=0.1965  kl=2.5583  44.3 s/s  ETA 58min
+step   8000/160000  bce=0.1842  kl=2.1526  44.4 s/s  ETA 57min
+step   9000/160000  bce=0.1939  kl=2.4130  44.4 s/s  ETA 57min
+step  10000/160000  bce=0.2809  kl=2.4807  44.4 s/s  ETA 56min
+  >>> EVAL LER @ p=0.007: 0.04060
+  >>> saved (ler=0.04060)
+step  11000/160000  bce=0.2161  kl=2.3806  44.4 s/s  ETA 56min
+step  12000/160000  bce=0.1703  kl=2.2708  44.4 s/s  ETA 56min
+step  13000/160000  bce=0.1679  kl=2.3195  44.4 s/s  ETA 55min
+step  14000/160000  bce=0.1855  kl=2.5936  44.4 s/s  ETA 55min
+step  15000/160000  bce=0.1822  kl=2.4235  44.5 s/s  ETA 54min
+step  16000/160000  bce=0.1894  kl=2.3041  44.5 s/s  ETA 54min
+step  17000/160000  bce=0.1890  kl=2.3176  44.5 s/s  ETA 54min
+step  18000/160000  bce=0.2629  kl=2.5739  44.5 s/s  ETA 53min
+step  19000/160000  bce=0.1923  kl=2.4021  44.5 s/s  ETA 53min
+step  20000/160000  bce=0.1926  kl=2.5308  44.5 s/s  ETA 52min
+  >>> EVAL LER @ p=0.007: 0.03480
+  >>> saved (ler=0.03480)
+step  21000/160000  bce=0.1799  kl=2.5691  44.5 s/s  ETA 52min
+step  22000/160000  bce=0.2029  kl=2.5195  44.5 s/s  ETA 52min
+step  23000/160000  bce=0.1889  kl=2.4295  44.5 s/s  ETA 51min
+step  24000/160000  bce=0.1679  kl=2.3992  44.5 s/s  ETA 51min
+step  25000/160000  bce=0.1753  kl=2.4777  44.5 s/s  ETA 51min
+step  26000/160000  bce=0.1905  kl=2.3178  44.5 s/s  ETA 50min
+step  27000/160000  bce=0.1931  kl=2.2880  44.5 s/s  ETA 50min
+step  28000/160000  bce=0.1818  kl=2.4533  44.5 s/s  ETA 49min
+step  29000/160000  bce=0.2158  kl=2.5540  44.5 s/s  ETA 49min
+step  30000/160000  bce=0.2086  kl=2.7793  44.5 s/s  ETA 49min
+  >>> EVAL LER @ p=0.007: 0.03310
+  >>> saved (ler=0.03310)
+step  31000/160000  bce=0.2313  kl=2.4443  44.5 s/s  ETA 48min
+step  32000/160000  bce=0.1705  kl=2.5495  44.5 s/s  ETA 48min
+step  33000/160000  bce=0.1732  kl=2.3668  44.5 s/s  ETA 48min
+step  34000/160000  bce=0.1947  kl=2.5832  44.5 s/s  ETA 47min
+step  35000/160000  bce=0.1761  kl=2.4261  44.5 s/s  ETA 47min
+step  36000/160000  bce=0.1843  kl=2.4510  44.5 s/s  ETA 46min
+step  37000/160000  bce=0.1690  kl=2.4201  44.5 s/s  ETA 46min
+step  38000/160000  bce=0.2013  kl=2.7188  44.5 s/s  ETA 46min
+step  39000/160000  bce=0.1738  kl=2.3085  44.5 s/s  ETA 45min
+step  40000/160000  bce=0.1685  kl=2.3605  44.5 s/s  ETA 45min
+  >>> EVAL LER @ p=0.007: 0.03190
+  >>> saved (ler=0.03190)
+step  41000/160000  bce=0.1931  kl=2.4314  44.5 s/s  ETA 45min
+step  42000/160000  bce=0.1656  kl=2.5126  44.5 s/s  ETA 44min
+step  43000/160000  bce=0.1953  kl=2.4777  44.5 s/s  ETA 44min
+step  44000/160000  bce=0.1699  kl=2.2856  44.5 s/s  ETA 43min
+step  45000/160000  bce=0.1672  kl=2.6159  44.5 s/s  ETA 43min
+step  46000/160000  bce=0.1719  kl=2.5018  44.5 s/s  ETA 43min
+step  47000/160000  bce=0.1857  kl=2.3721  44.5 s/s  ETA 42min
+step  48000/160000  bce=0.1631  kl=2.5442  44.5 s/s  ETA 42min
+step  49000/160000  bce=0.2028  kl=2.4507  44.5 s/s  ETA 42min
+step  50000/160000  bce=0.1805  kl=2.4477  44.5 s/s  ETA 41min
+  >>> EVAL LER @ p=0.007: 0.03310
+step  51000/160000  bce=0.2089  kl=2.4204  44.5 s/s  ETA 41min
+step  52000/160000  bce=0.1480  kl=2.2960  44.5 s/s  ETA 40min
+step  53000/160000  bce=0.1782  kl=2.3212  44.5 s/s  ETA 40min
+step  54000/160000  bce=0.2251  kl=2.5614  44.5 s/s  ETA 40min
+step  55000/160000  bce=0.2026  kl=2.4436  44.5 s/s  ETA 39min
+step  56000/160000  bce=0.1813  kl=2.3702  44.5 s/s  ETA 39min
+step  57000/160000  bce=0.2041  kl=2.6136  44.5 s/s  ETA 39min
+step  58000/160000  bce=0.1805  kl=2.4058  44.5 s/s  ETA 38min
+step  59000/160000  bce=0.2157  kl=2.4205  44.5 s/s  ETA 38min
+step  60000/160000  bce=0.1832  kl=2.3856  44.5 s/s  ETA 37min
+  >>> EVAL LER @ p=0.007: 0.03510
+step  61000/160000  bce=0.1633  kl=2.3448  44.5 s/s  ETA 37min
+step  62000/160000  bce=0.1740  kl=2.4564  44.5 s/s  ETA 37min
+step  63000/160000  bce=0.1715  kl=2.4169  44.5 s/s  ETA 36min
+step  64000/160000  bce=0.1731  kl=2.4588  44.5 s/s  ETA 36min
+step  65000/160000  bce=0.1575  kl=2.5095  44.5 s/s  ETA 36min
+step  66000/160000  bce=0.1703  kl=2.5142  44.5 s/s  ETA 35min
+step  67000/160000  bce=0.1526  kl=2.1758  44.5 s/s  ETA 35min
+step  68000/160000  bce=0.1720  kl=2.4339  44.5 s/s  ETA 34min
+step  69000/160000  bce=0.1514  kl=2.4633  44.5 s/s  ETA 34min
+step  70000/160000  bce=0.1895  kl=2.4888  44.5 s/s  ETA 34min
+  >>> EVAL LER @ p=0.007: 0.03380
+step  71000/160000  bce=0.1866  kl=2.4379  44.5 s/s  ETA 33min
+step  72000/160000  bce=0.1790  kl=2.4402  44.5 s/s  ETA 33min
+step  73000/160000  bce=0.2150  kl=2.5392  44.5 s/s  ETA 33min
+step  74000/160000  bce=0.1962  kl=2.3184  44.5 s/s  ETA 32min
+step  75000/160000  bce=0.1928  kl=2.5880  44.5 s/s  ETA 32min
+step  76000/160000  bce=0.1736  kl=2.3598  44.5 s/s  ETA 31min
+step  77000/160000  bce=0.1810  kl=2.3611  44.5 s/s  ETA 31min
+step  78000/160000  bce=0.1924  kl=2.3830  44.5 s/s  ETA 31min
+step  79000/160000  bce=0.1738  kl=2.5201  44.5 s/s  ETA 30min
+step  80000/160000  bce=0.1614  kl=2.5292  44.5 s/s  ETA 30min
+  >>> EVAL LER @ p=0.007: 0.03230
+step  81000/160000  bce=0.1968  kl=2.4656  44.5 s/s  ETA 30min
+step  82000/160000  bce=0.1734  kl=2.3886  44.5 s/s  ETA 29min
+step  83000/160000  bce=0.1645  kl=2.1948  44.5 s/s  ETA 29min
+step  84000/160000  bce=0.1762  kl=2.3954  44.5 s/s  ETA 28min
+step  85000/160000  bce=0.2054  kl=2.3538  44.5 s/s  ETA 28min
+step  86000/160000  bce=0.1714  kl=2.4838  44.6 s/s  ETA 28min
+step  87000/160000  bce=0.2018  kl=2.3816  44.6 s/s  ETA 27min
+step  88000/160000  bce=0.2174  kl=2.4302  44.6 s/s  ETA 27min
+step  89000/160000  bce=0.2050  kl=2.4165  44.6 s/s  ETA 27min
+step  90000/160000  bce=0.1722  kl=2.4863  44.6 s/s  ETA 26min
+  >>> EVAL LER @ p=0.007: 0.03610
+step  91000/160000  bce=0.2084  kl=2.4484  44.6 s/s  ETA 26min
+step  92000/160000  bce=0.1951  kl=2.4413  44.6 s/s  ETA 25min
+step  93000/160000  bce=0.1602  kl=2.3306  44.6 s/s  ETA 25min
+step  94000/160000  bce=0.1682  kl=2.5274  44.6 s/s  ETA 25min
+step  95000/160000  bce=0.2088  kl=2.3286  44.6 s/s  ETA 24min
+step  96000/160000  bce=0.1708  kl=2.4073  44.6 s/s  ETA 24min
+step  97000/160000  bce=0.2151  kl=2.4360  44.6 s/s  ETA 24min
+step  98000/160000  bce=0.1832  kl=2.4595  44.6 s/s  ETA 23min
+step  99000/160000  bce=0.1885  kl=2.4837  44.6 s/s  ETA 23min
+step 100000/160000  bce=0.1681  kl=2.3791  44.6 s/s  ETA 22min
+  >>> EVAL LER @ p=0.007: 0.03450
+step 101000/160000  bce=0.2604  kl=2.4690  44.6 s/s  ETA 22min
+step 102000/160000  bce=0.2410  kl=2.5998  44.6 s/s  ETA 22min
+step 103000/160000  bce=0.1563  kl=2.4348  44.6 s/s  ETA 21min
+step 104000/160000  bce=0.1808  kl=2.3681  44.6 s/s  ETA 21min
+step 105000/160000  bce=0.1561  kl=2.4408  44.6 s/s  ETA 21min
+step 106000/160000  bce=0.1718  kl=2.3958  44.6 s/s  ETA 20min
+step 107000/160000  bce=0.1694  kl=2.5510  44.6 s/s  ETA 20min
+step 108000/160000  bce=0.1836  kl=2.3750  44.6 s/s  ETA 19min
+step 109000/160000  bce=0.1806  kl=2.4630  44.6 s/s  ETA 19min
+step 110000/160000  bce=0.2151  kl=2.5279  44.6 s/s  ETA 19min
+  >>> EVAL LER @ p=0.007: 0.03410
+step 111000/160000  bce=0.1923  kl=2.4436  44.6 s/s  ETA 18min
+step 112000/160000  bce=0.1605  kl=2.5062  44.6 s/s  ETA 18min
+step 113000/160000  bce=0.1836  kl=2.3935  44.6 s/s  ETA 18min
+step 114000/160000  bce=0.1745  kl=2.4297  44.6 s/s  ETA 17min
+step 115000/160000  bce=0.1664  kl=2.3799  44.6 s/s  ETA 17min
+step 116000/160000  bce=0.1829  kl=2.3707  44.6 s/s  ETA 16min
+step 117000/160000  bce=0.2170  kl=2.4484  44.6 s/s  ETA 16min
+step 118000/160000  bce=0.1746  kl=2.6963  44.6 s/s  ETA 16min
+step 119000/160000  bce=0.1790  kl=2.3245  44.6 s/s  ETA 15min
+step 120000/160000  bce=0.1697  kl=2.4015  44.6 s/s  ETA 15min
+  >>> EVAL LER @ p=0.007: 0.02790
+  >>> saved (ler=0.02790)
+step 121000/160000  bce=0.1752  kl=2.5269  44.5 s/s  ETA 15min
+step 122000/160000  bce=0.1905  kl=2.4628  44.5 s/s  ETA 14min
+step 123000/160000  bce=0.2146  kl=2.3438  44.5 s/s  ETA 14min
+step 124000/160000  bce=0.1843  kl=2.5288  44.5 s/s  ETA 13min
+step 125000/160000  bce=0.2304  kl=2.6397  44.5 s/s  ETA 13min
+step 126000/160000  bce=0.1735  kl=2.3690  44.5 s/s  ETA 13min
+step 127000/160000  bce=0.1947  kl=2.5679  44.5 s/s  ETA 12min
+step 128000/160000  bce=0.1760  kl=2.3956  44.5 s/s  ETA 12min
+step 129000/160000  bce=0.1975  kl=2.3654  44.5 s/s  ETA 12min
+step 130000/160000  bce=0.1869  kl=2.2451  44.5 s/s  ETA 11min
+  >>> EVAL LER @ p=0.007: 0.02920
+step 131000/160000  bce=0.1505  kl=2.3228  44.5 s/s  ETA 11min
+step 132000/160000  bce=0.1600  kl=2.4614  44.5 s/s  ETA 10min
+step 133000/160000  bce=0.1958  kl=2.3462  44.5 s/s  ETA 10min
+step 134000/160000  bce=0.1906  kl=2.5012  44.5 s/s  ETA 10min
+step 135000/160000  bce=0.1603  kl=2.5003  44.5 s/s  ETA 9min
+step 136000/160000  bce=0.1795  kl=2.4112  44.5 s/s  ETA 9min
+step 137000/160000  bce=0.1951  kl=2.5000  44.5 s/s  ETA 9min
+step 138000/160000  bce=0.1819  kl=2.6229  44.5 s/s  ETA 8min
+step 139000/160000  bce=0.1635  kl=2.3628  44.5 s/s  ETA 8min
+step 140000/160000  bce=0.2171  kl=2.6165  44.5 s/s  ETA 7min
+  >>> EVAL LER @ p=0.007: 0.03020
+step 141000/160000  bce=0.1591  kl=2.6219  44.5 s/s  ETA 7min
+step 142000/160000  bce=0.1804  kl=2.4806  44.5 s/s  ETA 7min
+step 143000/160000  bce=0.2121  kl=2.4197  44.5 s/s  ETA 6min
+step 144000/160000  bce=0.1513  kl=2.5014  44.5 s/s  ETA 6min
+step 145000/160000  bce=0.2033  kl=2.6231  44.5 s/s  ETA 6min
+step 146000/160000  bce=0.1774  kl=2.5178  44.5 s/s  ETA 5min
+step 147000/160000  bce=0.1980  kl=2.3991  44.5 s/s  ETA 5min
+step 148000/160000  bce=0.1859  kl=2.3351  44.5 s/s  ETA 4min
+step 149000/160000  bce=0.1827  kl=2.3606  44.5 s/s  ETA 4min
+step 150000/160000  bce=0.1829  kl=2.2938  44.5 s/s  ETA 4min
+  >>> EVAL LER @ p=0.007: 0.03450
+step 151000/160000  bce=0.1547  kl=2.4597  44.5 s/s  ETA 3min
+step 152000/160000  bce=0.1766  kl=2.2611  44.5 s/s  ETA 3min
+step 153000/160000  bce=0.1696  kl=2.5515  44.5 s/s  ETA 3min
+step 154000/160000  bce=0.1592  kl=2.4035  44.5 s/s  ETA 2min
+step 155000/160000  bce=0.1749  kl=2.4388  44.5 s/s  ETA 2min
+step 156000/160000  bce=0.1544  kl=2.5032  44.5 s/s  ETA 1min
+step 157000/160000  bce=0.1572  kl=2.4483  44.5 s/s  ETA 1min
+step 158000/160000  bce=0.1988  kl=2.4389  44.5 s/s  ETA 1min
+step 159000/160000  bce=0.1940  kl=2.5327  44.5 s/s  ETA 0min
