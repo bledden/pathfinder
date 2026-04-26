@@ -1,0 +1,16 @@
+=== watcher START Sat Apr 25 18:27:00 UTC 2026 ===
+=== d=9 queue done at Sun Apr 26 04:53:02 UTC 2026, running eval ===
+d=9: 3 PF model(s)
+  /workspace/persist/checkpoints/pathfinder_wide_long_d9_seed0/best_model.pt
+  /workspace/persist/checkpoints/pathfinder_wide_long_d9_seed1/best_model.pt
+  /workspace/persist/checkpoints/pathfinder_wide_long_d9_seed2/best_model.pt
+  d=9 p=0.0005: PF=0.0000% [0.0000,0.0038]  Lange=0.0000% [0.0000,0.0038]  PM=0.0000%  Maj=0.0000%  PFvsLange=overlap  MajvsLange=overlap
+  d=9 p=0.001: PF=0.0010% [0.0002,0.0057]  Lange=0.0000% [0.0000,0.0038]  PM=0.0000%  Maj=0.0000%  PFvsLange=overlap  MajvsLange=overlap
+  d=9 p=0.002: PF=0.0110% [0.0061,0.0197]  Lange=0.0000% [0.0000,0.0038]  PM=0.0050%  Maj=0.0010%  PFvsLange=Lange<<PF  MajvsLange=overlap
+  d=9 p=0.003: PF=0.0520% [0.0397,0.0682]  Lange=0.0200% [0.0129,0.0309]  PM=0.0450%  Maj=0.0200%  PFvsLange=Lange<<PF  MajvsLange=overlap
+  d=9 p=0.005: PF=0.6490% [0.6011,0.7007]  Lange=0.4370% [0.3980,0.4798]  PM=0.6710%  Maj=0.4080%  PFvsLange=Lange<<PF  MajvsLange=overlap
+  d=9 p=0.007: PF=3.3100% [3.2009,3.4227]  Lange=2.6230% [2.5257,2.7239]  PM=3.1550%  Maj=2.2770%  PFvsLange=Lange<<PF  MajvsLange=Maj<<all
+  d=9 p=0.01: PF=15.0610% [14.8407,15.2840]  Lange=13.0850% [12.8774,13.2954]  PM=12.2270%  Maj=10.8520%  PFvsLange=Lange<<PF  MajvsLange=Maj<<all
+  d=9 p=0.015: PF=41.2800% [40.9752,41.5855]  Lange=39.6590% [39.3562,39.9626]  PM=34.5460%  Maj=35.7010%  PFvsLange=Lange<<PF  MajvsLange=Maj<<Lange
+Saved
+=== d=9 eval DONE Sun Apr 26 04:58:32 UTC 2026 ===
