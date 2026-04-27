@@ -1,0 +1,4 @@
+=== H=512 Triad-distill STATUS ===
+Update: Mon Apr 27 02:29:52 UTC 2026
+Phase: PHASE_1_DONE
+Details: Seed 0 LER=2.5100000000000002% (threshold 2.45%)

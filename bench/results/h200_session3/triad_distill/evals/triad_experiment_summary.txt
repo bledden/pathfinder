@@ -1,0 +1,30 @@
+=== Triad-distillation experiment FINAL SUMMARY (v3 watcher, 3 branches) ===
+Generated: Sun Apr 26 16:55:10 UTC 2026
+
+Branch 1 (soft Triad from-scratch, seed 0): LER = 0.0271 (decision:   File "<string>", line 1
+    x = float('0.0271'); print('GO' if x <=  else 'PIVOT')
+                               ^^^^^^^^^
+SyntaxError: expected 'else' after 'if' expression)
+Branch 2 (hardlabel from-scratch, seed 0): LER = 0.0271 (decision:   File "<string>", line 1
+    x = float('0.0271'); print('GO' if x <=  else 'PIVOT')
+                               ^^^^^^^^^
+SyntaxError: expected 'else' after 'if' expression)
+Branch 3 (soft Triad warm-init from PFWL3S, seed 0): LER = 0.0262 (decision:   File "<string>", line 1
+    x = float('0.0262'); print('GO' if x <=  else 'PIVOT')
+                               ^^^^^^^^^
+SyntaxError: expected 'else' after 'if' expression)
+
+Threshold for 'GO seeds 1+2':  ('GO' = train more seeds, 'PIVOT' = move to next branch)
+Goal: PF individual LER <= 2.38% (strictly beat the original Triad).
+
+Eval results (only present if branch went happy path):
+  Soft Triad: /workspace/persist/results/ensemble_triad_distill_d7.json
+  Hardlabel: /workspace/persist/results/ensemble_triad_hardlabel_d7.json (if hardlabel happy)
+  Warm-init: TBD (no full eval set up yet for warm-init branch)
+
+Best ckpts (sorted by approach):
+  Soft from-scratch: /workspace/persist/checkpoints/pathfinder_triad_distill_d7_seed{0,1,2}/
+  Hardlabel from-scratch: /workspace/persist/checkpoints/pathfinder_triad_hardlabel_d7_seed{0,1,2}/
+  Warm-init: /workspace/persist/checkpoints/pathfinder_triad_warminit_d7_seed{0,1,2}/
+
+Logs: /workspace/auto_continue_triad.log

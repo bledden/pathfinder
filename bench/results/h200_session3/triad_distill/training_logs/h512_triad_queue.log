@@ -1,0 +1,54 @@
+=== H=512 Triad-distill queue START Sun Apr 26 23:03:01 UTC 2026 ===
+=== H=512 seed=0 START Sun Apr 26 23:03:01 UTC 2026 ===
+step 117000/160000  bce=0.0552  kl=0.4075  12.9 s/s  ETA 56min
+step 118000/160000  bce=0.0820  kl=0.3019  12.9 s/s  ETA 54min
+step 119000/160000  bce=0.0452  kl=0.2309  12.9 s/s  ETA 53min
+step 120000/160000  bce=0.0497  kl=0.3366  12.9 s/s  ETA 52min
+  >>> EVAL LER @ p=0.007: 0.02630
+  >>> saved (ler=0.02630)
+step 121000/160000  bce=0.0137  kl=0.2646  12.9 s/s  ETA 50min
+step 122000/160000  bce=0.0760  kl=0.2506  12.9 s/s  ETA 49min
+step 123000/160000  bce=0.0909  kl=0.3582  12.9 s/s  ETA 48min
+step 124000/160000  bce=0.0518  kl=0.2972  12.9 s/s  ETA 47min
+step 125000/160000  bce=0.0632  kl=0.1976  12.9 s/s  ETA 45min
+step 126000/160000  bce=0.0446  kl=0.2392  12.9 s/s  ETA 44min
+step 127000/160000  bce=0.0192  kl=0.2992  12.9 s/s  ETA 43min
+step 128000/160000  bce=0.0389  kl=0.2562  12.9 s/s  ETA 41min
+step 129000/160000  bce=0.0469  kl=0.2762  12.9 s/s  ETA 40min
+step 130000/160000  bce=0.0310  kl=0.2864  12.9 s/s  ETA 39min
+  >>> EVAL LER @ p=0.007: 0.02510
+  >>> saved (ler=0.02510)
+step 131000/160000  bce=0.1131  kl=0.3708  12.9 s/s  ETA 38min
+step 132000/160000  bce=0.0304  kl=0.2755  12.9 s/s  ETA 36min
+step 133000/160000  bce=0.0370  kl=0.3172  12.9 s/s  ETA 35min
+step 134000/160000  bce=0.0234  kl=0.3015  12.9 s/s  ETA 34min
+step 135000/160000  bce=0.0160  kl=0.2019  12.9 s/s  ETA 32min
+step 136000/160000  bce=0.0328  kl=0.3299  12.9 s/s  ETA 31min
+step 137000/160000  bce=0.0395  kl=0.3289  12.9 s/s  ETA 30min
+step 138000/160000  bce=0.0578  kl=0.2200  12.9 s/s  ETA 28min
+step 139000/160000  bce=0.0244  kl=0.2332  12.9 s/s  ETA 27min
+step 140000/160000  bce=0.1706  kl=0.3480  12.9 s/s  ETA 26min
+  >>> EVAL LER @ p=0.007: 0.02830
+step 141000/160000  bce=0.0463  kl=0.2480  12.9 s/s  ETA 25min
+step 142000/160000  bce=0.0557  kl=0.2786  12.9 s/s  ETA 23min
+step 143000/160000  bce=0.0321  kl=0.2443  12.9 s/s  ETA 22min
+step 144000/160000  bce=0.1120  kl=0.3514  12.9 s/s  ETA 21min
+step 145000/160000  bce=0.1683  kl=0.3274  12.9 s/s  ETA 19min
+step 146000/160000  bce=0.0906  kl=0.4099  12.9 s/s  ETA 18min
+step 147000/160000  bce=0.1228  kl=0.2923  12.9 s/s  ETA 17min
+step 148000/160000  bce=0.1455  kl=0.3580  12.9 s/s  ETA 16min
+step 149000/160000  bce=0.0673  kl=0.3106  12.9 s/s  ETA 14min
+step 150000/160000  bce=0.0810  kl=0.4154  12.9 s/s  ETA 13min
+  >>> EVAL LER @ p=0.007: 0.02600
+step 151000/160000  bce=0.0606  kl=0.2339  12.9 s/s  ETA 12min
+step 152000/160000  bce=0.0713  kl=0.5100  12.9 s/s  ETA 10min
+step 153000/160000  bce=0.0535  kl=0.3625  12.9 s/s  ETA 9min
+step 154000/160000  bce=0.1622  kl=0.3101  12.9 s/s  ETA 8min
+step 155000/160000  bce=0.0440  kl=0.3958  12.9 s/s  ETA 6min
+step 156000/160000  bce=0.0327  kl=0.1963  12.9 s/s  ETA 5min
+step 157000/160000  bce=0.1701  kl=0.2457  12.9 s/s  ETA 4min
+step 158000/160000  bce=0.1519  kl=0.2186  12.9 s/s  ETA 3min
+step 159000/160000  bce=0.0404  kl=0.3236  12.9 s/s  ETA 1min
+Training done. Best LER: 0.02510
+=== H=512 seed=0 DONE Mon Apr 27 02:29:51 UTC 2026 ===
+H=512 seed 0 LER: 0.0251 (2.5100000000000002%)

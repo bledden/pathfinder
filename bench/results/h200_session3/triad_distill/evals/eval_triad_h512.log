@@ -1,0 +1,13 @@
+d=7 H=512: 3 Triad-distill PF model(s)
+  /workspace/persist/checkpoints/pathfinder_triad_h512_d7_seed0/best_model.pt
+  /workspace/persist/checkpoints/pathfinder_triad_h512_d7_seed1/best_model.pt
+  /workspace/persist/checkpoints/pathfinder_triad_h512_d7_seed2/best_model.pt
+  d=7 p=0.0005: PF=0.0000% [0.0000,0.0038]  Lange=0.0000%  PM=0.0010%  Maj=0.0000% [0.0000,0.0038]  PFvsLange=overlap  PFvsMaj=overlap
+  d=7 p=0.001: PF=0.0000% [0.0000,0.0038]  Lange=0.0000%  PM=0.0010%  Maj=0.0000% [0.0000,0.0038]  PFvsLange=overlap  PFvsMaj=overlap
+  d=7 p=0.002: PF=0.0170% [0.0106,0.0272]  Lange=0.0170%  PM=0.0220%  Maj=0.0170% [0.0106,0.0272]  PFvsLange=overlap  PFvsMaj=overlap
+  d=7 p=0.003: PF=0.1040% [0.0858,0.1260]  Lange=0.0860%  PM=0.1520%  Maj=0.0910% [0.0741,0.1117]  PFvsLange=overlap  PFvsMaj=overlap
+  d=7 p=0.005: PF=0.6890% [0.6396,0.7422]  Lange=0.7270%  PM=0.9840%  Maj=0.6330% [0.5857,0.6841]  PFvsLange=overlap  PFvsMaj=overlap
+  d=7 p=0.007: PF=2.5580% [2.4620,2.6577]  Lange=2.9560%  PM=3.3660%  Maj=2.4050% [2.3119,2.5018]  PFvsLange=PF<<Lange  PFvsMaj=overlap
+  d=7 p=0.01: PF=9.2930% [9.1146,9.4745]  Lange=10.7640%  PM=10.3070%  Maj=8.7360% [8.5626,8.9126]  PFvsLange=PF<<Lange  PFvsMaj=Maj<<PF
+  d=7 p=0.015: PF=27.1080% [26.8334,27.3844]  Lange=30.2000%  PM=27.1630%  Maj=25.6830% [25.4132,25.9547]  PFvsLange=PF<<Lange  PFvsMaj=Maj<<PF
+Saved

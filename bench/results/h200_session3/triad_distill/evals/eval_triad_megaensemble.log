@@ -1,0 +1,17 @@
+d=7 MEGA-ENSEMBLE: 7 PF model(s)
+  /workspace/persist/checkpoints/pathfinder_triad_warminit_d7_seed0/best_model.pt
+  /workspace/persist/checkpoints/pathfinder_triad_warminit_d7_seed1/best_model.pt
+  /workspace/persist/checkpoints/pathfinder_triad_warminit_d7_seed2/best_model.pt
+  /workspace/persist/checkpoints/pathfinder_triad_h512_d7_seed0/best_model.pt
+  /workspace/persist/checkpoints/pathfinder_triad_h512_d7_seed1/best_model.pt
+  /workspace/persist/checkpoints/pathfinder_triad_h512_d7_seed2/best_model.pt
+  /workspace/persist/checkpoints/pathfinder_pf_pm_d7_seed0/best_model.pt
+  d=7 p=0.0005: PF=0.0000% [0.0000,0.0038]  Lange=0.0000%  PM=0.0010%  Maj=0.0000% [0.0000,0.0038]  PFvsLange=overlap  PFvsMaj=overlap
+  d=7 p=0.001: PF=0.0000% [0.0000,0.0038]  Lange=0.0000%  PM=0.0010%  Maj=0.0000% [0.0000,0.0038]  PFvsLange=overlap  PFvsMaj=overlap
+  d=7 p=0.002: PF=0.0130% [0.0076,0.0222]  Lange=0.0170%  PM=0.0220%  Maj=0.0150% [0.0091,0.0247]  PFvsLange=overlap  PFvsMaj=overlap
+  d=7 p=0.003: PF=0.1060% [0.0877,0.1282]  Lange=0.0860%  PM=0.1520%  Maj=0.0960% [0.0786,0.1172]  PFvsLange=overlap  PFvsMaj=overlap
+  d=7 p=0.005: PF=0.6630% [0.6146,0.7152]  Lange=0.7270%  PM=0.9840%  Maj=0.6390% [0.5915,0.6903]  PFvsLange=overlap  PFvsMaj=overlap
+  d=7 p=0.007: PF=2.4580% [2.3638,2.5558]  Lange=2.9560%  PM=3.3660%  Maj=2.3990% [2.3060,2.4957]  PFvsLange=PF<<Lange  PFvsMaj=overlap
+  d=7 p=0.01: PF=8.8370% [8.6627,9.0145]  Lange=10.7640%  PM=10.3070%  Maj=8.5540% [8.3822,8.7289]  PFvsLange=PF<<Lange  PFvsMaj=overlap
+  d=7 p=0.015: PF=26.3370% [26.0649,26.6109]  Lange=30.2000%  PM=27.1630%  Maj=25.4990% [25.2298,25.7701]  PFvsLange=PF<<Lange  PFvsMaj=Maj<<PF
+Saved
