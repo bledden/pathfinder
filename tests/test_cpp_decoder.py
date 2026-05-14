@@ -1,4 +1,13 @@
-"""Test the C++ Union-Find decoder via pybind11 bindings."""
+"""Test the C++ Union-Find decoder via pybind11 bindings.
+
+Requires the C++ extension to be built first (see paper §A.1):
+    mkdir build && cd build
+    cmake .. -Dpybind11_DIR=$(python3 -m pybind11 --cmakedir)
+    make -j
+
+If the pydecoder module is not importable (the build step has not been run),
+this entire test module is skipped — the rest of the test suite still runs.
+"""
 import sys
 import os
 import numpy as np
@@ -7,8 +16,13 @@ import pytest
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'python'))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', 'build'))
 
+# Skip the entire module if pydecoder hasn't been built.
+pydecoder = pytest.importorskip(
+    "pydecoder",
+    reason="pydecoder C++ extension not built; see paper §A.1 for build instructions",
+)
+
 from stim_interface import SurfaceCodeConfig, make_circuit, sample_syndromes, extract_decoder_graph
-import pydecoder
 
 
 def graph_to_cpp(decoder_graph):
