@@ -104,8 +104,17 @@ cd pathfinder
 
 ### Run Table 1 evaluation (uses included d=3, d=5, d=7 ckpts)
 
+The simplest entry point is the top-level dispatcher (`python cli.py --help` lists all subcommands and which paper section each one produces):
+
 ```bash
-python run_final_eval.py
+python cli.py eval-table1            # paper §5.1 Table 1, ~3 min on GPU
+python cli.py --help                 # full subcommand list
+```
+
+The existing `run_*.py` scripts at the repo root remain for backwards compatibility; `cli.py` is a thin dispatcher that forwards arguments to them.
+
+```bash
+python run_final_eval.py             # equivalent direct invocation
 ```
 
 ### Train from scratch (Table 1 recipe)
@@ -125,7 +134,7 @@ python train/train.py --distance 7 --hidden_dim 256 --steps 80000
 
 ```bash
 # 1. Fine-tune at 4-parameter noise (~20 min on H200, init from Table-1 ckpt)
-python bench/results/h200_session3/train_finetune_4param.py \
+python bench/results/h200_main/train_finetune_4param.py \
   --distance 7 --steps 40000 --batch 256 --noise_rate 0.007 \
   --init train/checkpoints/d7_final/best_model.pt
 
@@ -134,14 +143,14 @@ python bench/results/h200_session3/train_finetune_4param.py \
 git clone https://github.com/LangeMoritz/GNN_decoder
 pip install torch-geometric torch-cluster
 for SEED in 0 1 2; do
-  python bench/results/h200_session3/triad_distill/scripts/train_seeded_wide_long_triad.py \
+  python bench/results/h200_main/triad_distill/scripts/train_seeded_wide_long_triad.py \
     --seed $SEED --distance 7 --hidden_dim 384 --steps 160000 \
     --batch 128 --noise_rate 0.007 --alpha_kl 0.7 --alpha_bce 0.3 \
     --ckpt checkpoints/pfwl3s_d7_seed${SEED}
 done
 
 # 3. Eval at 100K shots with 3-seed-avg ensembling
-python bench/results/h200_session3/triad_distill/scripts/eval_triad_distill.py
+python bench/results/h200_main/triad_distill/scripts/eval_triad_distill.py
 ```
 
 ### Use a Pre-trained Model

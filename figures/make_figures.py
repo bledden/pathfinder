@@ -4,10 +4,10 @@ Run from the repo root:
   python3 figures/make_figures.py
 
 Reads:
-  bench/results/h200_session3/phase2/ensemble_results_final.json
+  bench/results/h200_main/phase2/ensemble_results_final.json
   bench/results/h200_lange_headtohead_low_p.json
   bench/results/h200_lange_headtohead_high_p.json
-  bench/results/h200_session3/phase2/lange_latency.json
+  bench/results/h200_main/phase2/lange_latency.json
 
 Writes figures/fig{1..4}_*.{png,pdf}.
 """
@@ -22,8 +22,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(HERE)
 OUT = HERE
 
-ens_phase2 = json.load(open(f"{REPO}/bench/results/h200_session3/phase2/ensemble_results_final.json"))
-ens_tuned  = json.load(open(f"{REPO}/bench/results/h200_session3/tuned/ensemble_results_tuned.json"))
+ens_phase2 = json.load(open(f"{REPO}/bench/results/h200_main/phase2/ensemble_results_final.json"))
+ens_tuned  = json.load(open(f"{REPO}/bench/results/h200_main/tuned/ensemble_results_tuned.json"))
 # Canonical-Pathfinder-Triad: d=3/5 from phase2 (finetune_d3, finetune_d5);
 # d=7 from tuned (finetune_d7). Mirrors the paper's canonical choice.
 ens_final = {}
