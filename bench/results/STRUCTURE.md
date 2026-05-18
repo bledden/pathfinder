@@ -46,6 +46,11 @@ bench/results/
     │                               ckpts (§6.3), Triton-at-H=384 audit data
     │                               (M10), H=256 ensemble redo (M7), fine-tuned
     │                               Lange ckpt + eval (C2)
+    ├── hybrid_d7_3seed/            §5.16 Hybrid CNN+GNN architecture (negative
+    │                               result, architecturally novel). 3 seeds ×
+    │                               160K steps × H=384 + 100K-shot eval JSON +
+    │                               training logs + the HybridDecoder source.
+    │                               Has its own SUMMARY.md.
     └── triad_distill/              archived §5.13 Triad-distillation arc
                                     (~$110 follow-up compute) — 6 recipe
                                     variants + 7-ckpt mega-ensemble. Has its

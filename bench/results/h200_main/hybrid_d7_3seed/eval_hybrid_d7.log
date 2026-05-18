@@ -1,0 +1,10 @@
+Loaded 3 Hybrid, 3 PFWL3S
+  d=7 p=0.0005: Hyb=0.0000% [0.0000,0.0038]  PF=0.0000%  Lange=0.0000%  PM=0.0010%  MajHyb=0.0000%  MajPF=0.0000%  HybvsPF=overlap  HybvsLange=overlap
+  d=7 p=0.001: Hyb=0.0000% [0.0000,0.0038]  PF=0.0000%  Lange=0.0000%  PM=0.0010%  MajHyb=0.0000%  MajPF=0.0000%  HybvsPF=overlap  HybvsLange=overlap
+  d=7 p=0.002: Hyb=0.0140% [0.0083,0.0235]  PF=0.0140%  Lange=0.0170%  PM=0.0220%  MajHyb=0.0150%  MajPF=0.0150%  HybvsPF=overlap  HybvsLange=overlap
+  d=7 p=0.003: Hyb=0.0740% [0.0590,0.0929]  PF=0.0930%  Lange=0.0860%  PM=0.1520%  MajHyb=0.0770%  MajPF=0.0810%  HybvsPF=overlap  HybvsLange=overlap
+  d=7 p=0.005: Hyb=0.6640% [0.6155,0.7163]  PF=0.6570%  Lange=0.7270%  PM=0.9840%  MajHyb=0.6230%  MajPF=0.6210%  HybvsPF=overlap  HybvsLange=overlap
+  d=7 p=0.007: Hyb=2.5110% [2.4158,2.6098]  PF=2.4920%  Lange=2.9560%  PM=3.3660%  MajHyb=2.3730%  MajPF=2.3840%  HybvsPF=overlap  HybvsLange=Hyb<<Lange
+  d=7 p=0.01: Hyb=9.2660% [9.0878,9.4473]  PF=9.1730%  Lange=10.7640%  PM=10.3070%  MajHyb=8.6700%  MajPF=8.6890%  HybvsPF=overlap  HybvsLange=Hyb<<Lange
+  d=7 p=0.015: Hyb=27.4360% [27.1603,27.7134]  PF=27.3280%  Lange=30.2000%  PM=27.1630%  MajHyb=25.9720%  MajPF=25.8720%  HybvsPF=overlap  HybvsLange=Hyb<<Lange
+Saved
