@@ -1,7 +1,7 @@
 # Pathfinder: A Direction-Aware Neural Decoder that Outperforms Minimum-Weight Perfect Matching on Surface Codes
 
 **Blake Ledden**
-Second Nature Computing Inc., San Francisco, CA
+Independent Researcher · San Francisco, CA
 
 ---
 
@@ -185,6 +185,26 @@ Total elapsed time: approximately six weeks (calendar; not continuous compute) b
 ---
 
 ## 5. Results
+
+### 5.0 The Pathfinder-Triad Discovery Arc — How the Two Headline Systems Emerged
+
+The headline strict-CI Pathfinder-Triad-beats-Lange results at d=7 and d=9 (§5.12, §6.3) and the headline PFWL3S-strictly-beats-Lange individual-decoder result (§5.13) were not the original goals of this project. They emerged from a sequence of failed and partially-failed attempts that the paper documents in linear/sectional order but originated in this discovery arc:
+
+1. **§5.1 — Pathfinder beats PyMatching on 3-parameter noise (the original goal).** The initial work targeted only the §5.1 Table 1 result: a single Pathfinder checkpoint per code distance that beats PyMatching across the full operational noise range. Result: 22/24 strict wins, 2 zero-error ties. This was the planned scope.
+
+2. **§5.11 — Head-to-head with Lange reveals Pathfinder loses individually.** The 3-parameter-noise Table 1 ckpts are out-of-distribution on Lange's 4-parameter noise model (Pathfinder LER inflates 2.5–4× at d=7 p=0.007). Fine-tuning Pathfinder on Lange's noise model closes most of the OOD gap but not all — Lange's GNN still has lower individual LER at every tested matched-noise point. This was the first surprise: Pathfinder's individual accuracy does not exceed the prior open-source state of the art.
+
+3. **§5.6 → §5.12 — Failure-mode disjointness suggests an ensemble.** The §5.6 syndrome-overlap analysis (originally just a §5.1 sanity check) revealed that Pathfinder and PyMatching fail on almost entirely different syndromes at d=5 (0.01% overlap). Generalizing this hypothesis to three decoders — Pathfinder, Lange, PyMatching — and computing a simple 3-way majority vote gave **Pathfinder-Triad**: a system that strictly beats every individual decoder at d=7 operational rates with non-overlapping 95% Wilson CIs (the §5.12 result). This is *the* headline ensemble contribution. Critically, it required *no additional ML training* — just the realization that the three decoders' independent error modes (Pathfinder's lattice convolution, Lange's graph message passing, PyMatching's combinatorial matching) make their majority vote informationally richer than any individual.
+
+4. **§5.13 — PFWL3S emerges as a recipe to make Pathfinder competitive individually.** Once Pathfinder-Triad existed, the natural follow-up was: can we make the individual Pathfinder voter strong enough to *also* strictly beat Lange? The §5.13 arc walks through six failed and one successful recipe (Pathfinder-KD → Pathfinder-Wide → Pathfinder-XL → Pathfinder-Wide-Multi → Pathfinder-Wide-Long → Pathfinder-Wide-XLong → **PFWL3S**, the multi-seed-averaged variant). PFWL3S succeeded where the others failed by combining (a) wider H=384 model, (b) longer 160K-step training, (c) Lange-teacher distillation, (d) three independent random seeds averaged at inference. PFWL3S is the first open-source individual neural decoder reported to strictly beat Lange's GNN.
+
+5. **§5.13 — Pathfinder-Triad with PFWL3S voter is the lowest-LER system.** Plugging PFWL3S into Pathfinder-Triad's PF slot gives the lowest-known open-source LER at d=7 p=0.007 (Triad 2.384%), strictly beating both Lange alone (2.956%) and PFWL3S alone (2.492%). The Triad's value is therefore not just "majority vote rescue" — it's the synthesis of the three decoders' independent strengths into a system that outperforms its best component.
+
+6. **§6.3 — d=9 extension confirms the Triad's structural value.** At d=9 the individual-decoder architectural-reversal collapses: PFWL3S-H256-d9 loses to Lange across all operational rates. But Pathfinder-Triad with the same PFWL3S-H256-d9 voter *still* strictly beats Lange at d=9 p=0.007 and p=0.010 — confirming that the Triad's coverage advantage is structural (independent failure modes) rather than merely a consequence of a competitive PF voter.
+
+7. **§5.13 — A negative result confirms the Triad is architecturally fundamental.** A ~$110 follow-up arc (the "Triad-distillation experiment") attempted to train a single PF student to absorb Pathfinder-Triad's coverage advantage through six recipe variants (soft Triad teacher, hardlabel Triad, warm-init, H=512 capacity, PF+PM-only, 7-ckpt mega-ensemble). All six failed to beat the Triad — the best individual single-decoder student reaches 2.458% LER while the corresponding Triad reaches 2.399%, strict-CI loss at p=0.015. The Triad's three-way independent-failure-mode coverage is therefore an *architectural* property that single-decoder distillation cannot replicate.
+
+The paper's two headline systems — single-seed canonical Pathfinder + Triton (the real-time-budget System 1) and Pathfinder-Triad with PFWL3S voter (the lowest-LER System 2) — are the products of this 7-step arc. The transparency about steps 2 and 7 (the negative results) is what gives the §5.12/§5.13 strict-CI claims their force: the Triad is not the obvious thing one would design from scratch, and the single-decoder Triad-beating variant has been deliberately and unsuccessfully attempted across six recipes.
 
 ### 5.1 Main Results: Rotated Surface Code
 
@@ -862,6 +882,22 @@ At p=0.015 the Triad still beats Lange (Maj<<Lange) but PM dominates both — th
 **Noise-target ensemble for the full model.** At d=7, the best-per-point LER across the full noise range was obtained by selecting among four full models trained at different target noise rates (Section 4.5). A single model that dominates PM across all noise rates from a single training run has not been identified.
 
 **FP8.** Tested via `torch._scaled_mm` with `torchao` dynamic activation/weight quantization and found to regress latency at Pathfinder's matrix sizes (Section 5.3). Reported as a negative result; expected to become useful at 10M+ parameter scales.
+
+### 6.4 Future Work — Toward Architecturally Novel Decoders
+
+This paper is honest about its scope: Pathfinder is a *composition* of existing primitives (Gu et al.'s direction-specific convolution [8], the Muon optimizer [11], standard bottleneck residual blocks), and PFWL3S / Pathfinder-Triad are *systems built on top* of that composition. The genuinely novel contributions are the empirical findings (depth-dependent Muon, PFWL3S strict-CI win, Pathfinder-Triad's stat-sig non-overlap CIs extending to d=9), the custom Triton kernel, and the documented negative-result corpus. The *architectural* contribution is intentionally limited. Four concrete directions for architecturally novel follow-up work, ordered by my estimate of submission impact:
+
+**(a) Hybrid CNN+GNN architecture.** Combine Pathfinder's lattice-aware 3D convolution backbone with Lange's KNN-defect-graph message passing in a single trainable model — the CNN extracts local spatial+temporal features, the GNN handles the long-range defect topology that the §5.6/§5.12 analysis shows Lange catches and PF misses. The §5.14 hybrid attempt added attention rather than GNN message passing and was strictly dominated; replacing attention with Lange-style graph convolution is the untested cell. **Plausible impact:** could close the d=9 individual-decoder gap that §6.3 documents as a clean negative result. Estimated cost: ~$50-100 GPU + 1-2 weeks engineering for a single H=384, L=7 hybrid trained at d=7 p=0.007 with the Pathfinder + Lange + PM-disagreement-weighted loss.
+
+**(b) Learned meta-decoder for the Triad.** §5.12's findings show that a simple majority vote captures ~27% of the available oracle-bound headroom at d=7 p=0.007; the remaining 73% is the gap between Pathfinder-Triad's 2.45% and the OR-oracle's 1.09%. A small neural network (per-shot input: PF logits, Lange logits, PM binary prediction, syndrome features; output: ensemble probability) trained on the §5.12 raw-shot decomposition data could plausibly recover more of this headroom by learning shot-specific gating rather than coarse majority voting. The §5.12 "confidence-thresholded gating" experiment in line 511 (paper) already tested a simple threshold rule (failed at all 24 (d, p) points); a *learned* gating is the next step. Estimated cost: ~$20-40 GPU + 3-5 days engineering.
+
+**(c) Recurrent / streaming decoder.** Pathfinder is purely feedforward (Section 3.3), processing a single (d-round) syndrome block per forward pass. AlphaQubit [5] is recurrent and processes syndromes round-by-round, which is the right inductive bias for the streaming nature of online QEC decoding. A recurrent Pathfinder variant (replace the L=d bottleneck blocks with a recurrent stack consuming one round at a time) would close the architectural gap to AlphaQubit and could improve the §6.3 d=9 individual result. Estimated cost: ~$80-120 GPU + 2-3 weeks engineering for an LSTM/Mamba-style temporal-axis decoder.
+
+**(d) Bottleneck-block-level Triton fusion (closes the §6.3 B=1 latency open problem).** The current Triton kernel (Section 5.3) fuses only the DirectionalConv3d's seven matmuls into one launch. The full bottleneck block (Reduce 1×1×1 conv → DirectionalConv3d → Restore 1×1×1 conv → residual + LayerNorm) dispatches ~6 separate kernels per block × L blocks per forward pass, dominating B=1 latency at the kernel-launch-overhead boundary. A single Triton kernel spanning the entire bottleneck block (mentioned as a failed-due-to-register-pressure attempt in §5.3 line 282 and §6.3 line 858) would close the 201 μs → ~10 μs gap and let PFWL3S/Pathfinder-Triad sustain the 7-μs cycle budget for real-time deployment. Estimated cost: ~$20 GPU + 3-5 days kernel engineering (mostly developer time, not compute).
+
+**(e) Real hardware validation.** §6.3 limitations notes "Real quantum hardware exhibits device-specific correlated noise that may differ from these models; AlphaQubit [5] was validated on experimental Sycamore data, a comparison this work does not make." The Google Willow surface-code experiments [1] (Nature 2024) released decoder-input traces from real superconducting hardware; running PFWL3S/Pathfinder-Triad against these traces (without retraining) would directly address the simulation-only limitation. This is the lowest-friction additional eval: ~1 day engineering, negligible GPU cost. If addressed in the present work it would convert "we beat Lange on Stim simulations" to "we beat Lange on Stim simulations *and* perform competitively on real Willow hardware traces."
+
+The first three of these (a–c) are full architecturally novel follow-ups in their own right and are out of scope for this paper. (d) and (e) are within-scope improvements; (d) is gated on Triton expertise and (e) is gated on data-loader engineering for the Willow trace format.
 
 ---
 
