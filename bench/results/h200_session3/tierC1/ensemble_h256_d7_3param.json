@@ -1,0 +1,60 @@
+{
+  "arch": "H=256 (canonical Table-1)",
+  "noise_model": "3-parameter",
+  "ckpt": "/workspace/pathfinder/train/checkpoints/d7_final/best_model.pt",
+  "n_per_p": 20000,
+  "rates": {
+    "p0.003": {
+      "p": 0.003,
+      "pf_ler": 0.0004,
+      "pm_ler": 0.00045,
+      "ens_ler": 0.0002,
+      "or_ler": 0.00015,
+      "pf_use_fraction": 0.9989,
+      "both_correct": 19986,
+      "pf_wrong_pm_right": 5,
+      "pf_right_pm_wrong": 6,
+      "both_wrong": 3,
+      "n": 20000
+    },
+    "p0.005": {
+      "p": 0.005,
+      "pf_ler": 0.00315,
+      "pm_ler": 0.0034,
+      "ens_ler": 0.0028,
+      "or_ler": 0.00135,
+      "pf_use_fraction": 0.98885,
+      "both_correct": 19896,
+      "pf_wrong_pm_right": 36,
+      "pf_right_pm_wrong": 41,
+      "both_wrong": 27,
+      "n": 20000
+    },
+    "p0.007": {
+      "p": 0.007,
+      "pf_ler": 0.0167,
+      "pm_ler": 0.015,
+      "ens_ler": 0.01195,
+      "or_ler": 0.0054,
+      "pf_use_fraction": 0.95485,
+      "both_correct": 19474,
+      "pf_wrong_pm_right": 226,
+      "pf_right_pm_wrong": 192,
+      "both_wrong": 108,
+      "n": 20000
+    },
+    "p0.01": {
+      "p": 0.01,
+      "pf_ler": 0.0663,
+      "pm_ler": 0.05215,
+      "ens_ler": 0.0465,
+      "or_ler": 0.02415,
+      "pf_use_fraction": 0.83735,
+      "both_correct": 18114,
+      "pf_wrong_pm_right": 843,
+      "pf_right_pm_wrong": 560,
+      "both_wrong": 483,
+      "n": 20000
+    }
+  }
+}

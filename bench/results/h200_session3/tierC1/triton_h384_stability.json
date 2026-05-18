@@ -1,0 +1,80 @@
+{
+  "H": 384,
+  "arch": "PFWL3S",
+  "ckpt": "/workspace/persist/checkpoints/pathfinder_wide_long_d7/best_model.pt",
+  "fp32": {
+    "p0.003": {
+      "p": 0.003,
+      "disagreements_per_20K": 1,
+      "max_abs_logit_diff": 0.20904159545898438,
+      "mean_rel_logit_diff": 0.00035791530171991326,
+      "ler_ref_pct": 0.08,
+      "ler_tri_pct": 0.075
+    },
+    "p0.007": {
+      "p": 0.007,
+      "disagreements_per_20K": 4,
+      "max_abs_logit_diff": 0.2947077751159668,
+      "mean_rel_logit_diff": 0.0016997916201944463,
+      "ler_ref_pct": 2.56,
+      "ler_tri_pct": 2.5700000000000003
+    },
+    "p0.015": {
+      "p": 0.015,
+      "disagreements_per_20K": 6,
+      "max_abs_logit_diff": 0.41586101055145264,
+      "mean_rel_logit_diff": 0.008322341064922512,
+      "ler_ref_pct": 29.744999999999997,
+      "ler_tri_pct": 29.755
+    }
+  },
+  "fp16": {
+    "p0.003": {
+      "p": 0.003,
+      "disagreements_per_20K": 2,
+      "max_abs_logit_diff": 0.2734375,
+      "mean_rel_logit_diff": 0.0011875868833158166,
+      "ler_ref_pct": 0.075,
+      "ler_tri_pct": 0.075
+    },
+    "p0.007": {
+      "p": 0.007,
+      "disagreements_per_20K": 3,
+      "max_abs_logit_diff": 0.275390625,
+      "mean_rel_logit_diff": 0.0037786862812936306,
+      "ler_ref_pct": 2.565,
+      "ler_tri_pct": 2.56
+    },
+    "p0.015": {
+      "p": 0.015,
+      "disagreements_per_20K": 28,
+      "max_abs_logit_diff": 0.51171875,
+      "mean_rel_logit_diff": 0.025741830142214893,
+      "ler_ref_pct": 29.720000000000002,
+      "ler_tri_pct": 29.69
+    }
+  },
+  "latency": {
+    "B1": {
+      "ref_ms": 3.181635858491063,
+      "tri_ms": 1.1738379020243883,
+      "ref_us_per_syn": 3181.635858491063,
+      "tri_us_per_syn": 1173.8379020243883,
+      "speedup_x": 2.710455892593047
+    },
+    "B64": {
+      "ref_ms": 3.020600341260433,
+      "tri_ms": 1.9229253754019737,
+      "ref_us_per_syn": 47.19688033219427,
+      "tri_us_per_syn": 30.04570899065584,
+      "speedup_x": 1.5708359668554472
+    },
+    "B1024": {
+      "ref_ms": 20.898362705484033,
+      "tri_ms": 26.30616799928248,
+      "ref_us_per_syn": 20.40855732957425,
+      "tri_us_per_syn": 25.689617186799296,
+      "speedup_x": 0.7944282385049032
+    }
+  }
+}

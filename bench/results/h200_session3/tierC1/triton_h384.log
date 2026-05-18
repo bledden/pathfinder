@@ -1,0 +1,13 @@
+Loading H=384 PFWL3S ckpt: /workspace/persist/checkpoints/pathfinder_wide_long_d7/best_model.pt
+  config: DecoderConfig(distance=7, rounds=7, hidden_dim=384, n_observables=1)
+  [fp32] p=0.003: disagreements=1/20K  max|diff|=0.209042  ref_LER=0.080%  tri_LER=0.075%
+  [fp16] p=0.003: disagreements=2/20K  max|diff|=0.273438  ref_LER=0.075%  tri_LER=0.075%
+  [fp32] p=0.007: disagreements=4/20K  max|diff|=0.294708  ref_LER=2.560%  tri_LER=2.570%
+  [fp16] p=0.007: disagreements=3/20K  max|diff|=0.275391  ref_LER=2.565%  tri_LER=2.560%
+  [fp32] p=0.015: disagreements=6/20K  max|diff|=0.415861  ref_LER=29.745%  tri_LER=29.755%
+  [fp16] p=0.015: disagreements=28/20K  max|diff|=0.511719  ref_LER=29.720%  tri_LER=29.690%
+=== Latency measurement (H=384, d=7) ===
+  B=   1: ref=3.182ms (3181.64 us/syn)  tri=1.174ms (1173.84 us/syn)  speedup=2.71x
+  B=  64: ref=3.021ms (47.20 us/syn)  tri=1.923ms (30.05 us/syn)  speedup=1.57x
+  B=1024: ref=20.898ms (20.41 us/syn)  tri=26.306ms (25.69 us/syn)  speedup=0.79x
+Saved /workspace/persist/results/triton_h384_stability.json

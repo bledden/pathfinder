@@ -1,0 +1,6 @@
+Loading canonical H=256 Table-1 ckpt: /workspace/pathfinder/train/checkpoints/d7_final/best_model.pt
+  d=7 p=0.003: PF=0.0400%  PM=0.0450%  ENS=0.0200%  OR=0.0150%  ||  PFwrong&PMright=5  PFright&PMwrong=6  both_wrong=3  pf_use_frac=0.999
+  d=7 p=0.005: PF=0.3150%  PM=0.3400%  ENS=0.2800%  OR=0.1350%  ||  PFwrong&PMright=36  PFright&PMwrong=41  both_wrong=27  pf_use_frac=0.989
+  d=7 p=0.007: PF=1.6700%  PM=1.5000%  ENS=1.1950%  OR=0.5400%  ||  PFwrong&PMright=226  PFright&PMwrong=192  both_wrong=108  pf_use_frac=0.955
+  d=7 p=0.01: PF=6.6300%  PM=5.2150%  ENS=4.6500%  OR=2.4150%  ||  PFwrong&PMright=843  PFright&PMwrong=560  both_wrong=483  pf_use_frac=0.837
+Saved
