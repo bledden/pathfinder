@@ -1,0 +1,24 @@
+{
+  "dataset": "Willow d=7 r13 Z basis (real Sycamore hardware data, Nature 2024)",
+  "n_shots": 50000,
+  "circuit_path": "/workspace/persist/willow_data/willow_105Q/d7_z_r13/circuit_noisy_si1000.stim",
+  "pm_ler": 0.04006,
+  "pm_ci": [
+    0.03837614626936264,
+    0.04181452452101919
+  ],
+  "pfwl3s_ler": 0.46336,
+  "pfwl3s_ci": [
+    0.458992071949462,
+    0.4677335578669479
+  ],
+  "or_oracle_ler": 0.0208,
+  "or_oracle_ci": [
+    0.019585375842322308,
+    0.022088254289327414
+  ],
+  "pf_truncated_to_T": 8,
+  "willow_R": 13,
+  "pf_train_R": 7,
+  "note": "PFWL3S trained at R=d=7 (T=8 timepoints) and on standard Stim surface_code:rotated_memory_z 4-parameter noise. Willow data is R=13 (T=14) on Sycamore SI1000 noise with compound detectors (L=6 round-comparison). Truncated to first T=8 timepoints for in-distribution input shape; used first 3 coords of each detector as (x,y,t) mapping. Both Pathfinder's noise-model and detector-format are out-of-distribution relative to training."
+}

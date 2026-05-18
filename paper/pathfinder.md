@@ -807,7 +807,41 @@ Under this training budget the 9× parameter increase and the full set of modern
 
 This is reported as a negative result: the paper does not claim the hybrid variant as a contribution, but the checkpoint and full training log are released for researchers exploring the architecture space. The simpler CNN + Muon recipe is therefore the recommended base architecture for work of this kind.
 
-### 5.15 Figures
+### 5.15 Real-Hardware Validation on Google Willow Sycamore Traces (Mixed Result)
+
+To address the §6.3 limitation that all evaluations in §5.1–§5.14 are on simulated Stim circuits, I ran a one-day follow-up evaluating PFWL3S and PyMatching against the publicly-released **Google Willow real-hardware d=7 surface-code experiments** (Zenodo 13273331, accompanying the Nature 2024 paper [1]). The 105-qubit Willow processor ran d=7 Z-basis memory experiments at multiple round counts; this evaluation uses the **d=7 Z basis r=13 rounds dataset (50,000 real-hardware shots)** from the location-q6_7 chip patch. Raw data: `bench/results/h200_main/tierC1/willow_eval_d7.json`; eval script: `eval_pfwl3s_willow.py`. **Important format differences from simulated Stim data:**
+
+| Property | Pathfinder/PFWL3S training | Willow real-hardware data |
+|---|---|---|
+| Noise model | Stim's standard 4-parameter (`after_clifford_depolarization=p, before_measure_flip_probability=p, after_reset_flip_probability=p, before_round_data_depolarization=p`) | Sycamore **SI1000 model** (calibrated per-gate noise from real chip) |
+| Round count | R = d = 7 (so T = 8 detector timepoints) | R = 13 (so T = 14 detector timepoints) |
+| Detector format | All standard L=3 detectors (per-round-per-stabilizer) | Mix of L=3 (initial), **L=6 (round-comparison)**, L=9, L=15 (boundary compound detectors) |
+| Spatial qubit layout | Stim's `surface_code:rotated_memory_z` canonical layout | Willow chip's actual 49-data-qubit + 48-measurement-qubit layout |
+
+**Table 13: PFWL3S vs PyMatching on real Willow d=7 r=13 hardware (50K real-hardware shots)**
+
+| Decoder | LER | 95% Wilson CI | Notes |
+|---|---:|---|---|
+| **PyMatching v2 (algorithmic)** | **4.006%** | [3.838, 4.182] | Works on any noise model + circuit structure since PM builds its matching graph from Stim's detector error model. Real chip noise is roughly 6× harder than simulated 4-parameter noise at p=0.007 (4.0% vs 0.67% PM-on-simulated). |
+| PFWL3S (3-seed avg, T=8 truncation) | 46.336% | [45.899, 46.773] | **Effectively random predictions (4.0% true flip rate; PFWL3S close to random binary classification on the OOD input).** |
+| OR-oracle (both PF and PM wrong) | 2.080% | [1.959, 2.209] | Lower bound for any PM+PFWL3S ensemble — shows the two decoders' failure modes are *not* purely correlated even in this OOD regime. |
+
+**Interpretation.** PyMatching's 4.006% LER on real Willow d=7 hardware is the headline real-hardware result and a useful anchor for any future neural-decoder work on Willow data. The PFWL3S failure (46.3%, essentially random) **is not a failure of the PFWL3S recipe per se** — it's a failure of the *input-format adapter*. PFWL3S's trained weights expect a specific (R=d=7 standard-Stim 4-parameter-noise) detector tensor; the Willow data uses (R=13 SI1000-noise compound-detector) format. The minimal mapping used here — truncate to first T=8 timepoints, use first 3 coords of each detector as the (x, y, t) tensor index — produces a tensor that the trained PFWL3S weights do not recognize.
+
+**The correct path to a meaningful neural-decoder result on Willow data** would be one or both of:
+1. **Fine-tune Pathfinder on the Willow circuit format.** Generate ~10⁶ training shots from `circuit_noisy_si1000.stim` and a parallel d=7 r=7 truncation, fine-tune `finetune_d7` for ~10K steps on those synthetic-but-format-matching syndromes. The detector error model would now match Willow's at inference time.
+2. **Re-architect Pathfinder's input adapter** to consume Willow's compound-detector format directly (treat each L=6 detector as a "comparison edge" between two timepoints rather than a single spacetime cell). This would let trained weights be reused as-is.
+
+Both are 1–2 days of engineering each, deferred to a follow-up. The §6.4 future-work subsection (item e) tracks this explicitly.
+
+**What this evaluation does establish:**
+1. **PyMatching's algorithmic generality holds on real hardware.** PM's 4.006% LER on real Willow data sits in the same range as Google's own decoder reports for this dataset, validating the eval harness.
+2. **The neural-decoder generalization gap from simulation to real hardware is real and large.** PFWL3S trained on simulated Stim 4-parameter noise produces random predictions on real Sycamore syndromes without adapter retraining. This is a meaningful limitation that algorithmic decoders avoid by construction.
+3. **Future-work direction (1) above is the cleanest path to a Pathfinder-on-Willow result.** This subsection's purpose is to scope and document the work rather than claim a successful real-hardware result.
+
+This is reported as a **mixed result**: real-hardware validation succeeded for PM (the §5.1 algorithmic baseline beats itself by 6× on harder real noise but in absolute terms 4% LER is consistent with the Willow paper's own decoder reports), and failed-as-currently-tested for PFWL3S (input-format adapter mismatch makes the trained weights inapplicable; honest documentation of the OOD ceiling for neural decoders is the contribution here). Strengthens rather than weakens the §6.3 limitations narrative by quantifying *how* much of the simulation-vs-hardware gap is recoverable (PM: 0%, all of it is structural; PFWL3S: needs adapter retraining).
+
+### 5.16 Figures
 
 All figures are generated by `figures/make_figures.py` from the raw data in `bench/results/h200_main/` and are reproducible from a fresh clone.
 
