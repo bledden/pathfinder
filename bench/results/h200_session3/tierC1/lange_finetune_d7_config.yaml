@@ -1,0 +1,41 @@
+paths:
+  save_dir: /workspace/persist/lange_finetune_d7_p007/saved_models/d_7
+  save_model_dir: /workspace/persist/lange_finetune_d7_p007/saved_models/d_7
+  saved_model_path: /workspace/GNN_decoder/models/circuit_level_noise/d7/d7_d_t_7.pt
+model_settings:
+  hidden_channels_GCN:
+    - 32
+    - 128
+    - 256
+    - 512
+    - 512
+    - 256
+    - 256
+  hidden_channels_MLP:
+    - 256
+    - 128
+    - 64
+  num_classes: 1
+graph_settings:
+  code_size: 7
+  d_t: 7
+  train_error_rate: 0.007
+  test_error_rate: 0.007
+  m_nearest_nodes: 10
+  power: 2
+training_settings:
+  run_training: True
+  run_test: True
+  wandb: False
+  seed: 0
+  dataset_size: 2000000
+  validation_set_size: 10000
+  test_set_size: 20000
+  batch_size: 1024
+  acc_test_size: 20000
+  acc_test_batch_size: 1024
+  epochs: 1030
+  lr: 0.0001
+  device: cuda
+  resume_training: True
+  current_epoch: 0

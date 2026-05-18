@@ -1,0 +1,8 @@
+Fine-tuned ckpt epoch: 1029
+Test_acc trajectory (last 10): [0.97185, 0.97005, 0.9714, 0.97135, 0.9713, 0.9716, 0.9708, 0.9703, 0.9714, 0.9717]
+Loaded 3 PFWL3S ckpts
+  d=7 p=0.005: PF=0.6570% [0.6088,0.7090]  Lpub=0.7270% [0.6762,0.7816]  Lft=0.7170% [0.6666,0.7712]  PM=0.9840%  MajPub=0.6210%  MajFT=0.6130%  PFvsLpub=overlap  PFvsLft=overlap
+  d=7 p=0.007: PF=2.4920% [2.3972,2.5905]  Lpub=2.9560% [2.8528,3.0628]  Lft=2.7390% [2.6396,2.8420]  PM=3.3660%  MajPub=2.3840%  MajFT=2.3260%  PFvsLpub=PF<<LpubFT  PFvsLft=PF<<Lft
+  d=7 p=0.01: PF=9.1730% [8.9957,9.3535]  Lpub=10.7640% [10.5734,10.9576]  Lft=10.0880% [9.9029,10.2762]  PM=10.3070%  MajPub=8.6890%  MajFT=8.5470%  PFvsLpub=PF<<LpubFT  PFvsLft=PF<<Lft
+  d=7 p=0.015: PF=27.3280% [27.0527,27.6051]  Lpub=30.2000% [29.9162,30.4853]  Lft=28.1530% [27.8751,28.4326]  PM=27.1630%  MajPub=25.8720%  MajFT=25.5080%  PFvsLpub=PF<<LpubFT  PFvsLft=PF<<Lft
+Saved
