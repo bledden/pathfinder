@@ -18,8 +18,13 @@ venv/
 # Orphaned copy of the repo pulled off the training pod (22 MB of session2 checkpoints)
 bench/results/h200_session2/pathfinder/
 
-# Model checkpoints (large; released separately / reproducible from training scripts)
-*.pt
+# Model checkpoints ARE tracked in-repo — they back the paper's reproducibility claims
+# (paper §5.11 points reproducers at the in-repo finetune/calibrated ckpts, verified by SHA-256).
+# Only genuinely exploratory, unreferenced checkpoints are kept local (their train logs are
+# still published; the weights back no reported number):
+bench/results/h200_main/calibrated_phigh040/**/*.pt
+bench/results/h200_main/ibm_budget/**/*.pt
+bench/results/h200_main/soft/**/*.pt
 
 # coda_experiments/ is local exploratory scratch. Publish ONLY the files the paper cites
 # (the IBM-Heron real-hardware decode pipeline); everything else stays local.
@@ -35,8 +40,7 @@ coda_experiments/*
 qldpc/results/
 qldpc/__pycache__/
 
-# Large raw experiment artifacts kept locally (regenerable)
-coda_experiments/**/*.pt
+# coda_experiments logs kept local (the allowlist above already excludes its checkpoints)
 coda_experiments/**/*.log
 
 # Internal working notes / advisory-review correspondence (not part of the public record)
