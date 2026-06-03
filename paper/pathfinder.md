@@ -273,7 +273,9 @@ At p=0.003, Pathfinder's d=5→7 suppression (4.4×) substantially exceeds PyMat
 
 ### 5.3 Inference Latency
 
-Pathfinder's inference latency was measured on two GPUs: the AMD MI300X used for training, and the NVIDIA H200 SXM used by Gu et al. [8] — providing an apples-to-apples comparison on equivalent hardware. All H200 numbers below use PyTorch 2.6 with `torch.compile(mode="max-autotune")` and FP16, the configuration that produced the lowest latencies at every batch size.
+Pathfinder's inference latency was measured on two GPUs: the AMD MI300X used for training, and the NVIDIA H200 SXM used by Gu et al. [8] — providing an apples-to-apples comparison on equivalent hardware. All H200 latency numbers below were measured with PyTorch 2.4.1 (CUDA 12.4), `torch.compile(mode="max-autotune")`, and FP16.
+
+**Version sensitivity (important for reproduction).** This latency is sensitive to the PyTorch/Inductor version. The committed per-configuration sweeps show that at d=7, B=1024, FP16 the Inductor path measures **6.4 μs/syn on PyTorch 2.4.1** (`bench/results/h200_latency_results.json`) but **15.5 μs/syn on PyTorch 2.6.0** (`bench/results/h200_latency_torch26.json`) — a torch.compile/Inductor codegen regression at this model size, not a kernel or hardware change. The budget-compliance figures in this section are on the 2.4.1 stack; reproduce them there (see the reproduction note at the end of this section), and see Appendix A.3.
 
 **Table 3a: Pathfinder Inference Latency on NVIDIA H200 SXM (FP16, torch.compile max-autotune)**
 
@@ -333,7 +335,7 @@ FP16 quantization produces zero accuracy degradation (0 prediction differences o
 
 **Custom Triton kernel for DirectionalConv3d — methodology.** Profiling the compiled forward pass (PyTorch profiler, cuda_time_total, d=7 B=1024, FP16, 20 iterations) shows GPU time concentrated in: native LayerNorm (~17%), the Inductor-fused pad+GELU+add emitted for DirectionalConv3d's six boundary-padded shifted additions (~16%), the 7 direction-specific linear projections (~9%), and various copies/permutes (~10%). To close the d=7 cycle-time gap, we wrote a single Triton kernel that fuses all 7 direction-specific matrix multiplies and their boundary-masked accumulations into one launch, eliminating both the pad+add fusion overhead and 6 of the 7 separate matmul launches per DirectionalConv3d call.
 
-**Reproducibility (Triton kernel).** The kernel is at `bench/triton_directional.py`. It accepts the same `state_dict` as the reference `DirectionalConv3d` module (7 packed weight matrices, one per direction). The launch configuration is: grid = (ceil(B / BLOCK_B), T·R·C, ceil(C_out / BLOCK_CO)) with BLOCK_B = max(16, min(64, next_pow2(B))), BLOCK_CO = min(64, next_pow2(C_out)), BLOCK_C_IN = max(16, next_pow2(C_in)). The ≥16 floor is required by Triton's `tl.dot` minimum shape constraint. The kernel is not autotuned — block sizes are fixed as above — so no extra warmup cost. It is verified on Triton 3.2 + PyTorch 2.6 + CUDA 12.4 on an NVIDIA H200 SXM.
+**Reproducibility (Triton kernel).** The kernel is at `bench/triton_directional.py`. It accepts the same `state_dict` as the reference `DirectionalConv3d` module (7 packed weight matrices, one per direction). The launch configuration is: grid = (ceil(B / BLOCK_B), T·R·C, ceil(C_out / BLOCK_CO)) with BLOCK_B = max(16, min(64, next_pow2(B))), BLOCK_CO = min(64, next_pow2(C_out)), BLOCK_C_IN = max(16, next_pow2(C_in)). The ≥16 floor is required by Triton's `tl.dot` minimum shape constraint. The kernel is not autotuned — block sizes are fixed as above — so no extra warmup cost. It was developed and benchmarked on the NVIDIA H200 SXM stack of §5.3 (PyTorch 2.4.1, CUDA 12.4; Triton as bundled); its numerical equivalence to the reference module (below) is independent of the PyTorch/Triton version.
 
 **Numerical equivalence.** On 20,000 syndromes per noise rate at p ∈ {0.003, 0.007, 0.015}, the Triton kernel produces the following disagreement counts vs. the reference PyTorch implementation on the canonical `finetune_d7` checkpoint, at both FP32 and FP16 (see `bench/results/h200_main/tierBC/triton_stability.json`):
 
@@ -349,6 +351,8 @@ FP16 quantization produces zero accuracy degradation (0 prediction differences o
 Disagreement rate scales with noise — at high p, more defects produce more float accumulations and more numeric drift — but the LER impact is negligible at every tested configuration: ≤ 0.025 percentage points (well within single-seed variance), and the disagreement rate never exceeds 0.105% of shots (at the highest-noise FP16 configuration). FP16 introduces ~2× the disagreements of FP32 at each noise rate; still well inside the FP16 quantization noise floor. The full protocol's results are in `bench/results/h200_main/tierBC/triton_stability.json`; the earlier 10,000-shot check is `bench/triton_ler_test.py`.
 
 **Latency (measured).** In isolation on H200 SXM with FP16 + `torch.compile(max-autotune)`: **6.12 μs per syndrome at d=7 batch=1024** (down from 7.86 μs/syn without the kernel, a 22% speedup) and **201.6 μs at batch=1** (down from 250.8 μs, a 20% speedup). The B=1024 figure sustains the d=7 cycle-time budget of 7 μs with 13% positive margin. Applied to the narrow H=128 variant, the kernel brings batch=1024 throughput to **2.70 μs per syndrome** and batch=1 latency to **147.6 μs**. Numbers are the minimum of five independent trials, each 500 iterations after 100 warmup iterations, run back-to-back against the reference implementation to cancel host-side variance.
+
+**Reproduction note.** The two head-to-head figures (custom kernel **6.12** vs Inductor **7.86** μs/syn at d=7, B=1024) are produced by `bench/triton_vs_orig.py` on the PyTorch 2.4.1 stack above. The committed per-configuration sweeps under `bench/results/` record the Inductor path on both 2.4.1 and 2.6 but do not yet persist the custom-kernel head-to-head as a structured JSON; re-running `bench/triton_vs_orig.py` on a pinned 2.4.1 stack and committing its output is the recommended way to reproduce these two numbers exactly. (On PyTorch 2.6 the Inductor baseline regresses to ~15.5 μs/syn as noted above; the custom kernel bypasses Inductor codegen, so the budget-compliance claim should be reproduced and reported on the 2.4.1 stack until a pinned re-measurement is committed.)
 
 **Cross-vendor portability.** The Triton kernel is written for NVIDIA (Triton 3.2+, Hopper architecture). Whether a ROCm port to the MI300X training hardware would recover similar gains is an open question — Triton has experimental AMD backends but the 7-point stencil pattern has not been profiled there. The core PyTorch model code (`train/model.py`) has no vendor-specific dependencies and runs on CUDA, ROCm, MPS, and CPU.
 
@@ -1141,8 +1145,8 @@ All code, trained checkpoints, benchmark scripts, and raw logs are available at 
 Minimum versions (matches what was used for measurements reported in this paper):
 
 - Python 3.11
-- PyTorch ≥ 2.4 (training), 2.6 recommended for the H200 latency numbers in Section 5.3
-- Triton 3.2 (bundled with PyTorch 2.6) for the custom DirectionalConv3d kernel
+- PyTorch ≥ 2.4 (training); **2.4.1 to reproduce the §5.3 H200 latency numbers** — the Inductor latency regresses on 2.6 at this model size (§5.3, "Version sensitivity")
+- Triton 3.2 for the custom DirectionalConv3d kernel
 - Stim 1.15, PyMatching 2.3 — for syndrome generation and the MWPM baseline
 - Muon optimizer: `pip install git+https://github.com/KellerJordan/Muon` (use the `SingleDeviceMuon` variant for single-GPU training)
 - NumPy, pybind11, pytest
@@ -1167,8 +1171,8 @@ The repository includes the `d7_final/best_model.pt` checkpoint that produced th
 ### A.3 Reproducing the H200 latency numbers (Section 5.3)
 
 ```bash
-# Requires NVIDIA H200 (or an equivalent Hopper-class GPU)
-# with PyTorch 2.6 + Triton 3.2 + CUDA 12.4
+# Requires NVIDIA H200 (or an equivalent Hopper-class GPU), CUDA 12.4,
+# PyTorch 2.4.1 + its bundled Triton  (use 2.4.1: see §5.3 "Version sensitivity")
 
 # Reference-implementation latency (produces Table 3a and 3b "Inductor only" row)
 python bench/h200_final_benchmark.py
