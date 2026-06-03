@@ -1,0 +1,15 @@
+{
+  "p": 0.03,
+  "k": 12,
+  "equiv_params": 32652,
+  "mlp_params": 41412,
+  "models_differ_logit_normdiff": 1.512,
+  "equiv_loss0": 0.6927,
+  "equiv_lossF": 0.3062,
+  "equiv_ler": 0.1566,
+  "mlp_loss0": 0.6881,
+  "mlp_lossF": 0.2711,
+  "mlp_ler": 0.15354,
+  "bposd_bar_p003": 0.030883,
+  "PASS": true
+}

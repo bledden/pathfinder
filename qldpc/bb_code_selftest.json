@@ -1,0 +1,25 @@
+{
+  "n": 72,
+  "k": 12,
+  "N": 36,
+  "HX_shape": [
+    36,
+    72
+  ],
+  "HZ_shape": [
+    36,
+    72
+  ],
+  "symmetry_fails": 0,
+  "n_logicals_found": 18,
+  "sample_synd_shape": [
+    1000,
+    36
+  ],
+  "sample_logflip_shape": [
+    1000,
+    18
+  ],
+  "mean_syndrome_weight": 8.345,
+  "mean_logflip_rate": 0.3241
+}

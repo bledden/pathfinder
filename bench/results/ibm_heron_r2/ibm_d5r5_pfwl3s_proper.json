@@ -1,0 +1,84 @@
+{
+  "distance": 5,
+  "rounds": 5,
+  "n_shots": 10000,
+  "detector_flip_rate": 0.35299833333333336,
+  "observable_flip_rate": 0.491,
+  "pymatching_sweep": {
+    "p0.005": {
+      "ler": 0.4598,
+      "ci": [
+        0.4500490265879741,
+        0.46958184801523817
+      ],
+      "errors": 4598
+    },
+    "p0.01": {
+      "ler": 0.4568,
+      "ci": [
+        0.44705509687111744,
+        0.4665780818069615
+      ],
+      "errors": 4568
+    },
+    "p0.015": {
+      "ler": 0.4568,
+      "ci": [
+        0.44705509687111744,
+        0.4665780818069615
+      ],
+      "errors": 4568
+    },
+    "p0.02": {
+      "ler": 0.4599,
+      "ci": [
+        0.4501488303799724,
+        0.46968196742074436
+      ],
+      "errors": 4599
+    },
+    "p0.025": {
+      "ler": 0.4641,
+      "ci": [
+        0.45434094662558927,
+        0.4738866254703143
+      ],
+      "errors": 4641
+    }
+  },
+  "pymatching_best": {
+    "p_dem": "p0.01",
+    "ler": 0.4568,
+    "ci": [
+      0.44705509687111744,
+      0.4665780818069615
+    ],
+    "errors": 4568
+  },
+  "pfwl3s_5seed": {
+    "ler": 0.4768,
+    "ci": [
+      0.4670213400380047,
+      0.4865964781409636
+    ],
+    "errors": 4768,
+    "per_seed_errors": [
+      4729,
+      4814,
+      4758,
+      4764,
+      4801
+    ],
+    "ckpts": [
+      "bench/results/h200_main/tierC1/pathfinder_wide_long_d5_seed0/best_model.pt",
+      "bench/results/h200_main/tierC1/pathfinder_wide_long_d5_seed1/best_model.pt",
+      "bench/results/h200_main/tierC1/pathfinder_wide_long_d5_seed2/best_model.pt",
+      "bench/results/h200_main/tierC1/pathfinder_wide_long_d5_seed3/best_model.pt",
+      "bench/results/h200_main/tierC1/pathfinder_wide_long_d5_seed4/best_model.pt"
+    ],
+    "ensemble_method": "logit_mean"
+  },
+  "delta_pp": -2.0000000000000018,
+  "delta_relative_pct": -4.378283712784593,
+  "strict_winner": "PM"
+}

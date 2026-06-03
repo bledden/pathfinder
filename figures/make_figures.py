@@ -1,156 +1,809 @@
-"""Generate all four paper figures from raw experimental data.
+"""Generate all 11 paper figures from raw experimental data.
 
 Run from the repo root:
   python3 figures/make_figures.py
 
-Reads:
-  bench/results/h200_main/phase2/ensemble_results_final.json
-  bench/results/h200_lange_headtohead_low_p.json
-  bench/results/h200_lange_headtohead_high_p.json
-  bench/results/h200_main/phase2/lange_latency.json
+Writes figures/fig{01..11}_*.{png,pdf}.
 
-Writes figures/fig{1..4}_*.{png,pdf}.
+Aesthetic: seaborn whitegrid + Helvetica Neue sans-serif + insight-stating
+bold titles + prominent value labels + background-shaded zones + speech-bubble
+callouts with arrows. Matches the user's blog aesthetic at
+https://bledden.github.io/blog/*.
+
+Palette & decoder-family color mapping: see _style.py.
+
+Data sources (all under bench/results/):
+  comprehensive_eval.json
+  h200_lange_headtohead_{low,high}_p.json
+  h200_main/phase2/ensemble_results_final.json
+  h200_main/tuned/ensemble_results_tuned.json
+  h200_main/tierC1/ensemble_pfwl3s_full.json
+  h200_main/tierC1/ensemble_pfwl3s_d9.json
+  h200_main/tierC1/lange_finetuned_eval_d7.json
+  h200_main/tierC1/triton_h384_stability.json
+  h200_main/hybrid_d7_3seed/hybrid_eval_d7.json
 """
 import json
 import os
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+from matplotlib.ticker import FuncFormatter
+
+from _style import apply, PAL, STATUS, thin_spine, footer, callout
+
+apply()
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(HERE)
-OUT = HERE
+OUT  = HERE
 
-ens_phase2 = json.load(open(f"{REPO}/bench/results/h200_main/phase2/ensemble_results_final.json"))
-ens_tuned  = json.load(open(f"{REPO}/bench/results/h200_main/tuned/ensemble_results_tuned.json"))
-# Canonical-Pathfinder-Triad: d=3/5 from phase2 (finetune_d3, finetune_d5);
-# d=7 from tuned (finetune_d7). Mirrors the paper's canonical choice.
+def _save(fig, name):
+    fig.savefig(os.path.join(OUT, f"{name}.png"))
+    fig.savefig(os.path.join(OUT, f"{name}.pdf"))
+    plt.close(fig)
+    print(f"  wrote figures/{name}.{{png,pdf}}")
+
+def _pct(x, _=None):
+    if x == 0: return "0%"
+    if x >= 1: return f"{x:g}%"
+    if x >= 0.1: return f"{x:.1f}%"
+    if x >= 0.01: return f"{x:.2f}%"
+    return f"{x:.3f}%"
+
+from matplotlib.ticker import NullFormatter, LogLocator
+
+def _pct_log_axis(ax, minor_subs=(2, 3, 5)):
+    """Force a log-y axis to show percentage labels at major decades AND at
+    selected sub-decade ticks (2x, 3x, 5x) — necessary when the visible range
+    spans less than one decade, where matplotlib's default LogFormatter only
+    labels the bounding decades.
+    """
+    ax.yaxis.set_major_locator(LogLocator(base=10, numticks=12))
+    ax.yaxis.set_major_formatter(FuncFormatter(_pct))
+    if minor_subs:
+        ax.yaxis.set_minor_locator(LogLocator(base=10, subs=minor_subs, numticks=12))
+        ax.yaxis.set_minor_formatter(FuncFormatter(_pct))
+        ax.tick_params(axis="y", which="minor", labelsize=9, pad=4)
+    else:
+        ax.yaxis.set_minor_formatter(NullFormatter())
+
+# -- Load data -----------------------------------------------------------------
+J = lambda p: json.load(open(os.path.join(REPO, p)))
+
+comp        = J("bench/results/comprehensive_eval.json")["results"]
+h2h         = {**J("bench/results/h200_lange_headtohead_low_p.json"),
+               **J("bench/results/h200_lange_headtohead_high_p.json")}
+phase2      = J("bench/results/h200_main/phase2/ensemble_results_final.json")
+tuned       = J("bench/results/h200_main/tuned/ensemble_results_tuned.json")
+pfw_full    = J("bench/results/h200_main/tierC1/ensemble_pfwl3s_full.json")
+pfw_d9      = J("bench/results/h200_main/tierC1/ensemble_pfwl3s_d9.json")
+lange_ft    = J("bench/results/h200_main/tierC1/lange_finetuned_eval_d7.json")
+triton_h384 = J("bench/results/h200_main/tierC1/triton_h384_stability.json")
+hybrid      = J("bench/results/h200_main/hybrid_d7_3seed/hybrid_eval_d7.json")
+
 ens_final = {}
-for k, v in ens_phase2.items():
-    d = int(k.split('_')[0][1:])
-    ens_final[k] = ens_tuned[k] if (d == 7 and k in ens_tuned) else v
-ens_lo_p = json.load(open(f"{REPO}/bench/results/h200_lange_headtohead_low_p.json"))
-ens_hi_p = json.load(open(f"{REPO}/bench/results/h200_lange_headtohead_high_p.json"))
-h2h = {**ens_lo_p, **ens_hi_p}
+for k, v in phase2.items():
+    d = int(k.split("_")[0][1:])
+    ens_final[k] = tuned[k] if (d == 7 and k in tuned) else v
 
-# ---- Figure 1: LER vs p at d=7 (log-log) ----
-fig, ax = plt.subplots(figsize=(7, 5))
-noise_rates = [0.001, 0.002, 0.003, 0.005, 0.007, 0.010, 0.015]
-noise_sub = [0.003, 0.005, 0.007, 0.010]
-d7_pf_ood  = [h2h[f"d7_p{p}"]['pf_ler'] * 100 for p in noise_rates]
-d7_lange   = [h2h[f"d7_p{p}"]['lange_ler'] * 100 for p in noise_rates]
-d7_pm      = [h2h[f"d7_p{p}"]['pm_ler'] * 100 for p in noise_rates]
-d7_maj     = [ens_final[f"d7_p{p}"]['majority_ler'] * 100 for p in noise_sub]
-d7_pf_t    = [ens_final[f"d7_p{p}"]['pf_ler'] * 100 for p in noise_sub]
-ax.loglog(noise_rates, d7_pm,     'o-', label='PyMatching',                 color='#888888', linewidth=2, markersize=8)
-ax.loglog(noise_rates, d7_pf_ood, '^-', label='Pathfinder (Table-1 OOD)',   color='#d62728', alpha=0.6, linewidth=1.5, markersize=7)
-ax.loglog(noise_sub,   d7_pf_t,   's-', label='Canonical Pathfinder (fine-tune)', color='#d62728', linewidth=2, markersize=8)
-ax.loglog(noise_rates, d7_lange,  'D-', label='Lange GNN',                   color='#2ca02c', linewidth=2, markersize=8)
-ax.loglog(noise_sub,   d7_maj,    '*-', label='Pathfinder-Triad (this work)', color='#1f77b4', linewidth=2.5, markersize=14)
-ax.set_xlabel('Physical error rate  p', fontsize=12)
-ax.set_ylabel('Logical error rate (%)', fontsize=12)
-ax.set_title('d=7 decoder comparison at matched 4-parameter circuit-level noise\n(60K shots per point, 95% Wilson CIs)', fontsize=11)
-ax.grid(True, which='both', ls='--', alpha=0.3)
-ax.legend(fontsize=9, loc='lower right')
-plt.tight_layout()
-plt.savefig(f"{OUT}/fig1_ler_vs_noise_d7.png", dpi=150)
-plt.savefig(f"{OUT}/fig1_ler_vs_noise_d7.pdf")
-plt.close()
 
-# ---- Figure 2: Latency-vs-LER Pareto at d=7 p=0.007 (with legend) ----
-points = [
-    (6.12, 1.041, 'Pathfinder+Triton (3-param Table 1)',          '#8b0000', 'o', 170),
-    (6.12, 3.34,  'Canonical Pathfinder (4-param, §5.11)',         '#d62728', 's', 140),
-    (6.12, 3.09,  'Pathfinder-KD (4-param, §5.13)',                '#e06060', 'D', 140),
-    (6.12, 4.010, 'Pathfinder Table-1 OOD (4-param eval)',         '#ff9999', '^', 120),
-    (71.67, 2.94, 'Lange et al. GNN (measured here)',              '#2ca02c', 'D', 170),
-    (9.65, 1.489, 'PyMatching (3-param)',                          '#606060', 'o', 150),
-    (9.65, 3.343, 'PyMatching (4-param)',                          '#b0b0b0', '^', 130),
-    (72.0, 2.417, 'Pathfinder-Triad (canonical, §5.12) ★',         '#1f77b4', '*', 260),
-    (76.0, 2.495, 'Pathfinder-Triad (KD variant, §5.13)',          '#4a90d9', 'X', 200),
-    (63.0, 2.14,  'AlphaQubit (TPU, Sycamore noise)',              '#ff7f0e', 'p', 140),
-    (40.0, 1.0,   'Gu et al. (non-matched noise)',                 '#9467bd', 'h', 140),
-]
-fig, ax = plt.subplots(figsize=(9, 6))
-ax.axvline(7.0, color='black', linestyle=':', alpha=0.5, linewidth=1.2)
-ax.text(7.2, 0.60, 'd=7 cycle budget\n(7 μs)', fontsize=9, color='gray', va='bottom')
-ax.fill_between([2, 7], 0.5, 6, color='#2ca02c', alpha=0.07, zorder=0)
-ax.text(3.3, 0.75, 'sustains cycle budget', fontsize=8, color='#2ca02c', ha='center', alpha=0.8, style='italic')
-handles = []
-for i, (lat, ler, label, color, marker, size) in enumerate(points, start=1):
-    h = ax.scatter(lat, ler, s=size, c=color, marker=marker, edgecolors='black', linewidths=0.8, zorder=5)
-    handles.append(h)
-    off_x = 1.15 if marker in 'Do^sph' else 1.10
-    ax.annotate(str(i), (lat * off_x, ler * 0.98), fontsize=9, fontweight='bold', color=color, ha='left', va='center', zorder=6)
-legend_labels = [f"({i}) {p[2]}" for i, p in enumerate(points, start=1)]
-ax.legend(handles, legend_labels, fontsize=9, loc='upper left', bbox_to_anchor=(1.01, 1.0),
-          title='Decoder', title_fontsize=10, framealpha=0.95)
-ax.set_xscale('log'); ax.set_yscale('log')
-ax.set_xlabel('Latency (μs/syn, throughput-optimal batch)', fontsize=12)
-ax.set_ylabel('Logical error rate at d=7, p=0.007 (%)', fontsize=12)
-ax.set_title('Accuracy–latency Pareto at d=7, p=0.007\n(open-source + published comparators on matched or reported hardware)', fontsize=11)
-ax.set_xlim(3, 200); ax.set_ylim(0.5, 6)
-ax.grid(True, which='both', ls='--', alpha=0.3)
-plt.tight_layout()
-plt.savefig(f"{OUT}/fig2_pareto_d7.png", dpi=160, bbox_inches='tight')
-plt.savefig(f"{OUT}/fig2_pareto_d7.pdf", bbox_inches='tight')
-plt.close()
+# ============================================================================
+# F1 — HERO: Two named systems at d=7 — insight title, hero color emphasis
+# ============================================================================
+def fig01_hero():
+    fig, ax = plt.subplots(figsize=(11.0, 6.4))
+    ps = [0.001, 0.002, 0.003, 0.005, 0.007, 0.010, 0.015]
+    ps_op = [0.005, 0.007, 0.010, 0.015]
 
-# ---- Figure 3: LER vs distance at p=0.007 ----
-fig, ax = plt.subplots(figsize=(7, 5))
-d_axis = [3, 5, 7]
-pf_table1 = [1.818, 1.521, 1.041]
-pm_table1 = [2.014, 1.891, 1.489]
-pf_4p_tuned = [ens_final[f"d{d}_p0.007"]['pf_ler']*100 for d in d_axis]
-lange_4p    = [ens_final[f"d{d}_p0.007"]['lange_ler']*100 for d in d_axis]
-pm_4p       = [ens_final[f"d{d}_p0.007"]['pm_ler']*100 for d in d_axis]
-maj_4p      = [ens_final[f"d{d}_p0.007"]['majority_ler']*100 for d in d_axis]
-ax.semilogy(d_axis, pm_table1,   'o-',  label='PyMatching (3-param)',       color='#888888', linewidth=2, markersize=8)
-ax.semilogy(d_axis, pf_table1,   's-',  label='Pathfinder (3-param, Table 1)', color='#8b0000', linewidth=2, markersize=8)
-ax.semilogy(d_axis, pm_4p,       'o--', label='PyMatching (4-param)',        color='#888888', alpha=0.5, linewidth=1.5, markersize=7)
-ax.semilogy(d_axis, pf_4p_tuned, 's--', label='Pathfinder (4-param, tuned)', color='#d62728', linewidth=2, markersize=8)
-ax.semilogy(d_axis, lange_4p,    'D-',  label='Lange GNN (4-param)',         color='#2ca02c', linewidth=2, markersize=8)
-ax.semilogy(d_axis, maj_4p,      '*-',  label='Majority Vote (4-param)',     color='#1f77b4', linewidth=2.5, markersize=14)
-ax.set_xlabel('Code distance  d', fontsize=12)
-ax.set_ylabel('Logical error rate at p=0.007 (%)', fontsize=12)
-ax.set_title('Error-suppression scaling with code distance', fontsize=11)
-ax.set_xticks([3, 5, 7])
-ax.grid(True, which='both', ls='--', alpha=0.3)
-ax.legend(fontsize=9, loc='upper right')
-plt.tight_layout()
-plt.savefig(f"{OUT}/fig3_ler_vs_distance.png", dpi=150)
-plt.savefig(f"{OUT}/fig3_ler_vs_distance.pdf")
-plt.close()
+    pm    = [h2h[f"d7_p{p}"]["pm_ler"]    * 100 for p in ps]
+    la    = [h2h[f"d7_p{p}"]["lange_ler"] * 100 for p in ps]
+    pfw   = []
+    for p in ps:
+        k = f"d7_p{p}"
+        r = pfw_full[k] if k in pfw_full else h2h[k]
+        pfw.append(r["pf_ler"]*100)
+    tri    = [pfw_full[f"d7_p{p}"]["majority_ler"]   *100 for p in ps_op]
+    tri_lo = [pfw_full[f"d7_p{p}"]["majority_ci"][0] *100 for p in ps_op]
+    tri_hi = [pfw_full[f"d7_p{p}"]["majority_ci"][1] *100 for p in ps_op]
 
-# ---- Figure 4: Muon ablation depth dependence ----
-fig, ax = plt.subplots(figsize=(7, 5))
-d_ab = [3, 5, 7]
-full_muon   = [1.818, 1.28, 1.041]
-adamw_only  = [2.14, 2.20, 34.8]
-width = 0.35
-x = np.arange(len(d_ab))
-b1 = ax.bar(x - width/2, full_muon,  width, label='Full Muon (Table 1)', color='#1f77b4', edgecolor='black')
-b2 = ax.bar(x + width/2, adamw_only, width, label='AdamW only (§6.2)',   color='#ff7f0e', edgecolor='black')
-ax.set_yscale('log')
-ax.set_xticks(x)
-ax.set_xticklabels([f'd={d}' for d in d_ab])
-ax.set_ylabel('LER at p=0.007 (%)', fontsize=12)
-ax.set_title('Muon effect is depth-dependent (§6.2)\nCatastrophic to remove at d=7; negligible at d=3', fontsize=11)
-ax.grid(True, which='both', ls='--', alpha=0.3, axis='y')
-for b in list(b1) + list(b2):
-    h = b.get_height()
-    ax.text(b.get_x() + b.get_width()/2, h * 1.1, f'{h:.2f}%', ha='center', fontsize=9)
-for i, d in enumerate(d_ab):
-    rel = (adamw_only[i] / full_muon[i] - 1) * 100
-    lbl = f'+{rel:.0f}%' if rel < 200 else 'catastrophic'
-    color = '#d62728' if rel >= 50 else '#2ca02c'
-    ax.annotate(lbl, xy=(x[i], max(full_muon[i], adamw_only[i]) * 2), ha='center',
-                fontsize=10, fontweight='bold', color=color)
-ax.legend(fontsize=10)
-plt.tight_layout()
-plt.savefig(f"{OUT}/fig4_muon_depth.png", dpi=150)
-plt.savefig(f"{OUT}/fig4_muon_depth.pdf")
-plt.close()
+    # Operational-regime background shading, with the label up at the TOP of the chart
+    ax.axvspan(0.005, 0.015, color=PAL["win_band"], alpha=0.55, zorder=0)
+    ax.text(0.0087, 50, "operational regime", fontsize=11,
+            color="#92400E", style="italic", weight="bold", ha="center")
 
-print("All four figures regenerated under figures/.")
+    # Non-hero series — lighter weight + smaller markers
+    ax.plot(ps, pm,  "o-",  color=PAL["pm"],     linewidth=2.0, markersize=7,
+            label="PyMatching (baseline)")
+    ax.plot(ps, la,  "D-",  color=PAL["lange"],  linewidth=2.0, markersize=7,
+            label="Lange GNN (prior art)")
+    ax.plot(ps, pfw, "s-",  color=PAL["pf"],     linewidth=2.0, markersize=8,
+            label="PFWL3S (this work)")
+
+    # HERO: thicker line, larger markers, CI band
+    ax.fill_between(ps_op, tri_lo, tri_hi, color=PAL["triad"], alpha=0.20, linewidth=0)
+    ax.plot(ps_op, tri, "o-", color=PAL["triad"], linewidth=3.5, markersize=12,
+            markeredgecolor="white", markeredgewidth=2.0,
+            label="Pathfinder-Triad (HERO)", zorder=10)
+
+    # Value labels only at the headline rate (p=0.007) and worst rate (p=0.015) — clean
+    # White-rounded background so the label is readable on top of the operational-regime band
+    for x, y in [(0.007, tri[1]), (0.015, tri[3])]:
+        ax.annotate(f"{y:.2f}%", (x, y), xytext=(0, 14), textcoords="offset points",
+                    ha="center", fontsize=11, weight="bold", color=PAL["triad"],
+                    bbox=dict(boxstyle="round,pad=0.20", facecolor="white",
+                              edgecolor=PAL["triad"], linewidth=0.8, alpha=0.95))
+
+    # Callout in the lower-LEFT area (well clear of the curves)
+    ax.annotate("Pathfinder-Triad strict-CI\nbeats Lange (262 bp gap)",
+                xy=(0.007, 2.39),
+                xytext=(0.00125, 0.32),
+                fontsize=11, weight="bold", color=PAL["triad"], ha="left", va="center",
+                bbox=dict(boxstyle="round,pad=0.5", facecolor="white",
+                          edgecolor=PAL["triad"], linewidth=1.2, alpha=0.97),
+                arrowprops=dict(arrowstyle="-|>", color=PAL["triad"], lw=1.4,
+                                connectionstyle="arc3,rad=0.18"))
+
+    # Honesty callout: PM competitive at the saturated regime (p=0.015)
+    # At p=0.015 d=7: PM 27.16% vs PFWL3S 27.34% — PM wins by 18 bp
+    ax.annotate("Above-threshold regime:\nPM beats PFWL3S by 18 bp here\n(see §6.3 saturated-regime note)",
+                xy=(0.015, 27.16),
+                xytext=(0.0028, 75),
+                fontsize=10, weight="bold", color=PAL["pm"], ha="left", va="center",
+                bbox=dict(boxstyle="round,pad=0.4", facecolor="white",
+                          edgecolor=PAL["pm"], linewidth=1.0, alpha=0.97),
+                arrowprops=dict(arrowstyle="-|>", color=PAL["pm"], lw=1.1,
+                                connectionstyle="arc3,rad=-0.20"))
+
+    ax.set_xscale("log"); ax.set_yscale("log")
+    ax.set_xlabel("Physical error rate  p", fontsize=12.5)
+    ax.set_ylabel("Logical error rate", fontsize=12.5)
+    ax.set_xticks(ps); ax.set_xticklabels([f"{p:g}" for p in ps])
+    ax.set_ylim(0.005, 100)        # tighten the range so the Triad line stays prominent
+    _pct_log_axis(ax, minor_subs=None)   # range spans 4 decades — major ticks only
+    ax.set_title("Pathfinder-Triad beats every individual decoder at d=7 operational rates",
+                 fontsize=14.5, weight="bold", pad=14, loc="left")
+    ax.grid(True, which="both", alpha=0.6)
+    ax.legend(loc="lower right", fontsize=11)
+    thin_spine(ax)
+    footer(ax, "d=7 rotated surface code · 100K shots / point · 95% Wilson CIs shaded for the hero series · "
+                "Triad = PFWL3S + Lange + PyMatching majority vote.")
+    fig.tight_layout()
+    _save(fig, "fig01_hero_d7")
+
+# ============================================================================
+# F2 — Pathfinder vs PM 3-param, small-multiples d=3,5,7
+# ============================================================================
+def fig02_3param_multid():
+    ps = [0.0005, 0.001, 0.002, 0.003, 0.005, 0.007, 0.010, 0.015]
+    fig, axs = plt.subplots(1, 3, figsize=(15.0, 4.6), sharey=True)
+    win_count = {3: 0, 5: 0, 7: 0}
+    tie_count = {3: 0, 5: 0, 7: 0}
+    loss_count = {3: 0, 5: 0, 7: 0}
+    for ax, d in zip(axs, [3, 5, 7]):
+        nl     = np.array([comp[f"d{d}_p{p}"]["neural_ler"]*100 for p in ps])
+        nl_hw  = np.array([comp[f"d{d}_p{p}"]["neural_ci"] *100 for p in ps])
+        pm_    = np.array([comp[f"d{d}_p{p}"]["pm_ler"]    *100 for p in ps])
+        pm_hw  = np.array([comp[f"d{d}_p{p}"]["pm_ci"]     *100 for p in ps])
+        uf_    = np.array([comp[f"d{d}_p{p}"].get("uf_ler", np.nan)*100 for p in ps])
+        ax.plot(ps, pm_, "o-", color=PAL["pm"], linewidth=2.4, markersize=8, label="PyMatching")
+        ax.plot(ps, nl,  "s-", color=PAL["pf"], linewidth=2.8, markersize=9, label="Pathfinder")
+        ax.plot(ps, uf_, "^--", color=PAL["uf"], linewidth=1.8, alpha=0.85, label="Union-Find")
+        # Per-cell verdict markers (above each Pathfinder point)
+        for p, y, nhw, py, phw in zip(ps, nl, nl_hw, pm_, pm_hw):
+            if y == 0 and py == 0:
+                sym, color = "≈", "#888"; tie_count[d] += 1
+            elif (y + nhw) < (py - phw):
+                sym, color = "✓", "#16A34A"; win_count[d] += 1   # PF strict-wins
+            elif (py + phw) < (y - nhw):
+                sym, color = "✗", "#7C3AED"; loss_count[d] += 1  # PF strict-loses
+            else:
+                sym, color = "≈", "#888"; tie_count[d] += 1       # overlap
+            # Offset above the Pathfinder marker, in log-y display coords
+            label_y = max(y, 1e-4) * 0.45 if y > 0 else 5e-5
+            ax.text(p, label_y, sym, ha="center", va="top",
+                    fontsize=12, color=color, weight="bold")
+        ax.set_xscale("log"); ax.set_yscale("log")
+        ax.set_xlabel("Physical error rate  p", fontsize=12)
+        verdict = f"{win_count[d]}W / {tie_count[d]}T / {loss_count[d]}L vs PM"
+        ax.set_title(f"d = {d}   ({verdict})", fontsize=12.5, weight="bold", pad=10)
+        ax.grid(True, which="both", alpha=0.55)
+        ax.set_xticks(ps); ax.set_xticklabels([f"{p:g}" for p in ps],
+                                              rotation=35, fontsize=9.5)
+        thin_spine(ax)
+        _pct_log_axis(ax, minor_subs=None)
+        if d == 3:
+            ax.legend(loc="lower right")
+            ax.set_ylabel("Logical error rate", fontsize=12)
+            # In-axes legend for the verdict markers
+            ax.text(0.02, 0.98,
+                    "✓ Pathfinder strict-CI wins   ≈ overlap (tie)   ✗ PM strict-CI wins",
+                    transform=ax.transAxes, ha="left", va="top",
+                    fontsize=8.5, color="#374151", style="italic",
+                    bbox=dict(boxstyle="round,pad=0.3", facecolor="white",
+                              edgecolor="#D1D5DB", linewidth=0.6, alpha=0.95))
+    total_w = sum(win_count.values()); total_t = sum(tie_count.values()); total_l = sum(loss_count.values())
+    fig.suptitle(
+        f"Pathfinder vs PyMatching at d ∈ {{3,5,7}}: {total_w} strict-CI wins / {total_t} statistical ties / "
+        f"{total_l} strict-CI loss (3-param noise, 100K shots/point)",
+        fontsize=13, weight="bold", y=1.04, x=0.04, ha="left")
+    fig.text(0.04, -0.04,
+             f"Strict-CI test uses 95% Wilson intervals. Pathfinder's only strict-CI loss is at d=7, p=0.015 — "
+             f"the above-threshold regime where the surface code can no longer suppress errors and PM's "
+             f"combinatorial structure is provably near-optimal (same physics as the d=9 p=0.015 result of Fig 11).",
+             fontsize=9, style="italic", color="#6B7280")
+    fig.tight_layout()
+    _save(fig, "fig02_3param_multid")
+
+# ============================================================================
+# F3 — Pareto: accuracy vs latency at d=7, p=0.007
+# ============================================================================
+def fig03_pareto():
+    # Open-source decoders measured here on H200 SXM / Apple M4 — apples-to-apples comparable
+    P_main = [
+        (6.12,  1.041, "Pathfinder+Triton (3-param)",                PAL["pf"],         "o", 150),
+        (6.12,  2.492, "PFWL3S (4-param, HERO)",                     PAL["pfwl3s"],     "s", 200),
+        (20.4,  2.78,  "PFWL3S single-seed (H=384)",                 PAL["pf_kd"],      "D", 130),
+        (9.65,  1.489, "PyMatching (3-param, M4 CPU)",               PAL["pm"],         "o", 140),
+        (9.65,  3.366, "PyMatching (4-param)",                       PAL["pm_alt"],     "^", 130),
+        (71.67, 2.956, "Lange GNN (published)",                      PAL["lange"],      "D", 160),
+        (71.67, 2.739, "Lange GNN (fine-tuned)",                     PAL["lange_ft"],   "v", 150),
+        (72.0,  2.384, "Pathfinder-Triad (HERO)",                    PAL["triad"],      "o", 330),
+        (72.0,  2.326, "Triad w/ Lange-FT",                          PAL["triad_kd"],   "X", 190),
+    ]
+    # Closed-source / non-matched comparators — indicative only, different hardware OR noise model
+    P_indicative = [
+        (63.0,  2.14,  "AlphaQubit (TPU, Sycamore real-hw)",         PAL["alpha_qubit"],"p", 130),
+        (40.0,  1.0,   "Gu et al. (Gross codes, not surface)",       PAL["gu_etal"],    "h", 130),
+    ]
+    fig, (ax, ax2) = plt.subplots(1, 2, figsize=(14.5, 6.0),
+                                  gridspec_kw=dict(width_ratios=[3.4, 1.0]),
+                                  sharey=True)
+    P = P_main
+    # Cycle-budget shaded region
+    ax.axvspan(3, 7, color=PAL["budget_band"], alpha=0.9, zorder=0)
+    ax.axvline(7.0, color="#15803D", ls=":", lw=1.4, zorder=1)
+    ax.text(7.4, 2.5, "d=7 cycle budget  (7 μs)", fontsize=11, color="#15803D",
+            ha="left", va="center", rotation=90, style="italic", weight="bold")
+    ax.text(4.7, 0.78, "sustains cycle budget", fontsize=11, color="#15803D",
+            style="italic", ha="center", weight="bold")
+
+    # Pareto frontier (dotted)
+    P_sorted = sorted(P, key=lambda r: r[0])
+    front, best = [], float("inf")
+    for lat, ler, *_ in P_sorted:
+        if ler < best:
+            best = ler; front.append((lat, ler))
+    ax.plot([p[0] for p in front], [p[1] for p in front],
+            color="#9CA3AF", lw=1.6, ls=":", zorder=1)
+
+    # Manual offset table to keep numbered labels from overlapping
+    offset = {
+        1: (1.18, 0.97), 2: (1.18, 0.97), 3: (1.20, 0.98), 4: (1.16, 0.97),
+        5: (1.16, 0.97), 6: (1.07, 0.94), 7: (1.07, 1.05), 8: (1.06, 0.94),
+        9: (1.06, 1.05),
+    }
+    handles = []
+    for i, (lat, ler, lbl, color, marker, size) in enumerate(P, 1):
+        h = ax.scatter(lat, ler, s=size, c=color, marker=marker,
+                       edgecolors="#1F2937", linewidths=1.0, zorder=4)
+        handles.append(h)
+        dx, dy = offset.get(i, (1.18, 0.985))
+        ax.text(lat * dx, ler * dy, str(i), fontsize=11, fontweight="bold",
+                color=color, ha="left", va="center", zorder=5)
+
+    leg_labels = [f"({i}) {p[2]}" for i, p in enumerate(P, 1)]
+    ax.legend(handles, leg_labels, loc="lower right",
+              title="Open-source decoders (measured here)", title_fontsize=10.5,
+              frameon=True, fontsize=9.0, ncol=2,
+              labelspacing=0.3, columnspacing=0.8)
+    ax.set_xscale("log"); ax.set_yscale("log")
+    ax.set_xlabel("Latency  (μs / syndrome, throughput-optimal batch)", fontsize=12.5)
+    ax.set_ylabel("Logical error rate at d=7, p=0.007", fontsize=12.5)
+    ax.set_xlim(3, 200); ax.set_ylim(0.6, 5)
+    _pct_log_axis(ax)
+    ax.set_title("Open-source decoders on matched hardware (H200 SXM / Apple M4)",
+                 fontsize=12.5, weight="bold", pad=10, loc="left")
+    ax.grid(True, which="both", alpha=0.55)
+    thin_spine(ax)
+
+    # Second panel: closed-source / non-matched comparators (indicative only)
+    ax2.set_xscale("log"); ax2.set_yscale("log")
+    ax2.set_xlim(20, 200); ax2.set_ylim(0.6, 5)
+    ax2.set_xlabel("Latency  (μs / syn)", fontsize=12)
+    ax2.grid(True, which="both", alpha=0.55)
+    ax2.set_facecolor("#FAFAFA")
+    _pct_log_axis(ax2)
+    for i, (lat, ler, lbl, color, marker, size) in enumerate(P_indicative, 10):
+        ax2.scatter(lat, ler, s=size, c=color, marker=marker,
+                    edgecolors="#1F2937", linewidths=1.0, zorder=4)
+        ax2.text(lat * 1.18, ler * 0.98, str(i), fontsize=11, fontweight="bold",
+                 color=color, ha="left", va="center")
+        # Inline labels in the small panel
+        ax2.text(lat, ler * 1.45, lbl.split(" (")[0], ha="center", fontsize=9,
+                 color=color, weight="bold")
+    ax2.set_title("Indicative only\n(non-matched noise/hardware)",
+                  fontsize=11, weight="bold", pad=10, loc="left", color="#6B7280")
+    thin_spine(ax2)
+
+    fig.suptitle("Pathfinder+Triton is the only decoder that sustains the 7 μs cycle budget",
+                 fontsize=14.5, weight="bold", y=1.02, x=0.04, ha="left")
+    fig.text(0.04, -0.04,
+             "Latencies at throughput-optimal batch on each decoder's reported hardware. "
+             "Dotted line = Pareto frontier (lowest LER for each latency). "
+             "Right panel: AlphaQubit (TPU, real Sycamore noise) and Gu et al. (Gross codes, not surface) "
+             "are reported on different hardware OR a different problem — shown for context, not strictly comparable.",
+             fontsize=9, style="italic", color="#6B7280", wrap=True)
+    fig.tight_layout()
+    _save(fig, "fig03_pareto_d7")
+
+# ============================================================================
+# F4 — Triton vs reference at H=384 (audit M10 finding)
+# ============================================================================
+def fig04_triton_vs_ref():
+    L = triton_h384["latency"]
+    batches = ["B1", "B64", "B1024"]
+    ref = [L[b]["ref_us_per_syn"] for b in batches]
+    tri = [L[b]["tri_us_per_syn"] for b in batches]
+    x = np.arange(len(batches))
+    w = 0.34
+    fig, ax = plt.subplots(figsize=(11.0, 5.6))
+    bars_ref = ax.bar(x - w/2, ref, w, color=PAL["pf"],    edgecolor="#1F2937",
+                      linewidth=1.0, label="Reference (PyTorch)")
+    bars_tri = ax.bar(x + w/2, tri, w, color=PAL["triad"], edgecolor="#1F2937",
+                      linewidth=1.0, label="Triton kernel")
+    ax.set_yscale("log")
+    ax.set_xticks(x); ax.set_xticklabels(["B = 1", "B = 64", "B = 1024"], fontsize=12)
+    ax.set_ylabel("Latency  (μs / syndrome, log scale)", fontsize=12.5)
+    ax.grid(True, which="both", axis="y", alpha=0.55)
+    # Value labels
+    for bars, vals in [(bars_ref, ref), (bars_tri, tri)]:
+        for b, v in zip(bars, vals):
+            label = f"{v:.1f}" if v < 100 else f"{v:.0f}"
+            ax.text(b.get_x()+b.get_width()/2, v*1.10, label,
+                    ha="center", fontsize=10.5, weight="bold", color="#1F2937")
+    # Speedup labels above each batch group
+    for i, b in enumerate(batches):
+        sp = L[b]["speedup_x"]
+        color = "#16A34A" if sp >= 1 else "#7C3AED"
+        winner = "Triton wins" if sp >= 1 else "ref wins"
+        ratio = sp if sp >= 1 else 1/sp
+        ymax = max(ref[i], tri[i])
+        ax.text(i, ymax * 1.9, f"{ratio:.2f}x\n({winner})",
+                ha="center", va="bottom", fontsize=11.5, color=color, weight="bold")
+    # Cycle budget line
+    ax.axhline(7.0, color="#15803D", ls=":", lw=1.4)
+    ax.text(2.45, 8.0, "d=7 cycle budget  (7 μs)", color="#15803D",
+            ha="right", va="bottom", fontsize=10.5, style="italic", weight="bold")
+    ax.set_ylim(0.5, 9000)
+    ax.legend(loc="upper right", fontsize=11)
+    ax.set_title("Triton kernel tuned for H=256 LOSES to PyTorch reference at H=384 B=1024 (M10 audit)",
+                 fontsize=14.5, weight="bold", pad=14, loc="left")
+    thin_spine(ax)
+    footer(ax, "Pathfinder-Wide-Long (H=384), d=7, p=0.007 on NVIDIA H200 SXM. "
+                "Triton kernel block-tile sizes were chosen for H=256 (1.78x speedup at B=1024) and "
+                "are inefficient at H=384.")
+    fig.tight_layout()
+    _save(fig, "fig04_triton_h384")
+
+# ============================================================================
+# F5 — Decoder failure overlap (Venn diagram for set overlap)
+# ============================================================================
+def fig05_failure_overlap():
+    r = phase2["d7_p0.007"]
+    n = r["n"]
+    both    = r["both_wrong_pf_lange"]
+    pf_only = r["pf_wrong_lange_right"]
+    la_only = r["pf_right_lange_wrong"]
+    neither = n - both - pf_only - la_only
+
+    fig, ax = plt.subplots(figsize=(11.0, 6.2))
+    R = 1.05
+    cx_pf, cx_la, cy = -0.55, 0.55, 0.0
+    ax.add_patch(plt.Circle((cx_pf, cy), R, color=PAL["pf"],    alpha=0.40,
+                            linewidth=2.5, edgecolor=PAL["pf"]))
+    ax.add_patch(plt.Circle((cx_la, cy), R, color=PAL["lange"], alpha=0.40,
+                            linewidth=2.5, edgecolor=PAL["lange"]))
+
+    pf_only_pct = pf_only/n*100
+    la_only_pct = la_only/n*100
+    both_pct    = both/n*100
+
+    # Headers above each circle
+    ax.text(-1.15, cy + 0.65, "Pathfinder\nwrong", ha="center", va="center",
+            fontsize=13.5, weight="bold", color=PAL["pf"])
+    ax.text( 1.15, cy + 0.65, "Lange GNN\nwrong", ha="center", va="center",
+            fontsize=13.5, weight="bold", color=PAL["lange"])
+    # Count + pct in each region
+    ax.text(-0.90, cy - 0.10, f"only-PF\n{pf_only:,} shots\n{pf_only_pct:.3f}%",
+            ha="center", va="center", fontsize=11.5, color="#1F2937")
+    ax.text( 0.90, cy - 0.10, f"only-Lange\n{la_only:,} shots\n{la_only_pct:.3f}%",
+            ha="center", va="center", fontsize=11.5, color="#1F2937")
+    ax.text(  0.0, cy - 0.10, f"BOTH wrong\n{both:,} shots\n{both_pct:.3f}%",
+            ha="center", va="center", fontsize=11.5, color="white", weight="bold")
+    # Background line
+    ax.text(0.0, -1.85, f"Both correct on {neither:,} of {n:,} shots ({neither/n*100:.2f}%)",
+            ha="center", va="top", fontsize=11, color="#4B5563")
+
+    ax.set_xlim(-2.6, 2.6); ax.set_ylim(-2.4, 2.4)
+    ax.set_aspect("equal")
+    ax.set_xticks([]); ax.set_yticks([])
+    for s in ("top","right","left","bottom"): ax.spines[s].set_visible(False)
+    ax.set_title(f"Pathfinder and Lange fail on largely disjoint syndromes "
+                 f"(only {both_pct:.2f}% shot overlap)",
+                 fontsize=14.5, weight="bold", pad=14, loc="left")
+    ax.text(0.5, -0.02, "This near-disjoint failure mode is the structural reason "
+            "the §5.12 three-way majority vote (Pathfinder-Triad) beats every individual decoder.",
+            transform=ax.transAxes, ha="center", va="top",
+            fontsize=11, style="italic", color="#4B5563")
+    fig.tight_layout()
+    _save(fig, "fig05_failure_overlap")
+
+# ============================================================================
+# F6 — PFWL3S vs Lange (published vs fine-tuned) at d=7
+# ============================================================================
+def fig06_lange_ft():
+    fig, ax = plt.subplots(figsize=(11.0, 5.8))
+    ps = [0.005, 0.007, 0.010, 0.015]
+    pfw    = [lange_ft["rates"][f"p{p}"]["pf_ler"]    *100 for p in ps]
+    pub    = [lange_ft["rates"][f"p{p}"]["lange_pub_ler"]    *100 for p in ps]
+    ftL    = [lange_ft["rates"][f"p{p}"]["lange_ft_ler"]    *100 for p in ps]
+    pm_    = [lange_ft["rates"][f"p{p}"]["pm_ler"]    *100 for p in ps]
+
+    ax.plot(ps, pm_,  "o-",  color=PAL["pm"],       linewidth=2.0, markersize=7, label="PyMatching")
+    ax.plot(ps, pub,  "D-",  color=PAL["lange"],    linewidth=2.4, markersize=8, label="Lange GNN (published)")
+    ax.plot(ps, ftL,  "v--", color=PAL["lange_ft"], linewidth=2.4, markersize=8, label="Lange GNN (fine-tuned @ p=0.007)")
+    ax.plot(ps, pfw,  "s-",  color=PAL["pfwl3s"],   linewidth=3.2, markersize=10,
+            markeredgecolor="white", markeredgewidth=1.6, label="PFWL3S (this work, HERO)", zorder=10)
+
+    # Label only the headline-rate (p=0.007) PFWL3S point to anchor the strict-CI claim
+    idx = ps.index(0.007)
+    ax.annotate(f"PFWL3S {pfw[idx]:.2f}%", (0.007, pfw[idx]),
+                xytext=(0.0089, 1.55), textcoords="data",
+                ha="left", va="center", fontsize=10.5, weight="bold", color=PAL["pfwl3s"],
+                bbox=dict(boxstyle="round,pad=0.25", facecolor="white",
+                          edgecolor=PAL["pfwl3s"], linewidth=0.8, alpha=0.97),
+                arrowprops=dict(arrowstyle="-", color=PAL["pfwl3s"], lw=0.8))
+    ax.annotate(f"Lange-FT {ftL[idx]:.2f}%", (0.007, ftL[idx]),
+                xytext=(0.0089, 5.5), textcoords="data",
+                ha="left", va="center", fontsize=10.5, weight="bold", color=PAL["lange_ft"],
+                bbox=dict(boxstyle="round,pad=0.25", facecolor="white",
+                          edgecolor=PAL["lange_ft"], linewidth=0.8, alpha=0.97),
+                arrowprops=dict(arrowstyle="-", color=PAL["lange_ft"], lw=0.8))
+
+    # Honesty callout at p=0.015: PM beats PFWL3S by 18 bp here
+    idx15 = ps.index(0.015)
+    ax.annotate(
+        f"At p=0.015: PM {pm_[idx15]:.2f}% beats PFWL3S {pfw[idx15]:.2f}% by 18 bp\n(above-threshold saturated regime — see §6.3)",
+        xy=(0.015, pm_[idx15]),
+        xytext=(0.0050, 60), textcoords="data",
+        ha="left", va="center", fontsize=10, weight="bold", color=PAL["pm"],
+        bbox=dict(boxstyle="round,pad=0.35", facecolor="white",
+                  edgecolor=PAL["pm"], linewidth=1.0, alpha=0.97),
+        arrowprops=dict(arrowstyle="-|>", color=PAL["pm"], lw=1.0,
+                        connectionstyle="arc3,rad=0.30"))
+
+    # Callout placed in the upper-left empty region (high above the curves)
+    callout(ax, 0.007, 2.74,
+            "PFWL3S strict-CI beats\nfine-tuned Lange\n(49 bp gap at p=0.007)",
+            dx=-0.0042, dy=8.5, color=PAL["pfwl3s"])
+
+    ax.set_xscale("log"); ax.set_yscale("log")
+    ax.set_xlabel("Physical error rate  p", fontsize=12.5)
+    ax.set_ylabel("Logical error rate", fontsize=12.5)
+    ax.set_xticks(ps); ax.set_xticklabels([f"{p:g}" for p in ps])
+    ax.set_xlim(0.0042, 0.020)
+    ax.set_ylim(0.4, 100)
+    _pct_log_axis(ax)
+    ax.set_title("PFWL3S strictly beats Lange even after Lange is fine-tuned at p=0.007 (C2 audit)",
+                 fontsize=14.5, weight="bold", pad=14, loc="left")
+    ax.grid(True, which="both", alpha=0.55)
+    ax.legend(loc="lower right", fontsize=11)
+    thin_spine(ax)
+    footer(ax, "100K shots / point. Lange fine-tune: 30 epochs at p=0.007, Adam lr=1e-4, "
+                "resume from Lange's published d7 ckpt.")
+    fig.tight_layout()
+    _save(fig, "fig06_lange_ft")
+
+# ============================================================================
+# F7 — Strict-CI dominance heatmap with CI-gap magnitudes in basis points
+# ============================================================================
+def fig07_dominance_heatmap():
+    rows = []
+    for d in [3, 5, 7]:
+        for p in [0.005, 0.007, 0.010, 0.015]:
+            rows.append((d, p))
+    for p in [0.005, 0.007, 0.010, 0.015]:
+        rows.append((9, p))
+    cols = [
+        "PFWL3S\nvs Lange-pub",
+        "PFWL3S\nvs Lange-FT",
+        "Triad\nvs Lange-pub",
+        "Triad\nvs PyMatching",
+    ]
+    def status_and_gap(a_lo, a_hi, b_lo, b_hi):
+        if a_hi < b_lo: return "win",  b_lo - a_hi
+        if b_hi < a_lo: return "loss", a_lo - b_hi
+        return "tie", 0.0
+    def fetch(d, p):
+        kd = f"d{d}_p{p}"
+        if d == 9 and kd in pfw_d9:        r = pfw_d9[kd]
+        elif kd in pfw_full:               r = pfw_full[kd]
+        else:                              r = h2h.get(kd, {})
+        ft_l, ft_ci = None, None
+        if d == 7 and f"p{p}" in lange_ft["rates"]:
+            ft_l  = lange_ft["rates"][f"p{p}"]["lange_ft_ler"]
+            ft_ci = lange_ft["rates"][f"p{p}"]["lange_ft_ci"]
+        return r, (ft_l, ft_ci)
+
+    cells = []
+    for (d, p) in rows:
+        r, (ft_l, ft_ci) = fetch(d, p)
+        out = []
+        out.append(status_and_gap(r["pf_ci"][0], r["pf_ci"][1],
+                                  r["lange_ci"][0], r["lange_ci"][1]))
+        if ft_l is None:
+            out.append(("na", 0.0))
+        else:
+            out.append(status_and_gap(r["pf_ci"][0], r["pf_ci"][1],
+                                      ft_ci[0], ft_ci[1]))
+        if "majority_ci" not in r:
+            out.append(("na", 0.0)); out.append(("na", 0.0))
+        else:
+            out.append(status_and_gap(r["majority_ci"][0], r["majority_ci"][1],
+                                      r["lange_ci"][0], r["lange_ci"][1]))
+            out.append(status_and_gap(r["majority_ci"][0], r["majority_ci"][1],
+                                      r["pm_ci"][0], r["pm_ci"][1]))
+        cells.append(out)
+
+    fig, ax = plt.subplots(figsize=(10.5, 7.5))
+    for i, row in enumerate(cells):
+        y = len(cells)-1-i
+        for j, (status, gap) in enumerate(row):
+            color = STATUS[status]
+            ax.add_patch(plt.Rectangle((j, y), 1, 1,
+                                        facecolor=color,
+                                        edgecolor="white", linewidth=2.0))
+            if status == "win":
+                lbl = f"WIN\n+{gap*10000:.0f} bp";  tc = "white"; weight = "bold"
+            elif status == "loss":
+                lbl = f"loss\n-{gap*10000:.0f} bp"; tc = "white"; weight = "bold"
+            elif status == "tie":
+                lbl = "overlap"; tc = "#4B5563"; weight = "normal"
+            else:
+                lbl = "—"; tc = "#9CA3AF"; weight = "normal"
+            ax.text(j+0.5, y+0.5, lbl, ha="center", va="center",
+                    fontsize=10.5, color=tc, weight=weight)
+
+    ax.set_xlim(0, len(cols)); ax.set_ylim(0, len(rows))
+    ax.set_xticks(np.arange(len(cols))+0.5); ax.set_xticklabels(cols, fontsize=11, weight="bold")
+    ax.set_yticks(np.arange(len(rows))+0.5)
+    ax.set_yticklabels([f"d={d}, p={p}" for (d, p) in reversed(rows)], fontsize=11)
+    for s in ("top","right","left","bottom"): ax.spines[s].set_visible(False)
+    ax.tick_params(length=0)
+    handles = [
+        mpatches.Patch(facecolor=STATUS["win"],  label="strict-CI WIN  (95% non-overlap)"),
+        mpatches.Patch(facecolor=STATUS["tie"],  label="overlap (statistical tie)"),
+        mpatches.Patch(facecolor=STATUS["loss"], label="strict-CI loss"),
+    ]
+    ax.legend(handles=handles, loc="upper left", bbox_to_anchor=(0.0, -0.06),
+              ncol=3, frameon=False, fontsize=11)
+    ax.set_title("Triad strict-CI beats Lange at 5 of 8 d ≥ 7 ops points;\nloses to PM at d=9 p=0.015 (above threshold)",
+                 fontsize=13.5, weight="bold", pad=14, loc="left")
+    footer(ax, "Wilson 95% CIs at 100K shots / point. WIN = row-decoder strictly beats column-decoder. "
+                "Numbers show CI-gap magnitude in basis points. The single 'loss' cell at d=9 p=0.015 in "
+                "the right column reflects that the d=9 surface code is above its pseudo-threshold at p=0.015, "
+                "where PM's combinatorial structure is provably near-optimal.")
+    fig.tight_layout()
+    _save(fig, "fig07_dominance_heatmap")
+
+# ============================================================================
+# F8 — Triad-distillation arc (bars vs Triad baseline reference line)
+# ============================================================================
+def fig08_triad_distill():
+    recipes = [
+        ("Original\nPFWL3S",                 2.492),
+        ("Soft Triad-distill\nfrom-scratch", 2.71),
+        ("Hardlabel Triad-distill\nfrom-scratch", 2.71),
+        ("Warm-init Triad-distill\n3-seed avg",   2.507),
+        ("H=512 Triad-distill\n3-seed avg",       2.558),
+        ("PF+PM-only KD\nwarm-init",              2.57),
+    ]
+    triad_baseline = 2.384
+    labels = [r[0] for r in recipes]
+    vals   = [r[1] for r in recipes]
+    x = np.arange(len(recipes))
+    fig, ax = plt.subplots(figsize=(11.5, 5.6))
+    bars = ax.bar(x, vals, width=0.65,
+                  color=[PAL["pfwl3s"]] + [PAL["pf_kd"]]*5,
+                  edgecolor="#1F2937", linewidth=1.0)
+    ax.axhline(triad_baseline, color=PAL["triad"], ls="--", lw=2.4, zorder=4,
+               label=f"Pathfinder-Triad baseline  ({triad_baseline:.3f}%)")
+    ax.set_xticks(x); ax.set_xticklabels(labels, fontsize=10)
+    ax.set_ylabel("LER at d=7, p=0.007", fontsize=12.5)
+    ax.yaxis.set_major_formatter(FuncFormatter(_pct))
+    for b, v in zip(bars, vals):
+        ax.text(b.get_x()+b.get_width()/2, v + 0.02, f"{v:.3f}%",
+                ha="center", fontsize=10.5, weight="bold", color="#1F2937")
+    ax.set_ylim(2.2, 2.85)
+    ax.legend(loc="upper right", fontsize=11)
+    ax.grid(True, which="major", axis="y", alpha=0.55)
+    ax.set_title("No distilled single PF student beats the Triad — coverage is architectural",
+                 fontsize=14.5, weight="bold", pad=14, loc="left")
+    thin_spine(ax)
+    footer(ax, "Six recipe variants ($110 follow-up compute). Bars: 3-seed-avg distilled-student LER. "
+                "Dashed line: Pathfinder-Triad baseline.")
+    fig.tight_layout()
+    _save(fig, "fig08_triad_distill")
+
+# ============================================================================
+# F9 — Hybrid CNN+GNN vs PFWL3S — paired-difference plot (canonical for ties)
+# ============================================================================
+def fig09_hybrid_vs_pfwl3s():
+    ps = [0.0005, 0.001, 0.002, 0.003, 0.005, 0.007, 0.010, 0.015]
+    diffs, cis = [], []
+    for p in ps:
+        r = hybrid["rates"][f"p{p}"]
+        n = r["n"]
+        pa = r["hybrid_ler"]; pb = r["pfwl3s_ler"]
+        d_ler = pa - pb
+        var = pa*(1-pa)/n + pb*(1-pb)/n
+        hw = 1.96 * np.sqrt(var)
+        diffs.append(d_ler * 10000)        # bp
+        cis.append(hw * 10000)             # bp
+
+    fig, ax = plt.subplots(figsize=(11.0, 5.6))
+    x = np.arange(len(ps))
+    # Zero-line shaded band: "statistically indistinguishable" region
+    ax.axhspan(-max(cis), max(cis), color="#F3F4F6", alpha=0.7, zorder=0)
+    ax.axhline(0, color="#4B5563", linewidth=1.4, zorder=1)
+    ax.errorbar(x, diffs, yerr=cis, fmt="o", color=PAL["hybrid"],
+                ecolor="#1F2937", elinewidth=1.4, capsize=6, capthick=1.4,
+                markersize=11, markeredgecolor="white", markeredgewidth=1.6,
+                zorder=4)
+    # Value labels (ΔLER in bp) above each point
+    for xi, d, c in zip(x, diffs, cis):
+        ax.annotate(f"{d:+.1f}", (xi, d + c + 1.5),
+                    ha="center", fontsize=10, weight="bold", color="#1F2937")
+    ax.set_xticks(x); ax.set_xticklabels([f"{p:g}" for p in ps], fontsize=11.5)
+    ax.set_xlabel("Physical error rate  p", fontsize=12.5)
+    ax.set_ylabel("Hybrid − PFWL3S  (LER difference, basis points)", fontsize=12.5)
+    ax.grid(True, axis="y", alpha=0.55)
+    ax.set_ylim(min(min(diffs)-max(cis), -25) * 1.4, max(max(diffs)+max(cis), 25) * 1.4)
+    ax.set_title("Hybrid CNN+GNN statistically ties PFWL3S at all 8 noise rates",
+                 fontsize=14.5, weight="bold", pad=14, loc="left")
+    # Caption-style headline
+    ax.text(0.5, -0.20,
+            "All 8 differences contain zero (error bars cross the zero line). "
+            "The architectural fusion does not measurably help at this scale.",
+            transform=ax.transAxes, ha="center", va="top",
+            fontsize=11, style="italic", color="#4B5563")
+    thin_spine(ax)
+    fig.tight_layout()
+    _save(fig, "fig09_hybrid_vs_pfwl3s")
+
+# ============================================================================
+# F10 — Muon ablation depth dependence
+# ============================================================================
+def fig10_muon_ablation():
+    d_ab = [3, 5, 7]
+    full = [1.818, 1.28, 1.041]
+    adam = [2.14,  2.20, 34.8]
+    x = np.arange(len(d_ab))
+    w = 0.34
+    fig, ax = plt.subplots(figsize=(11.0, 5.8))
+    b1 = ax.bar(x - w/2, full, w, color=PAL["triad"], edgecolor="#1F2937",
+                linewidth=1.0, label="Full Muon  (Table 1)")
+    b2 = ax.bar(x + w/2, adam, w, color=PAL["lange"], edgecolor="#1F2937",
+                linewidth=1.0, label="AdamW only  (§6.2)")
+    ax.set_yscale("log")
+    ax.set_xticks(x); ax.set_xticklabels([f"d = {d}" for d in d_ab], fontsize=12.5)
+    ax.set_ylabel("LER at p=0.007  (log scale)", fontsize=12.5)
+    ax.yaxis.set_major_formatter(FuncFormatter(_pct))
+    ax.grid(True, which="both", axis="y", alpha=0.55)
+    # Value labels (bold, in the bar's color)
+    for b, v, c in zip(list(b1), full, [PAL["triad"]]*3):
+        ax.text(b.get_x()+b.get_width()/2, v*1.12, f"{v:.2f}%",
+                ha="center", fontsize=11, weight="bold", color=c)
+    for b, v, c in zip(list(b2), adam, [PAL["lange"]]*3):
+        ax.text(b.get_x()+b.get_width()/2, v*1.12, f"{v:.2f}%",
+                ha="center", fontsize=11, weight="bold", color=c)
+    # Relative regression callouts
+    for i, d in enumerate(d_ab):
+        rel = (adam[i]/full[i] - 1) * 100
+        lbl = f"+{rel:.0f}%" if rel < 300 else "catastrophic\nfailure"
+        color = "#7C3AED" if rel >= 50 else "#16A34A"
+        ymax = max(full[i], adam[i])
+        ax.annotate(lbl, xy=(x[i], ymax*2.4), ha="center",
+                    fontsize=12, fontweight="bold", color=color)
+    ax.legend(loc="upper left", fontsize=11)
+    ax.set_ylim(0.5, 200)
+    ax.set_title("Muon is essential at d=7 — removing it causes catastrophic failure",
+                 fontsize=14.5, weight="bold", pad=14, loc="left")
+    thin_spine(ax)
+    footer(ax, "80K training steps / configuration. AdamW-only d=7 fails to escape its initial plateau.")
+    fig.tight_layout()
+    _save(fig, "fig10_muon_ablation")
+
+# ============================================================================
+# F11 — d=9 Triad extension (grouped bars with CIs)
+# ============================================================================
+def fig11_d9_triad():
+    ps = [0.005, 0.007, 0.010, 0.015]
+    pfw    = [pfw_d9[f"d9_p{p}"]["pf_ler"]    *100 for p in ps]
+    pfw_lo = [pfw_d9[f"d9_p{p}"]["pf_ci"][0]  *100 for p in ps]
+    pfw_hi = [pfw_d9[f"d9_p{p}"]["pf_ci"][1]  *100 for p in ps]
+    la     = [pfw_d9[f"d9_p{p}"]["lange_ler"] *100 for p in ps]
+    la_lo  = [pfw_d9[f"d9_p{p}"]["lange_ci"][0]*100 for p in ps]
+    la_hi  = [pfw_d9[f"d9_p{p}"]["lange_ci"][1]*100 for p in ps]
+    pm_    = [pfw_d9[f"d9_p{p}"]["pm_ler"]    *100 for p in ps]
+    pm_lo  = [pfw_d9[f"d9_p{p}"]["pm_ci"][0]  *100 for p in ps]
+    pm_hi  = [pfw_d9[f"d9_p{p}"]["pm_ci"][1]  *100 for p in ps]
+    tri    = [pfw_d9[f"d9_p{p}"]["majority_ler"]   *100 for p in ps]
+    tri_lo = [pfw_d9[f"d9_p{p}"]["majority_ci"][0] *100 for p in ps]
+    tri_hi = [pfw_d9[f"d9_p{p}"]["majority_ci"][1] *100 for p in ps]
+    x = np.arange(len(ps))
+    w = 0.20
+    fig, ax = plt.subplots(figsize=(12.0, 6.0))
+    def bars(offset, vals, lo, hi, color, label, linewidth=1.0):
+        err_lo = np.array(vals) - np.array(lo)
+        err_hi = np.array(hi)   - np.array(vals)
+        ax.bar(x + offset, vals, w, yerr=[err_lo, err_hi], capsize=4,
+               color=color, edgecolor="#1F2937", linewidth=linewidth, label=label,
+               error_kw=dict(elinewidth=1.2, ecolor="#1F2937"))
+    bars(-1.5*w, pm_, pm_lo, pm_hi, PAL["pm"],     "PyMatching")
+    bars(-0.5*w, la,  la_lo, la_hi, PAL["lange"],  "Lange GNN")
+    bars( 0.5*w, pfw, pfw_lo, pfw_hi, PAL["pfwl3s"], "PFWL3S-H256-d9")
+    bars( 1.5*w, tri, tri_lo, tri_hi, PAL["triad"], "Pathfinder-Triad", linewidth=1.6)
+    ax.set_xticks(x); ax.set_xticklabels([f"p = {p:g}" for p in ps], fontsize=12)
+    ax.set_yscale("log")
+    ax.set_ylabel("Logical error rate at d=9  (log scale)", fontsize=12.5)
+    ax.yaxis.set_major_formatter(FuncFormatter(_pct))
+    ax.grid(True, which="both", axis="y", alpha=0.55)
+    ax.legend(loc="upper left", ncol=2, fontsize=11)
+    # WIN annotations for Triad strict-CI wins (p=0.007, p=0.010)
+    for j, p in enumerate(ps):
+        if tri_hi[j] < la_lo[j]:
+            ax.annotate("Triad STRICT-CI\nbeats Lange",
+                        xy=(x[j]+1.5*w, tri[j]),
+                        xytext=(x[j]+1.5*w, tri[j]*0.55),
+                        ha="center", fontsize=10.5, color="#16A34A", weight="bold",
+                        arrowprops=dict(arrowstyle="->", color="#16A34A", lw=1.4))
+
+    # Honesty: at p=0.015 PM strictly beats Triad (saturated/above-threshold regime)
+    j15 = ps.index(0.015)
+    if pm_hi[j15] < tri_lo[j15]:
+        ax.annotate(
+            f"PM WINS HERE\n(PM {pm_[j15]:.1f}% vs Triad {tri[j15]:.1f}%)\nabove-threshold regime",
+            xy=(x[j15]-1.5*w, pm_[j15]),
+            xytext=(x[j15]-1.6*w, pm_[j15]*0.18),
+            ha="center", va="center", fontsize=10.5, color="#7C3AED", weight="bold",
+            bbox=dict(boxstyle="round,pad=0.35", facecolor="white",
+                      edgecolor="#7C3AED", linewidth=1.2, alpha=0.97),
+            arrowprops=dict(arrowstyle="-|>", color="#7C3AED", lw=1.4))
+    ax.set_title("Triad strict-CI win extends from d=7 to d=9 at operational rates — but PM wins at p=0.015 (above threshold)",
+                 fontsize=13, weight="bold", pad=14, loc="left")
+    thin_spine(ax)
+    footer(ax, "100K shots / point. PFWL3S-H256-d9 loses to Lange individually at every rate, "
+                "but the Triad strictly beats Lange at p=0.007 (25 bp) and p=0.010 (204 bp).")
+    fig.tight_layout()
+    _save(fig, "fig11_d9_triad")
+
+
+def main():
+    print("Generating Pathfinder paper figures (modern aesthetic, insight-titles)...")
+    fig01_hero()
+    fig02_3param_multid()
+    fig03_pareto()
+    fig04_triton_vs_ref()
+    fig05_failure_overlap()
+    fig06_lange_ft()
+    fig07_dominance_heatmap()
+    fig08_triad_distill()
+    fig09_hybrid_vs_pfwl3s()
+    fig10_muon_ablation()
+    fig11_d9_triad()
+    print("All 11 figures written.")
+
+if __name__ == "__main__":
+    main()

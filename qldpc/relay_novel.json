@@ -1,0 +1,66 @@
+{
+  "p": 0.03,
+  "subset": "novel (per-seed mask), pooled",
+  "seeds": [
+    1,
+    2,
+    3
+  ],
+  "neural_equiv_novel": 0.03479,
+  "bposd60_novel_seed1": 0.05604,
+  "relay_config": "RelayDecoderF32 gamma0=0.65 pre80 sets60 setmax60 (-0.24,0.66) stop5",
+  "per_seed": [
+    {
+      "seed": 1,
+      "n_novel": 11433,
+      "per_logical": 0.03633487856788828,
+      "pl_ci": [
+        0.035357618798838975,
+        0.0373381036137152
+      ],
+      "block": 0.0850170558908423,
+      "synd_match": 1.0
+    },
+    {
+      "seed": 2,
+      "n_novel": 11503,
+      "per_logical": 0.035910921788518936,
+      "pl_ci": [
+        0.03494217225264035,
+        0.03690550219441581
+      ],
+      "block": 0.0844996957315483,
+      "synd_match": 1.0
+    },
+    {
+      "seed": 3,
+      "n_novel": 11489,
+      "per_logical": 0.0360562276960571,
+      "pl_ci": [
+        0.03508498114312121,
+        0.03705332849703957
+      ],
+      "block": 0.08556010096614153,
+      "synd_match": 1.0
+    }
+  ],
+  "relay_full": {
+    "per_logical": 0.013833333333333333,
+    "pl_ci": [
+      0.013456945061498365,
+      0.01422009737148438
+    ],
+    "block": 0.03266666666666666,
+    "synd_match": 1.0,
+    "n": 30000
+  },
+  "relay_novel_pooled": {
+    "per_logical": 0.03610021786492375,
+    "pl_ci": [
+      0.03553566607334848,
+      0.03667339759564451
+    ]
+  },
+  "relay_novel_mean_over_seeds": 0.0361,
+  "equiv_neural_beats_relay_on_novel": true
+}

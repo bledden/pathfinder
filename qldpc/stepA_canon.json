@@ -1,0 +1,36 @@
+{
+  "dem": "canonical Z-only",
+  "R": 6,
+  "p": 0.003,
+  "n_det": 252,
+  "n_hyperedges": 1584,
+  "n_unique_detsets": 1584,
+  "spatial_Z6xZ6_global": "36/36",
+  "xyswap_global": true,
+  "timereversal_global": false,
+  "temporal_shift1_global": false,
+  "n_fg_edges": 4536,
+  "n_orbits": 40,
+  "fg_by_type": {
+    "bulk": 3096,
+    "cross": 1008,
+    "boundary": 432
+  },
+  "orbits_by_type": {
+    "bulk": 19,
+    "cross": 15,
+    "boundary": 6
+  },
+  "tying_total": 113.4,
+  "tying_bulk": 162.95,
+  "tying_cross": 67.2,
+  "tying_boundary": 72.0,
+  "params_equiv_T12": 960,
+  "params_free_T12": 108864,
+  "vs_prev_bothchecks": {
+    "old_tying_total": 109.6,
+    "old_n_orbits": 138,
+    "old_n_fg": 15120
+  },
+  "GATE_tying_ge_10x": true
+}

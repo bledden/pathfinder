@@ -1,0 +1,57 @@
+{
+  "R": 3,
+  "p": 0.01,
+  "ndet": 144,
+  "E": 1584,
+  "n_orb": 138,
+  "objective": "per-error-mechanism BCE vs ground-truth (Liu-Poulin), DEM-sampled",
+  "mean_error_rate": 0.00851,
+  "params_classical": 0,
+  "params_equiv": 2208,
+  "params_free": 122688,
+  "results": {
+    "classical": {
+      "bit_acc": 0.9873,
+      "error_recall": 0.3553
+    },
+    "equiv": {
+      "loss_curve": [
+        0.0457,
+        0.0281,
+        0.0262,
+        0.0256,
+        0.0253,
+        0.0257,
+        0.0252,
+        0.0247,
+        0.0253,
+        0.0242
+      ],
+      "final_loss": 0.0242,
+      "bit_acc": 0.993,
+      "error_recall": 0.2627,
+      "loss_dropped": false,
+      "recall_above_chance": true
+    },
+    "free": {
+      "loss_curve": [
+        0.0457,
+        0.0306,
+        0.0296,
+        0.0287,
+        0.0276,
+        0.0272,
+        0.0265,
+        0.026,
+        0.0267,
+        0.0261
+      ],
+      "final_loss": 0.0261,
+      "bit_acc": 0.9923,
+      "error_recall": 0.204,
+      "loss_dropped": false,
+      "recall_above_chance": true
+    }
+  },
+  "TRAINS_HONEST": false
+}

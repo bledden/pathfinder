@@ -1,0 +1,16 @@
+{
+  "equiv_params": 139084,
+  "mlp_params_w256": 144140,
+  "mlp_matched_width": 248,
+  "mlp_matched_params": 135668,
+  "body_equivariance_max_err": 7.82310962677002e-08,
+  "EQUIVARIANT_PASS": true,
+  "equiv_out_shape": [
+    4,
+    12
+  ],
+  "mlp_out_shape": [
+    4,
+    12
+  ]
+}

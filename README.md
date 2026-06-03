@@ -220,6 +220,19 @@ Six weeks calendar time; single engineer working part-time across multiple short
 
 Full write-up: [`paper/pathfinder.md`](paper/pathfinder.md). Reviewer-style audit at [`paper/AUDIT_2026-05-13.md`](paper/AUDIT_2026-05-13.md).
 
+## qLDPC follow-on (negative result)
+
+[`qldpc/`](qldpc/) contains a self-contained, controlled study of group-equivariant neural decoding
+for the [[72,12,6]] bivariate-bicycle code. The honest conclusion is a **negative result**: under a
+parameter-matched control, the Z₆×Z₆ symmetry prior gives no decoding advantage over a
+non-equivariant baseline, consistent with the AED-QC-LDPC theorem. See [`qldpc/README.md`](qldpc/README.md).
+
+## Acknowledgements
+
+Methodology for the real-hardware and qLDPC studies — the maximum-likelihood decoding-ceiling check,
+the novel-syndrome (train/test-leakage) split, and the matched-parameter control — was sharpened
+through adversarial review by the **Coda** expert model, which is gratefully acknowledged.
+
 ## Key References
 
 - **Lange et al.** "Data-driven decoding of quantum error correcting codes using graph neural networks." Phys. Rev. Research 7, 023181 (2025). arXiv:2307.01241. Open source: [github.com/LangeMoritz/GNN_decoder](https://github.com/LangeMoritz/GNN_decoder)

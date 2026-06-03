@@ -1,0 +1,81 @@
+{
+  "p": 0.03,
+  "n_train": 20000,
+  "seeds": [
+    1,
+    2,
+    3
+  ],
+  "n_test": 30000,
+  "bposd_config": "ldpc ms + osd_cs order7, max_iter72",
+  "bposd_full": {
+    "per_logical": 0.029775,
+    "pl_ci": [
+      0.029224775712955134,
+      0.030335259826398946
+    ],
+    "block": 0.06673333333333334,
+    "fails_pl": 10719,
+    "fails_blk": 2002,
+    "n": 30000
+  },
+  "bposd_novel_per_seed": [
+    {
+      "seed": 1,
+      "frac_novel": 0.3811,
+      "n_novel": 11433,
+      "per_logical": 0.07742208227645121,
+      "pl_ci": [
+        0.0760196572086009,
+        0.07884817173501504
+      ],
+      "block": 0.17274556109507566
+    },
+    {
+      "seed": 2,
+      "frac_novel": 0.3834,
+      "n_novel": 11503,
+      "per_logical": 0.07685676200411487,
+      "pl_ci": [
+        0.07546331676239942,
+        0.07827375909932777
+      ],
+      "block": 0.17186820829348864
+    },
+    {
+      "seed": 3,
+      "frac_novel": 0.383,
+      "n_novel": 11489,
+      "per_logical": 0.07726230887515595,
+      "pl_ci": [
+        0.07586461595587005,
+        0.07868355974645555
+      ],
+      "block": 0.17251283836713377
+    }
+  ],
+  "bposd_novel_pooled": {
+    "per_logical": 0.07717985959816025,
+    "pl_ci": [
+      0.0763699459017438,
+      0.07799763720523449
+    ],
+    "block": 0.17237472766884532,
+    "n_shots_pooled": 34425
+  },
+  "bposd_novel_mean_over_seeds": 0.07718,
+  "neural_memorized_decomposition": {
+    "equiv": {
+      "full": 0.01343,
+      "novel": 0.03479,
+      "frac_novel": 0.3825,
+      "memorized_subset_ler": 0.000199
+    },
+    "free": {
+      "full": 0.01432,
+      "novel": 0.03711,
+      "frac_novel": 0.3825,
+      "memorized_subset_ler": 0.000203
+    }
+  }
+}

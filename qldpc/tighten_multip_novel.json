@@ -1,0 +1,83 @@
+{
+  "n_train": 20000,
+  "steps": 4000,
+  "seeds": [
+    1,
+    2,
+    3
+  ],
+  "n_test": 30000,
+  "subset": "novel (per-seed train mask)",
+  "decoder": "equiv neural-BP vs Relay-BP (tuned)",
+  "scope": "CODE-CAPACITY gate for circuit-level pod decision",
+  "points": {
+    "p0.02": {
+      "equiv_novel_seeds": [
+        0.01554,
+        0.01548,
+        0.01539
+      ],
+      "equiv_novel_mean": 0.01547,
+      "relay_novel_seeds": [
+        0.017,
+        0.0166,
+        0.0154
+      ],
+      "relay_novel_mean": 0.01633,
+      "paired_relay_minus_equiv": [
+        0.00146,
+        0.00112,
+        1e-05
+      ],
+      "paired_mean": 0.00086,
+      "equiv_wins_all_seeds": true,
+      "margin_pp": 0.0862
+    },
+    "p0.03": {
+      "equiv_novel_seeds": [
+        0.03533,
+        0.03407,
+        0.03482
+      ],
+      "equiv_novel_mean": 0.03474,
+      "relay_novel_seeds": [
+        0.03633,
+        0.03591,
+        0.03606
+      ],
+      "relay_novel_mean": 0.0361,
+      "paired_relay_minus_equiv": [
+        0.00101,
+        0.00184,
+        0.00124
+      ],
+      "paired_mean": 0.00136,
+      "equiv_wins_all_seeds": true,
+      "margin_pp": 0.1362
+    },
+    "p0.04": {
+      "equiv_novel_seeds": [
+        0.06233,
+        0.06179,
+        0.06229
+      ],
+      "equiv_novel_mean": 0.06214,
+      "relay_novel_seeds": [
+        0.06318,
+        0.06243,
+        0.06278
+      ],
+      "relay_novel_mean": 0.0628,
+      "paired_relay_minus_equiv": [
+        0.00085,
+        0.00064,
+        0.00049
+      ],
+      "paired_mean": 0.00066,
+      "equiv_wins_all_seeds": true,
+      "margin_pp": 0.066
+    }
+  },
+  "equiv_wins_every_seed_every_p": true,
+  "VERDICT": "signal holds across p -> justifies circuit-level pod test"
+}

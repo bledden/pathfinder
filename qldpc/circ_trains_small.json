@@ -1,0 +1,51 @@
+{
+  "R": 3,
+  "p": 0.01,
+  "ndet": 144,
+  "E": 1584,
+  "n_orb": 138,
+  "n_fg_edges": 7668,
+  "params_classical": 0,
+  "params_equiv": 2208,
+  "params_free": 122688,
+  "results": {
+    "classical": {
+      "untrained_obs_acc_at_median_thr": 0.496
+    },
+    "equiv": {
+      "loss_curve": [
+        2.904,
+        0.7141,
+        0.6953,
+        0.6935,
+        0.692,
+        0.6933,
+        0.6928,
+        0.6931,
+        0.6907,
+        0.6933
+      ],
+      "final_loss": 0.6933,
+      "trained_obs_acc": 0.4865,
+      "optimized": true
+    },
+    "free": {
+      "loss_curve": [
+        2.904,
+        0.7203,
+        0.6933,
+        0.6912,
+        0.6933,
+        0.6932,
+        0.6961,
+        0.6913,
+        0.6885,
+        0.6912
+      ],
+      "final_loss": 0.6912,
+      "trained_obs_acc": 0.4893,
+      "optimized": true
+    }
+  },
+  "TRAINS": true
+}

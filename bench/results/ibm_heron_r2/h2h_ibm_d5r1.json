@@ -1,0 +1,41 @@
+{
+  "ibm_result": "ibm_d5r1_result.json",
+  "distance": 5,
+  "rounds": 1,
+  "n_shots": 10000,
+  "detector_flip_rate": 0.21439166666666667,
+  "observable_flip_rate": 0.3253,
+  "pymatching": {
+    "ler": 0.1653,
+    "ci": [
+      0.1581483510410555,
+      0.17270870691156143
+    ],
+    "errors": 1653
+  },
+  "pfwl3s": {
+    "ler": 0.4067,
+    "ci": [
+      0.3971097379461643,
+      0.4163619187821869
+    ],
+    "errors": 4067,
+    "n_seeds": 5,
+    "per_seed_errors": [
+      4168,
+      6325,
+      3736,
+      4164,
+      4138
+    ]
+  },
+  "pfwl3s_pm_ensemble": {
+    "ler": 0.1653,
+    "ci": [
+      0.1581483510410555,
+      0.17270870691156143
+    ],
+    "errors": 1653,
+    "policy": "PF if PF==PM else PM (defer-to-baseline)"
+  }
+}

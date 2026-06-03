@@ -1,0 +1,53 @@
+{
+  "distance": 7,
+  "rounds": 7,
+  "n_shots": 10000,
+  "det_flip_rate": 0.4161139880952381,
+  "obs_flip_rate": 0.5014,
+  "pm": {
+    "ler": 0.4925,
+    "ci": [
+      0.4827058638623677,
+      0.5022998963247987
+    ],
+    "errors": 4925,
+    "p_dem_best": 0.01
+  },
+  "pfwl3s": {
+    "ler": 0.5025,
+    "ci": [
+      0.492701044240836,
+      0.5122970356967751
+    ],
+    "errors": 5025,
+    "per_seed_errors": [
+      5028,
+      5010,
+      4980
+    ],
+    "ckpts": [
+      "bench/results/h200_main/tierC1/pathfinder_wide_long_d7/best_model.pt",
+      "bench/results/h200_main/tierC1/pathfinder_wide_long_d7_seed1/best_model.pt",
+      "bench/results/h200_main/tierC1/pathfinder_wide_long_d7_seed2/best_model.pt"
+    ],
+    "label": "wide-long-3seed-H384 (not calibrated)"
+  },
+  "lange_published": {
+    "ler": 0.493,
+    "ci": [
+      0.48320552982302917,
+      0.5027998463516594
+    ],
+    "errors": 4930,
+    "ckpt": "coda_experiments/GNN_decoder/models/circuit_level_noise/d7/d7_d_t_7.pt",
+    "d_t": 7
+  },
+  "pathfinder_triad": {
+    "ler": 0.4974,
+    "ci": [
+      0.4876030126948452,
+      0.5071989841700391
+    ],
+    "errors": 4974
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "code": "[[72,12,6]]",
+  "target_distance": 6,
+  "n_orderings_tested": 720,
+  "n_deterministic": 0,
+  "deterministic_orders_sample": [],
+  "filter_seconds": 119.8
+}

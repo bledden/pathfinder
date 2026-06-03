@@ -1,0 +1,25 @@
+{
+  "x_order": [
+    "A0",
+    "A1",
+    "A2",
+    "B0",
+    "B1",
+    "B2"
+  ],
+  "z_order": [
+    "B2",
+    "B1",
+    "B0",
+    "A2",
+    "A1",
+    "A0"
+  ],
+  "target": 6,
+  "n_detectors": 252,
+  "capped5_no_error_within_cap": true,
+  "distance_ge_6": true,
+  "search_s": 0.0,
+  "stim_msg": "Failed to find any logical errors.",
+  "DISTANCE_OK": true
+}

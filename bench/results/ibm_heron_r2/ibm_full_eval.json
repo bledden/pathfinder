@@ -1,0 +1,122 @@
+{
+  "d3r3": {
+    "distance": 3,
+    "rounds": 3,
+    "n_shots": 10000,
+    "det_flip_rate": 0.2786,
+    "obs_flip_rate": 0.3631,
+    "pm": {
+      "ler": 0.2849,
+      "ci": [
+        0.2761371248831471,
+        0.293828077284788
+      ],
+      "errors": 2849,
+      "p_dem_best": 0.005
+    },
+    "pfwl3s": {
+      "ler": 0.2898,
+      "ci": [
+        0.2809901394423797,
+        0.2987712994032733
+      ],
+      "errors": 2898,
+      "per_seed_errors": [
+        2894,
+        2897,
+        2889
+      ],
+      "ckpts": [
+        "bench/results/h200_main/tierC1/pathfinder_wide_long_d3_rescue_seed0/best_model.pt",
+        "bench/results/h200_main/tierC1/pathfinder_wide_long_d3_rescue_seed1/best_model.pt",
+        "bench/results/h200_main/tierC1/pathfinder_wide_long_d3_rescue_seed2/best_model.pt"
+      ],
+      "label": "rescue-3seed-H384"
+    },
+    "lange_published": {
+      "ler": 0.4393,
+      "ci": [
+        0.42959763360953457,
+        0.44904898550526623
+      ],
+      "errors": 4393,
+      "ckpt": "coda_experiments/GNN_decoder/models/circuit_level_noise/d3/d3_d_t_3.pt",
+      "d_t": 3
+    },
+    "pathfinder_triad": {
+      "ler": 0.289,
+      "ci": [
+        0.2801977240243068,
+        0.2979643292413105
+      ],
+      "errors": 2890
+    },
+    "verdicts": {
+      "pfwl3s_vs_pm": "tie (CIs overlap)",
+      "pfwl3s_vs_lange": "PFWL3S strict-wins",
+      "triad_vs_pm": "tie (CIs overlap)",
+      "triad_vs_lange": "Triad strict-wins",
+      "triad_vs_pfwl3s": "tie (CIs overlap)"
+    }
+  },
+  "d5r5": {
+    "distance": 5,
+    "rounds": 5,
+    "n_shots": 10000,
+    "det_flip_rate": 0.35299833333333336,
+    "obs_flip_rate": 0.491,
+    "pm": {
+      "ler": 0.4568,
+      "ci": [
+        0.44705509687111744,
+        0.4665780818069615
+      ],
+      "errors": 4568,
+      "p_dem_best": 0.01
+    },
+    "pfwl3s": {
+      "ler": 0.4727,
+      "ci": [
+        0.4629269755457209,
+        0.4824939915355651
+      ],
+      "errors": 4727,
+      "per_seed_errors": [
+        4746,
+        4731,
+        4791
+      ],
+      "ckpts": [
+        "bench/results/h200_main/calibrated/seed0/best_model.pt",
+        "bench/results/h200_main/calibrated/seed1/best_model.pt",
+        "bench/results/h200_main/calibrated/seed2/best_model.pt"
+      ],
+      "label": "calibrated-3seed-H384"
+    },
+    "lange_published": {
+      "ler": 0.4968,
+      "ci": [
+        0.48700331127220503,
+        0.5065991464076526
+      ],
+      "errors": 4968,
+      "ckpt": "coda_experiments/GNN_decoder/models/circuit_level_noise/d5/d5_d_t_5.pt",
+      "d_t": 5
+    },
+    "pathfinder_triad": {
+      "ler": 0.4646,
+      "ci": [
+        0.454840054500535,
+        0.47438713358289075
+      ],
+      "errors": 4646
+    },
+    "verdicts": {
+      "pfwl3s_vs_pm": "tie (CIs overlap)",
+      "pfwl3s_vs_lange": "PFWL3S strict-wins",
+      "triad_vs_pm": "tie (CIs overlap)",
+      "triad_vs_lange": "Triad strict-wins",
+      "triad_vs_pfwl3s": "tie (CIs overlap)"
+    }
+  }
+}

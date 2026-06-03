@@ -1,0 +1,30 @@
+{
+  "stage": 1,
+  "R": 6,
+  "desc": "matched-param kill-switch: equiv-640 vs free_random-640",
+  "note": "content transcribed from verified pod read before stop; STAGE1_PASS=false, kill-switch fired",
+  "seeds": [1, 2, 3, 4, 5],
+  "points": {
+    "p0.005": {
+      "n_orb": 40,
+      "classical": {"params": 0, "ler_mean": 0.00314, "ler_seeds": [0.004, 0.0027, 0.0028, 0.0036, 0.0026]},
+      "equiv": {"params": 640, "ler_mean": 0.0038, "ler_std": 0.00061, "ler_seeds": [0.0045, 0.003, 0.0037, 0.0045, 0.0033],
+                "per_class_fails": {"bulk": 111, "cross": 41, "boundary": 38}},
+      "free_random": {"params": 640, "ler_mean": 0.0041, "ler_std": 0.00033, "ler_seeds": [0.0047, 0.0038, 0.0039, 0.0042, 0.0039],
+                      "per_class_fails": {"bulk": 119, "cross": 39, "boundary": 47}},
+      "equiv_vs_free_random": {"paired_mean_margin": 0.0003, "paired_std": 0.00038, "equiv_wins_all_seeds": false, "margin_over_2std": false}
+    },
+    "p0.01": {
+      "n_orb": 40,
+      "classical": {"params": 0, "ler_mean": 0.05448, "ler_seeds": [0.0551, 0.0544, 0.0529, 0.0542, 0.0558]},
+      "equiv": {"params": 640, "ler_mean": 0.06566, "ler_std": 0.00217, "ler_seeds": [0.0621, 0.0675, 0.0642, 0.0669, 0.0676],
+                "per_class_fails": {"bulk": 2496, "cross": 489, "boundary": 298}},
+      "free_random": {"params": 640, "ler_mean": 0.06496, "ler_std": 0.0021, "ler_seeds": [0.063, 0.0635, 0.0643, 0.0689, 0.0651],
+                      "per_class_fails": {"bulk": 2451, "cross": 494, "boundary": 303}},
+      "equiv_vs_free_random": {"paired_mean_margin": -0.0007, "paired_std": 0.00222, "equiv_wins_all_seeds": false, "margin_over_2std": false}
+    }
+  },
+  "STAGE1_PASS": false,
+  "kill_switch": "STOP: equiv ties free_random, inductive-bias claim collapses",
+  "elapsed_min": 38.3
+}

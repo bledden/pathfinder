@@ -1,0 +1,23 @@
+{
+  "n_edges": 216,
+  "n_orbits": 6,
+  "orbit_sizes": [
+    36,
+    36,
+    36,
+    36,
+    36,
+    36
+  ],
+  "orbits_6x36": true,
+  "weight1_corrected": "72/72",
+  "weight1_all": true,
+  "classicalBP_block_ler": 0.1895,
+  "classicalBP_per_logical_ler": 0.096,
+  "bposd_block_bar": 0.06875,
+  "bposd_per_logical_bar": 0.030883,
+  "equiv_grad_flows": true,
+  "equiv_n_params": 111,
+  "free_n_params": 3681,
+  "SELFTEST_PASS": true
+}

@@ -1,0 +1,152 @@
+{
+  "p": 0.03,
+  "T": 12,
+  "n_train": 20000,
+  "steps": 4000,
+  "seeds": [
+    1,
+    2,
+    3
+  ],
+  "n_test": 20000,
+  "osd_order": 7,
+  "eval": "leak-free (novel syndromes only)",
+  "ldpc_api": "v2 BpOsdDecoder.update_channel_probs",
+  "per_seed": {
+    "1": {
+      "frac_novel": 0.3805,
+      "n_novel": 7610,
+      "classical": {
+        "per_logical": 0.2206964520367937,
+        "ci": [
+          0.2180184064482926,
+          0.22339799581571376
+        ],
+        "synd_match": 1.0,
+        "n": 7610
+      },
+      "equiv": {
+        "per_logical": 0.035107314936487076,
+        "ci": [
+          0.03393299125727031,
+          0.036320750674672234
+        ],
+        "synd_match": 1.0,
+        "n": 7610
+      },
+      "free": {
+        "per_logical": 0.03446123521681997,
+        "ci": [
+          0.033297575948747715,
+          0.03566406089943322
+        ],
+        "synd_match": 1.0,
+        "n": 7610
+      },
+      "sanity_decoders_differ": true
+    },
+    "2": {
+      "frac_novel": 0.3836,
+      "n_novel": 7671,
+      "classical": {
+        "per_logical": 0.21849606744014252,
+        "ci": [
+          0.21583836366935596,
+          0.2211772662002426
+        ],
+        "synd_match": 1.0,
+        "n": 7671
+      },
+      "equiv": {
+        "per_logical": 0.03362230043888237,
+        "ci": [
+          0.03247715911579537,
+          0.034806366756613784
+        ],
+        "synd_match": 1.0,
+        "n": 7671
+      },
+      "free": {
+        "per_logical": 0.03550167296745318,
+        "ci": [
+          0.034325521097437056,
+          0.03671659297520208
+        ],
+        "synd_match": 1.0,
+        "n": 7671
+      },
+      "sanity_decoders_differ": true
+    },
+    "3": {
+      "frac_novel": 0.3821,
+      "n_novel": 7641,
+      "classical": {
+        "per_logical": 0.21993194608035596,
+        "ci": [
+          0.21726268570625695,
+          0.22262467337328495
+        ],
+        "synd_match": 1.0,
+        "n": 7641
+      },
+      "equiv": {
+        "per_logical": 0.0344195785891899,
+        "ci": [
+          0.03325893309673097,
+          0.035619235092741224
+        ],
+        "synd_match": 1.0,
+        "n": 7641
+      },
+      "free": {
+        "per_logical": 0.03512847358548183,
+        "ci": [
+          0.03395614870493014,
+          0.03633975007877218
+        ],
+        "synd_match": 1.0,
+        "n": 7641
+      },
+      "sanity_decoders_differ": true
+    }
+  },
+  "summary": {
+    "classical": {
+      "mean": 0.21971,
+      "std": 0.00091,
+      "seeds": [
+        0.2207,
+        0.2185,
+        0.21993
+      ]
+    },
+    "equiv": {
+      "mean": 0.03438,
+      "std": 0.00061,
+      "seeds": [
+        0.03511,
+        0.03362,
+        0.03442
+      ]
+    },
+    "free": {
+      "mean": 0.03503,
+      "std": 0.00043,
+      "seeds": [
+        0.03446,
+        0.0355,
+        0.03513
+      ]
+    },
+    "equiv_minus_classical": {
+      "delta": -0.18533,
+      "sigma": -169.16,
+      "trained_strict_beats_classical": true
+    },
+    "free_minus_classical": {
+      "delta": -0.18468,
+      "sigma": -183.11,
+      "trained_strict_beats_classical": true
+    }
+  }
+}

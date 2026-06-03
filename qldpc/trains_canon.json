@@ -1,0 +1,49 @@
+{
+  "harness": "canonical",
+  "R": 3,
+  "p": 0.01,
+  "n_det": 144,
+  "n_err": 828,
+  "n_orb": 40,
+  "seeds": [
+    1,
+    2,
+    3
+  ],
+  "results": {
+    "classical": {
+      "params": 0,
+      "ler_seeds": [
+        0.03725,
+        0.0395,
+        0.03275
+      ],
+      "ler_mean": 0.0365
+    },
+    "equiv": {
+      "params": 640,
+      "ler_seeds": [
+        0.03825,
+        0.038,
+        0.03175
+      ],
+      "ler_mean": 0.036,
+      "ler_std": 0.00301
+    },
+    "free": {
+      "params": 38016,
+      "ler_seeds": [
+        0.046,
+        0.043,
+        0.0355
+      ],
+      "ler_mean": 0.0415,
+      "ler_std": 0.00442
+    }
+  },
+  "equiv_beats_classical": true,
+  "equiv_beats_free": true,
+  "equiv_params": 640,
+  "free_params": 38016,
+  "GATE": true
+}

@@ -1,0 +1,21 @@
+{
+  "generators": "spatial_Z6xZ6 (36/36 global) + temporal_shift_pm1 (bulk-valid); xyswap+timereversal EXCLUDED (not global automorphisms)",
+  "n_fg_edges": 15120,
+  "n_orbits": 138,
+  "orbits_by_type": {
+    "bulk": 58,
+    "boundary": 6,
+    "cross-boundary": 74
+  },
+  "fg_by_type": {
+    "bulk": 10152,
+    "boundary": 432,
+    "cross-boundary": 4536
+  },
+  "tying_total": 109.57,
+  "tying_bulk": 175.03,
+  "tying_boundary": 72.0,
+  "tying_cross": 61.3,
+  "params_free_T12": 362880,
+  "params_equiv_T12": 3312
+}

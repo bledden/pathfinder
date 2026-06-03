@@ -1,0 +1,43 @@
+{
+  "R": 3,
+  "p": 0.01,
+  "ndet": 144,
+  "E": 1584,
+  "n_orb": 138,
+  "metric": "logical error rate via BP-posterior -> OSD-cs order10 (max_iter0)",
+  "params_classical": 0,
+  "params_equiv": 2208,
+  "params_free": 122688,
+  "results": {
+    "classical": {
+      "ler": 0.2335,
+      "ci": [
+        0.22297,
+        0.24437
+      ],
+      "fails": 1401,
+      "n": 6000
+    },
+    "equiv": {
+      "ler": 0.17567,
+      "ci": [
+        0.16625,
+        0.1855
+      ],
+      "fails": 1054,
+      "n": 6000
+    },
+    "free": {
+      "ler": 0.18617,
+      "ci": [
+        0.17652,
+        0.19622
+      ],
+      "fails": 1117,
+      "n": 6000
+    }
+  },
+  "equiv_le_classical": true,
+  "equiv_le_free": true,
+  "GATE_GREEN": true
+}

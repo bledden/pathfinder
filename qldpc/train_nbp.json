@@ -1,0 +1,46 @@
+{
+  "p": 0.03,
+  "T": 12,
+  "seeds": [
+    1,
+    2,
+    3
+  ],
+  "bposd_per_logical": 0.030883,
+  "bposd_block": 0.06875,
+  "results": {
+    "equiv": {
+      "params": 163,
+      "n_train": 20000,
+      "per_logical_mean": 0.01277,
+      "per_logical_std": 0.00013,
+      "per_logical_seeds": [
+        0.01286,
+        0.01259,
+        0.01287
+      ],
+      "block_mean": 0.03022,
+      "beats_bposd": true,
+      "min": 6.5
+    },
+    "free": {
+      "params": 5413,
+      "n_train": 20000,
+      "per_logical_mean": 0.01376,
+      "per_logical_std": 0.00026,
+      "per_logical_seeds": [
+        0.01357,
+        0.01359,
+        0.01412
+      ],
+      "block_mean": 0.03227,
+      "beats_bposd": true,
+      "min": 6.6
+    }
+  },
+  "classical": {
+    "per_logical_ler": 0.08491,
+    "block_ler": 0.17475,
+    "params": 0
+  }
+}

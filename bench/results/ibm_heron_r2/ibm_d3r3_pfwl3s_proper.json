@@ -1,0 +1,38 @@
+{
+  "distance": 3,
+  "rounds": 3,
+  "n_shots": 10000,
+  "detector_flip_rate": 0.2786,
+  "observable_flip_rate": 0.3631,
+  "p_dem_used": 0.01,
+  "pymatching": {
+    "ler": 0.2856,
+    "ci": [
+      0.2768303348602316,
+      0.2945343296902347
+    ],
+    "errors": 2856
+  },
+  "pfwl3s_3seed": {
+    "ler": 0.2898,
+    "ci": [
+      0.2809901394423797,
+      0.2987712994032733
+    ],
+    "errors": 2898,
+    "per_seed_errors": [
+      2894,
+      2897,
+      2889
+    ],
+    "ckpts": [
+      "bench/results/h200_main/tierC1/pathfinder_wide_long_d3_rescue_seed0/best_model.pt",
+      "bench/results/h200_main/tierC1/pathfinder_wide_long_d3_rescue_seed1/best_model.pt",
+      "bench/results/h200_main/tierC1/pathfinder_wide_long_d3_rescue_seed2/best_model.pt"
+    ],
+    "ensemble_method": "logit_mean"
+  },
+  "delta_pp": -0.41999999999999815,
+  "delta_relative_pct": -1.470588235294111,
+  "strict_winner": "tie"
+}

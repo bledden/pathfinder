@@ -1,0 +1,62 @@
+{
+  "code": "[[72,12,6]]",
+  "p": 0.003,
+  "rounds": 6,
+  "n_detectors": 252,
+  "n_hyperedges": 3096,
+  "note": "topology automorphism (weight-tying notion): keyed on detector-sets, NOT prior/obs",
+  "hyperedge_by_type": {
+    "cross-boundary": 864,
+    "boundary": 144,
+    "bulk": 2088
+  },
+  "spatial_Z6xZ6_automorphisms": "36/36",
+  "temporal_shift_global": [
+    {
+      "k": 1,
+      "defined": false,
+      "is_automorphism": false
+    },
+    {
+      "k": 2,
+      "defined": false,
+      "is_automorphism": false
+    },
+    {
+      "k": 3,
+      "defined": false,
+      "is_automorphism": false
+    },
+    {
+      "k": 4,
+      "defined": false,
+      "is_automorphism": false
+    },
+    {
+      "k": 5,
+      "defined": false,
+      "is_automorphism": false
+    }
+  ],
+  "spacetime_automorphisms": "36/36 (globally-defined candidates)",
+  "n_unique_hyperedge_detsets": 3096,
+  "n_factor_graph_edges": 15120,
+  "n_edge_orbits_total": 420,
+  "n_edge_orbits_by_type": {
+    "bulk": 282,
+    "boundary": 12,
+    "cross-boundary": 126
+  },
+  "tying_factor_total": 36.0,
+  "fg_edges_by_type": {
+    "bulk": 10152,
+    "boundary": 432,
+    "cross-boundary": 4536
+  },
+  "tying_factor_bulk": 36.0,
+  "n_surviving_spatial": 36,
+  "params_free_per_iter": 30240,
+  "params_equiv_per_iter": 840,
+  "params_free_total_T12": 362880,
+  "params_equiv_total_T12": 10080
+}
