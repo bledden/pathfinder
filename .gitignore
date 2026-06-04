@@ -74,8 +74,3 @@ bench/results/h200_main/**/*.log
 
 # Stale compiled HTML (regenerate from paper/pathfinder.md; embeds absolute figure paths)
 paper/pathfinder.html
-
-# qLDPC architecture-strength arm (B-vector) — WIP, CPU-smoke-tested but pending the decisive
-# GPU run before it goes public (remove these two lines once sweep_vec results are committed).
-qldpc/circ_neural_bp_vec.py
-qldpc/sweep_vec.py
