@@ -1,0 +1,111 @@
+{
+  "stage": "1-vec",
+  "desc": "architecture-strength: expressive equiv-vec vs free_random-vec (matched params) + classical",
+  "R": 6,
+  "D": 4,
+  "T": 8,
+  "seeds": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "device": "cuda",
+  "points": {
+    "p0.005": {
+      "n_orb": 40,
+      "classical": {
+        "params": 0,
+        "ler_mean": 0.00425,
+        "ler_seeds": [
+          0.006,
+          0.00375,
+          0.0035,
+          0.005,
+          0.003
+        ]
+      },
+      "equiv": {
+        "params": 10240,
+        "ler_mean": 0.0049,
+        "ler_std": 0.00086,
+        "ler_seeds": [
+          0.004,
+          0.00375,
+          0.00575,
+          0.00575,
+          0.00525
+        ]
+      },
+      "free_random": {
+        "params": 10240,
+        "ler_mean": 0.0052,
+        "ler_std": 0.00139,
+        "ler_seeds": [
+          0.005,
+          0.0035,
+          0.00475,
+          0.00775,
+          0.005
+        ]
+      },
+      "equiv_vs_free_random": {
+        "paired_mean_margin": 0.0003,
+        "paired_std": 0.00107,
+        "equiv_wins_all_seeds": false,
+        "margin_over_2std": false
+      },
+      "equiv_beats_classical": false
+    },
+    "p0.01": {
+      "n_orb": 40,
+      "classical": {
+        "params": 0,
+        "ler_mean": 0.06395,
+        "ler_seeds": [
+          0.0565,
+          0.0685,
+          0.0585,
+          0.06575,
+          0.0705
+        ]
+      },
+      "equiv": {
+        "params": 10240,
+        "ler_mean": 0.08595,
+        "ler_std": 0.00654,
+        "ler_seeds": [
+          0.0795,
+          0.09425,
+          0.08025,
+          0.08225,
+          0.0935
+        ]
+      },
+      "free_random": {
+        "params": 10240,
+        "ler_mean": 0.0885,
+        "ler_std": 0.00514,
+        "ler_seeds": [
+          0.081,
+          0.096,
+          0.08525,
+          0.0915,
+          0.08875
+        ]
+      },
+      "equiv_vs_free_random": {
+        "paired_mean_margin": 0.00255,
+        "paired_std": 0.0046,
+        "equiv_wins_all_seeds": false,
+        "margin_over_2std": false
+      },
+      "equiv_beats_classical": false
+    }
+  },
+  "STAGE1_VEC_PASS": false,
+  "expressive_arm_beats_classical": false,
+  "verdict": "equiv ties free_random even when expressive \u2014 equivariance negative is airtight; close",
+  "note": "Top-level gate fields reconstructed from the per-seed data below (the run's final json write did not persist them on the network volume); values match the run stdout: 'STAGE1_VEC_PASS False | expressive beats classical: False'. Per-seed LERs are verbatim from the pod run (H200, torch 2.4.1, 5 paired seeds)."
+}
