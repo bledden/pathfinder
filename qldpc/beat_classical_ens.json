@@ -1,0 +1,64 @@
+{
+  "desc": "beat-classical ENSEMBLE: 3-seed logit-avg neural-BP (D=32,T=12,6000 steps) -> OSD-CS7 vs canonical classical",
+  "R": 6,
+  "D": 32,
+  "T": 12,
+  "mode": "equiv",
+  "steps": 6000,
+  "osd_order": 7,
+  "n_train": 40000,
+  "seeds": [
+    1,
+    2,
+    3
+  ],
+  "device": "cuda",
+  "points": {
+    "p0.005": {
+      "n_test": 15000,
+      "neural_params": 983040,
+      "classical_ler": 0.00373,
+      "classical_ci": [
+        0.00288,
+        0.00484
+      ],
+      "ensemble_ler": 0.0036,
+      "ensemble_ci": [
+        0.00276,
+        0.00469
+      ],
+      "per_seed_ler": [
+        0.00373,
+        0.0044,
+        0.00413
+      ],
+      "indiv_mean": 0.00409,
+      "ensemble_strict_beats": false,
+      "statistical_tie": true
+    },
+    "p0.01": {
+      "n_test": 10000,
+      "neural_params": 983040,
+      "classical_ler": 0.0523,
+      "classical_ci": [
+        0.04811,
+        0.05684
+      ],
+      "ensemble_ler": 0.0574,
+      "ensemble_ci": [
+        0.05301,
+        0.06213
+      ],
+      "per_seed_ler": [
+        0.06,
+        0.0606,
+        0.0605
+      ],
+      "indiv_mean": 0.06037,
+      "ensemble_strict_beats": false,
+      "statistical_tie": true
+    }
+  },
+  "any_ensemble_strict_beat": false,
+  "any_tie_or_beat": true
+}

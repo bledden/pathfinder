@@ -1,0 +1,42 @@
+{
+  "desc": "beat-classical: well-trained expressive neural-BP -> OSD-CS7 vs classical BP-OSD-CS7",
+  "R": 6,
+  "D": 24,
+  "T": 12,
+  "mode": "equiv",
+  "steps": 5000,
+  "osd_order": 7,
+  "n_test": 5000,
+  "n_train": 30000,
+  "seeds": [
+    1
+  ],
+  "device": "cuda",
+  "points": {
+    "p0.01": {
+      "neural_params": 552960,
+      "classical_ler": 0.0538,
+      "classical_ci": [
+        0.04788,
+        0.0604
+      ],
+      "neural_ler": 0.0618,
+      "neural_ci": [
+        0.05546,
+        0.06882
+      ],
+      "neural_strict_beats": false,
+      "statistical_tie": true,
+      "n_pooled": 5000,
+      "per_seed": [
+        {
+          "seed": 1,
+          "classical": 0.0538,
+          "neural": 0.0618
+        }
+      ]
+    }
+  },
+  "any_strict_beat": false,
+  "any_tie_or_beat": true
+}
