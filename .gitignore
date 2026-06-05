@@ -74,3 +74,6 @@ bench/results/h200_main/**/*.log
 
 # Stale compiled HTML (regenerate from paper/pathfinder.md; embeds absolute figure paths)
 paper/pathfinder.html
+
+# Internal research strategy/specs (private, like CODA_*/PAPER_SPEC_*; the paper is what ships, not the strategy)
+docs/superpowers/
