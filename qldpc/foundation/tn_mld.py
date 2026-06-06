@@ -160,6 +160,47 @@ def coset_ml_ler(H, L, priors, syndromes, observables):
     return fails / n_shots
 
 
+def coset_ml_ler_memoized(H, L, priors, syndromes, observables):
+    """Syndrome-memoized coset-ML LER -- BIT-IDENTICAL to ``coset_ml_ler``.
+
+    coset-ML decode is DETERMINISTIC given a syndrome: the predicted logical
+    class depends only on ``(H, L, priors, syndrome)``, never on the observed
+    class. At code capacity many shots share a syndrome (the all-zero syndrome
+    dominates), so caching the predicted class per unique syndrome bitstring lets
+    us skip re-contracting the tensor network for repeats. This is what makes the
+    multi-seed grid tractable (n=18 coset-ML is ~hundreds of ms per UNIQUE
+    syndrome).
+
+    Returns the same float as ``coset_ml_ler`` (fraction of failing shots).
+    A reviewer cross-validated that memoization yields identical fail counts; the
+    test ``test_memoized_equals_direct`` asserts equivalence on a tiny case.
+    """
+    L = np.asarray(L) % 2
+    n_log = L.shape[0]
+    syndromes = np.asarray(syndromes)
+    observables = np.asarray(observables) % 2
+    if observables.ndim == 1:
+        observables = observables.reshape(-1, 1)
+
+    n_shots = len(syndromes)
+    if n_shots == 0:
+        return 0.0
+
+    cache = {}
+    fails = 0
+    for i in range(n_shots):
+        key = np.asarray(syndromes[i] % 2, dtype=np.uint8).tobytes()
+        pred = cache.get(key)
+        if pred is None:
+            probs = _coset_prob(H, L, priors, syndromes[i])
+            best = int(np.argmax(probs))
+            pred = np.array([(best >> b) & 1 for b in range(n_log)], dtype=np.int64)
+            cache[key] = pred
+        if not np.array_equal(pred, observables[i]):
+            fails += 1
+    return fails / n_shots
+
+
 def _brute_coset_ml_single(H, L, priors, syndrome):
     """Reference brute-force coset-ML class (n_log == 1) for one syndrome.
 

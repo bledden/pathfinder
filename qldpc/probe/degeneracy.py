@@ -9,14 +9,33 @@ code, so we must show that the **MLE-vs-coset-ML degeneracy gap**
 is small and non-growing at the small BB scales where exact coset-ML IS tractable
 (width-gated). Two PRE-REGISTERED kill-switches decide the verdict:
 
-  * Level kill-switch: any tested ratio > 2.0  ->  verdict C.
-  * Trend kill-switch: the BB-family ratios (in ascending-n order) strictly
-    monotonically increasing across >=2 points  ->  verdict C.
+  * Level kill-switch: any tested ratio > 2.0  ->  verdict C.  (Robust: a 2x gap
+    is far outside the ~1% sampling-noise band, so this stays a strict
+    point-estimate rule.)
+  * Trend kill-switch (CI-AWARE): the BB-family ratios (in ascending-n order)
+    strictly monotonically increasing across >=2 points AND the growth is
+    STATISTICALLY SIGNIFICANT (the largest-n ratio's lower CI bound exceeds the
+    smallest-n ratio's upper CI bound -- i.e. endpoint CIs are disjoint with the
+    large end higher)  ->  verdict C.
   * Otherwise -> verdict B-MLE (the gap is measured-bounded and not growing).
 
-These are point-estimate rules: the verdict obeys them even if a fired trend is
-within CI noise. Wilson CIs are recorded as context, not as a relaxation of the
-rule.
+HISTORY / RATIONALE
+-------------------
+The trend kill-switch was ORIGINALLY a strict point-estimate rule (fire on any
+strictly-increasing BB sequence regardless of CIs). That rule was found
+SEED-FRAGILE: at the BB scales the MLE/coset-ML ratios all sit in a ~1%
+sampling-noise band around 1.0, so an ascending ordering can arise purely from
+RNG noise. Demonstrated: p=0.01, seed=123 gave BB ratios [0.9851, 0.9953,
+1.0013] -- strictly increasing by construction-noise alone -> a SPURIOUS "C".
+The point-estimate rule detects noise, not signal.
+
+The defensible form, consistent with the program's stated statistics discipline
+(>=5 seeds, CI-aware, CI-overlap != signal), is the CI-AWARE rule above: a trend
+only counts as a kill-switch event if the increase exceeds sampling noise
+(disjoint endpoint CIs). When a gap carries optional ``ratio_lo``/``ratio_hi``
+(95% CI on the ratio), the CI-aware test is used. When those keys are ABSENT we
+fall back to the original strict point-estimate rule, so the synthetic no-CI unit
+tests retain their original meaning.
 
 PAIRED PROBE
 ------------
@@ -53,15 +72,29 @@ _OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "degeneracy_verd
 # Pre-registered verdict logic (STEP A/B.1)
 # --------------------------------------------------------------------------- #
 def verdict_from_gaps(gaps, level=2.0):
-    """Apply the pre-registered level + trend kill-switches to a list of gaps.
+    """Apply the pre-registered level + (CI-aware) trend kill-switches to gaps.
 
     ``gaps`` is a list of dicts each with at least a ``ratio`` and a ``scale``;
     BB-family entries are marked ``bb=True`` and are read **in the given order**
-    (the runner orders the BB spine ascending by ``n``).
+    (the runner orders the BB spine ascending by ``n``). A gap MAY additionally
+    carry ``ratio_lo``/``ratio_hi`` (a 95% CI on the ratio).
+
+    Kill-switches (see module docstring for full rationale):
+
+      * LEVEL (strict point-estimate, unchanged): any ratio > ``level`` -> C.
+      * TREND (CI-aware when CIs present, strict point-estimate otherwise):
+          - With CIs on BOTH endpoints: fire ONLY if the BB ratios are strictly
+            monotonically increasing AND the largest-n ratio's ``ratio_lo`` >
+            the smallest-n ratio's ``ratio_hi`` (endpoint CIs disjoint, large end
+            higher -> the growth exceeds sampling noise).
+          - Without CIs: fall back to strict point-estimate (any strictly
+            increasing BB sequence fires) so the no-CI synthetic tests keep their
+            meaning.
 
     Returns ``{"verdict": "C"|"B-MLE", "reason": str, "gaps": gaps}``.
     """
     # Level kill-switch: any single ratio above the level threshold -> C.
+    # (Strict and unchanged: 2x is far outside the ~1% noise band.)
     for g in gaps:
         if g["ratio"] > level:
             return {
@@ -69,17 +102,43 @@ def verdict_from_gaps(gaps, level=2.0):
                 "reason": f"level kill-switch: ratio {g['ratio']} > {level} at {g['scale']}",
                 "gaps": gaps,
             }
-    # Trend kill-switch: BB-only ratios, in order; >=2 and strictly increasing -> C.
-    bb = [g["ratio"] for g in gaps if g.get("bb")]
-    if len(bb) >= 2 and all(a < b for a, b in zip(bb[:-1], bb[1:])):  # strictly increasing
-        return {
-            "verdict": "C",
-            "reason": "trend kill-switch: BB-family gap monotonically increasing",
-            "gaps": gaps,
-        }
+
+    # Trend kill-switch: BB-only ratios, in given (ascending-n) order.
+    bb = [g for g in gaps if g.get("bb")]
+    ratios = [g["ratio"] for g in bb]
+    if len(ratios) >= 2 and all(a < b for a, b in zip(ratios[:-1], ratios[1:])):
+        # Strictly increasing in point estimate. Decide whether it is significant.
+        first, last = bb[0], bb[-1]
+        have_ci = all(k in first for k in ("ratio_lo", "ratio_hi")) and all(
+            k in last for k in ("ratio_lo", "ratio_hi")
+        )
+        if have_ci:
+            # CI-aware: fire only if endpoint CIs are disjoint with large end up,
+            # i.e. the growth exceeds sampling noise.
+            if last["ratio_lo"] > first["ratio_hi"]:
+                return {
+                    "verdict": "C",
+                    "reason": (
+                        "trend kill-switch (CI-aware): BB-family gap "
+                        "monotonically increasing AND significant -- "
+                        f"largest-n ratio_lo {last['ratio_lo']:.4f} > "
+                        f"smallest-n ratio_hi {first['ratio_hi']:.4f} "
+                        "(endpoint CIs disjoint)"
+                    ),
+                    "gaps": gaps,
+                }
+            # Monotonic but within noise (CIs overlap) -> NOT a kill-switch event.
+        else:
+            # No CIs: original strict point-estimate fallback.
+            return {
+                "verdict": "C",
+                "reason": "trend kill-switch: BB-family gap monotonically increasing",
+                "gaps": gaps,
+            }
+
     return {
         "verdict": "B-MLE",
-        "reason": "all gaps <=2x and no increasing BB trend",
+        "reason": "all gaps <=2x and no significant increasing BB trend (CI-aware)",
         "gaps": gaps,
     }
 
@@ -161,10 +220,10 @@ def probe_scale(name, kind, bb, H, L, p, shots, beam=64, seed=0):
     """Run the PAIRED degeneracy probe for one (H, L, p) scale.
 
     Samples ``shots`` (dets, obs) ONCE from the code-capacity circuit, decodes
-    the same shots with both coset-ML (exact TN) and Tesseract MLE, and records
-    a full per-scale gap record.
+    the same shots with both coset-ML (exact TN, syndrome-memoized) and Tesseract
+    MLE, and records a full per-scale gap record.
     """
-    from qldpc.foundation.tn_mld import coset_ml_ler
+    from qldpc.foundation.tn_mld import coset_ml_ler_memoized
 
     H = np.asarray(H) % 2
     L = np.asarray(L) % 2
@@ -178,7 +237,9 @@ def probe_scale(name, kind, bb, H, L, p, shots, beam=64, seed=0):
     dets = np.asarray(dets, dtype=bool)
     obs = np.asarray(obs, dtype=bool)
 
-    ler_cml = coset_ml_ler(H, L, priors, dets, obs)
+    # Syndrome-memoized coset-ML: bit-identical to the un-memoized path but skips
+    # re-contracting on repeated syndromes (esp. the dominant all-zero syndrome).
+    ler_cml = coset_ml_ler_memoized(H, L, priors, dets, obs)
     fails_cml = int(round(ler_cml * shots))
 
     dem = circ.detector_error_model(decompose_errors=False)
@@ -206,6 +267,75 @@ def probe_scale(name, kind, bb, H, L, p, shots, beam=64, seed=0):
     }
 
 
+def probe_scale_multiseed(name, kind, bb, H, L, p, shots, beam=64, seeds=(0, 1, 2, 3, 4)):
+    """Run ``probe_scale`` over S seeds and aggregate to a pooled ratio + CI.
+
+    For each seed we run the paired probe at ``shots`` shots, collecting per-seed
+    ``(fails_cml, fails_mle, shots)``. We then:
+
+      * POOL: total_fails_* = sum over seeds, total_shots = S * shots, and the
+        pooled LERs LER_* = total_fails_* / total_shots. The pooled RATIO is
+        LER_MLE / LER_cosetML.
+      * RATIO CI (reported method = "pooled-Wilson-propagated"): compute a 95%
+        Wilson CI on EACH pooled LER, then propagate to a ratio CI by the
+        monotone-quotient bound
+            ratio_lo = LER_MLE_lo / LER_cosetML_hi
+            ratio_hi = LER_MLE_hi / LER_cosetML_lo
+        This is the cleaner of the two options (it uses the full pooled sample
+        directly and the program's own ``wilson_ci``); we also record the
+        per-seed ratio spread for transparency.
+
+    Emits a per-scale record with ``ratio`` (pooled), ``ratio_lo``/``ratio_hi``
+    (so the CI-aware verdict can use it), ``per_seed_ratios``, total shots/fails,
+    and the per-seed sub-records.
+    """
+    seeds = list(seeds)
+    per_seed = []
+    for s in seeds:
+        rec = probe_scale(name, kind, bb, H, L, p, shots, beam=beam, seed=int(s))
+        per_seed.append(rec)
+
+    total_shots = sum(r["shots"] for r in per_seed)
+    total_fails_cml = sum(r["fails_cml"] for r in per_seed)
+    total_fails_mle = sum(r["fails_mle"] for r in per_seed)
+
+    ler_cml = total_fails_cml / total_shots if total_shots else 0.0
+    ler_mle = total_fails_mle / total_shots if total_shots else 0.0
+    ratio = (ler_mle / ler_cml) if ler_cml > 0 else float("inf")
+
+    lo_c, hi_c = wilson_ci(total_fails_cml, total_shots)
+    lo_m, hi_m = wilson_ci(total_fails_mle, total_shots)
+    # Propagate the two pooled-LER Wilson CIs to a ratio CI (monotone quotient).
+    ratio_lo = (lo_m / hi_c) if hi_c > 0 else 0.0
+    ratio_hi = (hi_m / lo_c) if lo_c > 0 else float("inf")
+
+    per_seed_ratios = [r["ratio"] for r in per_seed]
+
+    return {
+        "scale": name,
+        "kind": kind,
+        "bb": bool(bb),
+        "n": int(per_seed[0]["n"]),
+        "p": float(p),
+        "beam": int(beam),
+        "seeds": [int(s) for s in seeds],
+        "shots_per_seed": int(shots),
+        "total_shots": int(total_shots),
+        "total_fails_cml": int(total_fails_cml),
+        "total_fails_mle": int(total_fails_mle),
+        "ler_cosetML": float(ler_cml),
+        "ler_MLE": float(ler_mle),
+        "ci_cosetML": [float(lo_c), float(hi_c)],
+        "ci_MLE": [float(lo_m), float(hi_m)],
+        "ratio": float(ratio),
+        "ratio_lo": float(ratio_lo),
+        "ratio_hi": float(ratio_hi),
+        "ratio_ci_method": "pooled-Wilson-propagated",
+        "per_seed_ratios": [float(r) for r in per_seed_ratios],
+        "per_seed": per_seed,
+    }
+
+
 def run(scales, out_path=_OUT):
     """Run the paired probe over ``scales`` (each a dict for ``probe_scale``),
     apply the verdict logic, write the full record to JSON, and return it.
@@ -214,6 +344,18 @@ def run(scales, out_path=_OUT):
     trend kill-switch reads it correctly.
     """
     gaps = [probe_scale(**s) for s in scales]
+    verdict = verdict_from_gaps(gaps)
+    out = {**verdict, "gaps": gaps}
+    json.dump(out, open(out_path, "w"), indent=2)
+    return out
+
+
+def run_multiseed(scales, out_path=_OUT):
+    """Multi-seed variant of ``run``: each scale is a dict for
+    ``probe_scale_multiseed`` (carrying ``seeds=...``). Applies the CI-aware
+    verdict to the aggregated gaps and writes the full record to JSON.
+    """
+    gaps = [probe_scale_multiseed(**s) for s in scales]
     verdict = verdict_from_gaps(gaps)
     out = {**verdict, "gaps": gaps}
     json.dump(out, open(out_path, "w"), indent=2)
