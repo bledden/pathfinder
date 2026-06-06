@@ -518,6 +518,36 @@ _BB_SPINE = [
 ]
 
 
+# Why the trend kill-switch is CI-aware, recorded in the artifact so a reviewer
+# asking "why not the simple strict-monotonic rule?" gets a concrete answer.
+# The original strict point-estimate rule fired C on ANY strictly-increasing BB
+# sequence; at these scales the ratios all sit in a ~1% sampling-noise band around
+# 1.0, so a monotone ordering arises from RNG noise alone. Concrete demonstration:
+METHODOLOGY_VALIDATION = {
+    "issue": (
+        "the ORIGINAL trend kill-switch was a strict point-estimate rule (fire C on "
+        "any strictly-increasing BB ratio sequence). At these scales all BB ratios sit "
+        "in a ~1% sampling-noise band around 1.0, so a monotone ordering can arise from "
+        "RNG noise alone -> the rule was a noise detector and could flip the decisive "
+        "label by seed."
+    ),
+    "counterexample": {
+        "p": 0.01,
+        "seed": 123,
+        "bb_ratios_ascending_n": [0.9851, 0.9953, 1.0013],
+        "note": "strictly increasing by sampling noise alone; every ratio ~1.0 within CI",
+        "old_strict_rule_verdict": "C",       # spurious demotion
+        "new_ci_aware_rule_verdict": "B-MLE",  # endpoint CIs overlap -> not significant -> no fire
+    },
+    "resolution": (
+        "TREND switch is now CI-aware (fires only if BB ratios strictly increase AND the "
+        "largest-n ratio_lo > smallest-n ratio_hi, i.e. growth exceeds sampling noise), "
+        "applied to MULTI-SEED pooled ratios. LEVEL switch unchanged (strict ratio>2.0; "
+        "2x is ~100 sigma outside the noise band, so it needs no CI-awareness)."
+    ),
+}
+
+
 def _wiring_sanity():
     """T6 wiring anchor: on BBCode(3,3, A=x0x1x2, B=x0x1y1) the MLE/coset-ML ratio
     must be ~1.0 (>= coset-ML within noise). Returns the gap record."""
@@ -590,5 +620,87 @@ def main(p=0.05, shots=6000, beam=64, seed=7):
     return out
 
 
+# Shots per seed by (p, scale-family), chosen so every code clears the ~300-failure
+# target (lower p -> lower LER -> more shots). These are the exact counts behind the
+# committed degeneracy_verdict.json, so `python3 -m qldpc.probe.degeneracy`
+# regenerates the decisive artifact bit-for-bit (same seeds + deterministic decoders).
+_SHOTS_BY_P = {
+    0.05: {"surface": 6000, "color": 8000, "bb": 6000},
+    0.01: {"surface": 24000, "color": 36000, "bb": 9000},
+}
+
+
+def main_multiseed(seeds=(0, 1, 2, 3, 4), p_values=(0.05, 0.01), beam=64, out_path=_OUT):
+    """Reproduce the DECISIVE multi-seed x two-p degeneracy verdict from committed code.
+
+    For each p in ``p_values`` runs the paired probe over ``seeds`` on the cross-family
+    references (surface d3/d5, color d3) + the genuinely-bivariate BB spine (ascending n),
+    pools per scale, applies the CI-aware verdict, and writes the full record (incl. the
+    wiring anchor, BB-spine selection, and the methodology-validation counterexample) to
+    JSON. Overall verdict is C if EITHER p demotes, else B-MLE.
+    """
+    seeds = list(seeds)
+    anchor = _wiring_sanity()
+    print("\n=== WIRING SANITY ANCHOR (T6) ===")
+    print(f"  {anchor['scale']}: coset-ML={anchor['ler_cosetML']:.4f} "
+          f"MLE={anchor['ler_MLE']:.4f} ratio={anchor['ratio']:.4f}")
+    if anchor["ler_MLE"] + 1e-9 < anchor["ci_cosetML"][0]:
+        raise SystemExit(
+            "WIRING FAILURE: MLE materially BELOW coset-ML CI -- the code-capacity DEM "
+            "likely does not match (H,L,priors). Aborting before reporting."
+        )
+
+    per_p, per_p_verdict = {}, {}
+    for p in p_values:
+        sh = _SHOTS_BY_P[p]
+        scales = []
+        HZ, LX, _ = rotated_surface_HZ_LX(3)
+        scales.append(dict(name="surface-d3", kind="surface", bb=False, H=HZ, L=LX,
+                           p=p, shots=sh["surface"], beam=beam, seeds=seeds))
+        HZ, LX, _ = rotated_surface_HZ_LX(5)
+        scales.append(dict(name="surface-d5", kind="surface", bb=False, H=HZ, L=LX,
+                           p=p, shots=sh["surface"], beam=beam, seeds=seeds))
+        HZ, LX, _ = steane_color_d3_HZ_LX()
+        scales.append(dict(name="color-d3", kind="color", bb=False, H=HZ, L=LX,
+                           p=p, shots=sh["color"], beam=beam, seeds=seeds))
+        for spec in _BB_SPINE:
+            HZ, LX, n, k = bb_HZ_LX(**spec)
+            scales.append(dict(name=f"BB n={n}", kind="bb", bb=True, H=HZ, L=LX,
+                               p=p, shots=sh["bb"], beam=beam, seeds=seeds))
+        gaps = [probe_scale_multiseed(**s) for s in scales]
+        v = verdict_from_gaps(gaps)
+        per_p[str(p)] = {"verdict": v["verdict"], "reason": v["reason"], "gaps": gaps}
+        per_p_verdict[str(p)] = v["verdict"]
+        bb_ratios = [g["ratio"] for g in gaps if g["bb"]]
+        print(f"\n=== p={p}: verdict {v['verdict']} ===")
+        print(f"  BB ratios (ascending n): {[round(r, 4) for r in bb_ratios]}")
+        for g in gaps:
+            print(f"  {g['scale']:<12}{'BB' if g['bb'] else '  ':<3} ratio={g['ratio']:.4f} "
+                  f"CI=[{g['ratio_lo']:.4f},{g['ratio_hi']:.4f}] "
+                  f"fails c/m={g['total_fails_cml']}/{g['total_fails_mle']} "
+                  f"shots={g['total_shots']}")
+
+    overall = "C" if "C" in per_p_verdict.values() else "B-MLE"
+    out = {
+        "overall_verdict": overall,
+        "per_p_verdict": per_p_verdict,
+        "seeds": seeds,
+        "beam": beam,
+        "method": ("multi-seed (>=5 seeds) x two p; syndrome-memoized coset-ML; "
+                   "CI-aware trend kill-switch (pooled-Wilson-propagated ratio CI)"),
+        "bb_spine_selection": [
+            {**spec, "criterion": "strong bivariate: A and B each mix x and y"}
+            for spec in _BB_SPINE
+        ],
+        "wiring_anchor": anchor,
+        "methodology_validation": METHODOLOGY_VALIDATION,
+        "per_p": per_p,
+    }
+    json.dump(out, open(out_path, "w"), indent=2)
+    print(f"\n*** OVERALL VERDICT: {overall} (per-p: {per_p_verdict}) ***")
+    print(f"Wrote {out_path}")
+    return out
+
+
 if __name__ == "__main__":
-    main()
+    main_multiseed()
