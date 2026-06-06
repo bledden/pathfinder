@@ -68,6 +68,10 @@ def _ler_from_samples(dem, dets, obs, beam):
         obs = obs.reshape(-1, 1)
     if pred.ndim == 1:
         pred = pred.reshape(-1, 1)
+    assert pred.shape == obs.shape, (
+        f"Tesseract prediction shape {pred.shape} != observable shape {obs.shape} "
+        f"(decoder returned a wrong n_obs column count)"
+    )
     fails = int(np.any(pred != obs, axis=1).sum())
     return fails / n_shots, fails
 
@@ -115,8 +119,17 @@ def beam_convergence(circuit, shots=20000, ladder=(8, 16, 32, 64),
     Decodes the SAME sampled shots at every beam in ``ladder`` (ascending),
     records the LER and failure count at each beam, and reports the smallest
     beam whose LER has *plateaued* -- i.e. is TOST-equivalent (at ``margin_rel``)
-    to the next-larger beam's LER. If no adjacent pair is equivalent, defaults to
-    the largest beam in the ladder.
+    to the next-larger beam's LER.
+
+    ``beam_star`` falls back to the largest beam in the ladder when the plateau
+    is **not** statistically resolved at the given shots/margin -- this is the
+    conservative choice (use the strongest beam; never under-claim the beam
+    needed for the MLE). The returned ``plateau_resolved`` flag is ``True`` only
+    when some beam strictly smaller than the max was confirmed TOST-equivalent to
+    its successor, and ``False`` when the result fell back to the max because no
+    smaller beam was statistically confirmed to plateau. Callers wanting a
+    resolved plateau must supply adequate shots for the LER/margin (a low LER at
+    a tight margin needs many shots for TOST power).
 
     Because the same fixed shot set is reused across beams, only the decoder
     (not the noise realization) changes, so the comparison isolates the effect
@@ -146,7 +159,10 @@ def beam_convergence(circuit, shots=20000, ladder=(8, 16, 32, 64),
     -------
     dict
         ``{"ler_by_beam": {beam: ler}, "fails_by_beam": {beam: fails},
-        "beam_star": int, "shots": int, "margin_rel": float}``.
+        "beam_star": int, "plateau_resolved": bool, "shots": int,
+        "margin_rel": float}``. ``plateau_resolved`` is ``True`` iff a beam
+        strictly smaller than the max was confirmed TOST-equivalent to its
+        successor; ``False`` when ``beam_star`` fell back to the largest beam.
     """
     if dem is None:
         dem = circuit.detector_error_model(decompose_errors=False)
@@ -165,18 +181,21 @@ def beam_convergence(circuit, shots=20000, ladder=(8, 16, 32, 64),
     # beam_star = smallest beam whose LER is TOST-equivalent to the next-larger
     # beam's LER (a plateau). Default to the largest beam if nothing plateaus.
     beam_star = ladder[-1]
+    plateau_resolved = False
     for i in range(len(ladder) - 1):
         b_lo, b_hi = ladder[i], ladder[i + 1]
         if tost_equivalent(fails_by_beam[b_lo], n,
                            fails_by_beam[b_hi], n,
                            margin_rel=margin_rel):
             beam_star = b_lo
+            plateau_resolved = True
             break
 
     return {
         "ler_by_beam": ler_by_beam,
         "fails_by_beam": fails_by_beam,
         "beam_star": beam_star,
+        "plateau_resolved": plateau_resolved,
         "shots": n,
         "margin_rel": margin_rel,
     }

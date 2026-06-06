@@ -16,3 +16,15 @@ def test_beam_convergence_returns_plateau():
     res = beam_convergence(circ, shots=2000, ladder=(4, 8, 16))
     assert res["beam_star"] in (4, 8, 16)
     assert "ler_by_beam" in res and len(res["ler_by_beam"]) == 3
+
+def test_beam_convergence_resolves_plateau_with_power():
+    circ = _surface_d3()
+    res = beam_convergence(circ, shots=20000, ladder=(2, 4, 8, 16), margin_rel=0.15)
+    assert res["plateau_resolved"] is True
+    assert res["beam_star"] < 16
+
+def test_beam_convergence_unresolved_falls_back_to_max():
+    circ = _surface_d3()
+    res = beam_convergence(circ, shots=800, ladder=(2, 4, 8, 16), margin_rel=0.10)
+    assert res["plateau_resolved"] is False
+    assert res["beam_star"] == 16
