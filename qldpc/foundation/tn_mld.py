@@ -64,7 +64,9 @@ def _coset_prob(H, L, priors, syndrome):
     """Return the length-2^n_log coset-probability vector for one syndrome.
 
     Index ``a`` (0..2^n_log-1) carries the logical-class bits little-endian:
-    bit ``o`` of ``a`` is the parity of logical row ``o``.
+    bit ``o`` of ``a`` (i.e. ``(a >> o) & 1``) is the parity of logical row
+    ``o`` (the open leg ``O{o}``). This matches ``coset_ml_ler``'s decode
+    ``pred[o] = (best >> o) & 1``.
     """
     H = np.asarray(H) % 2
     L = np.asarray(L) % 2
@@ -111,12 +113,21 @@ def _coset_prob(H, L, priors, syndrome):
         tn |= qtn.Tensor(_logical_tensor(len(mechs)), inds=legs)
 
     out_inds = tuple(f"O{o}" for o in range(n_log))
-    arr = tn.contract(output_inds=out_inds, optimize="auto-hq")
+    # Order the contracted output so that O0 is the LOWEST-order axis under a
+    # C-order ``reshape(-1)`` (last axis varies fastest). That makes the flat
+    # index ``a = sum_o bit(O_o) * 2^o`` (O0 = bit 0, little-endian), matching
+    # ``coset_ml_ler``'s decode ``(best >> o) & 1``. We achieve this by laying
+    # out the axes in REVERSED output order (O_{n-1}, ..., O1, O0) then C-order
+    # reshape.
+    rev_inds = out_inds[::-1]
+    with np.errstate(divide="ignore", invalid="ignore"):
+        arr = tn.contract(output_inds=out_inds, optimize="auto")
     if hasattr(arr, "data"):
-        # quimb may reorder indices; transpose to the requested order.
-        arr = arr.transpose(*out_inds)
+        # quimb may reorder indices; transpose to the reversed output order.
+        arr = arr.transpose(*rev_inds)
         data = np.asarray(arr.data)
     else:
+        # scalar (n_log == 0): nothing to reorder.
         data = np.asarray(arr)
     return data.reshape(-1)
 
