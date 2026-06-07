@@ -78,23 +78,38 @@ def test_si1000_emits_idle_noise():
             f"({mass_uni:.4f}) once idle noise is emitted")
 
 
+def _depolarize1_rates(circ):
+    """All DEPOLARIZE1 probabilities in a circuit, parsed NUMERICALLY (robust to float repr)."""
+    rates = []
+    for inst in circ:
+        if inst.name == "DEPOLARIZE1":
+            rates.extend(inst.gate_args_copy())
+    return rates
+
+
 def test_si1000_idle_rates_present():
     """The built si1000 circuit must contain DEPOLARIZE1 at the p/10 (per-CNOT-layer idle) and
-    2p (idle-during-measure) rates; uniform must contain NO DEPOLARIZE1 idle."""
+    2p (idle-during-measure) rates; uniform must contain NO DEPOLARIZE1 idle.
+
+    Rates are parsed numerically from the circuit (not matched against float repr) so this holds
+    at any p -- including p=0.003 (the spec reference), where repr(p/10)=0.0003000...3 != Stim's
+    printed 0.0003 would break a string match."""
     bb = _IDLE_BB
-    p = 0.01
-    idle = p / 10.0           # 0.001
-    idle_meas = 2.0 * p       # 0.02
-    for basis in ("Z", "X"):
-        cs = str(build_memory(bb, 2, p, basis=basis, noise="si1000"))
-        # DEPOLARIZE1 at both idle rates must appear
-        assert "DEPOLARIZE1" in cs, f"{basis}: si1000 has no DEPOLARIZE1 idle"
-        assert any(f"DEPOLARIZE1({r}" in cs for r in (repr(idle), str(idle))), \
-            f"{basis}: si1000 missing per-layer idle DEPOLARIZE1({idle})"
-        assert any(f"DEPOLARIZE1({r}" in cs for r in (repr(idle_meas), str(idle_meas))), \
-            f"{basis}: si1000 missing idle-during-measure DEPOLARIZE1({idle_meas})"
-        cu = str(build_memory(bb, 2, p, basis=basis, noise="uniform"))
-        assert "DEPOLARIZE1" not in cu, f"{basis}: uniform must emit NO DEPOLARIZE1 idle"
+    for p in (0.01, 0.003):
+        idle = p / 10.0
+        idle_meas = 2.0 * p
+        for basis in ("Z", "X"):
+            rates = _depolarize1_rates(build_memory(bb, 2, p, basis=basis, noise="si1000"))
+            assert rates, f"{basis} p={p}: si1000 has no DEPOLARIZE1 idle"
+            assert any(np.isclose(r, idle) for r in rates), \
+                f"{basis} p={p}: si1000 missing per-layer idle DEPOLARIZE1(~{idle})"
+            assert any(np.isclose(r, idle_meas) for r in rates), \
+                f"{basis} p={p}: si1000 missing idle-during-measure DEPOLARIZE1(~{idle_meas})"
+            # every DEPOLARIZE1 rate must be one of the two idle rates (no stray rates)
+            assert all(np.isclose(r, idle) or np.isclose(r, idle_meas) for r in rates), \
+                f"{basis} p={p}: unexpected DEPOLARIZE1 rate in {sorted(set(rates))}"
+            cu = build_memory(bb, 2, p, basis=basis, noise="uniform")
+            assert not _depolarize1_rates(cu), f"{basis} p={p}: uniform must emit NO DEPOLARIZE1"
 
 
 def test_uniform_unchanged_no_idle():
