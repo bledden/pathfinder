@@ -638,6 +638,27 @@ _SHOTS_BY_P = {
 }
 
 
+def _beam_convergence_check(beams=(16, 32, 64, 128), p=0.05, shots=4000, seed=0):
+    """Back the 'MLE = Tesseract @ beam=64' claim inside the verdict artifact: on the
+    n=18 spine code (the widest/hardest BB toy), decode the SAME sampled dets at a beam
+    ladder and record the fail count per beam. beam=64 is converged iff fails[64] ==
+    fails[128] (no further change). So a reviewer reading only this probe sees the
+    convergence evidence, not an assertion."""
+    spec = next(s for s in _BB_SPINE if 2 * s["l"] * s["m"] == 18)
+    HZ, LX, n, _k = bb_HZ_LX(**spec)
+    circ = build_codecap_circuit(HZ, LX, p)
+    dets, obs = circ.compile_detector_sampler(seed=seed).sample(shots, separate_observables=True)
+    dem = circ.detector_error_model(decompose_errors=False)
+    fails_by_beam = {}
+    for b in beams:
+        _ler, f = tesseract_ler_on_samples(dem, np.asarray(dets, dtype=bool),
+                                           np.asarray(obs, dtype=bool), b)
+        fails_by_beam[int(b)] = int(f)
+    converged = fails_by_beam.get(64) == fails_by_beam.get(max(beams))
+    return {"code": "n=18 spine", "p": p, "shots": shots, "seed": seed,
+            "fails_by_beam": fails_by_beam, "beam64_converged": bool(converged)}
+
+
 def main_multiseed(seeds=(0, 1, 2, 3, 4), p_values=(0.05, 0.01), beam=64, out_path=_OUT):
     """Reproduce the DECISIVE multi-seed x two-p degeneracy verdict from committed code.
 
@@ -701,6 +722,7 @@ def main_multiseed(seeds=(0, 1, 2, 3, 4), p_values=(0.05, 0.01), beam=64, out_pa
             for spec in _BB_SPINE
         ],
         "wiring_anchor": anchor,
+        "beam_convergence_check": _beam_convergence_check(),
         "methodology_validation": METHODOLOGY_VALIDATION,
         "per_p": per_p,
     }
