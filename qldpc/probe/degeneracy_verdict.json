@@ -1,0 +1,2006 @@
+{
+  "overall_verdict": "B-MLE",
+  "per_p_verdict": {
+    "0.05": "B-MLE",
+    "0.01": "B-MLE"
+  },
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "beam": 64,
+  "method": "multi-seed (>=5 seeds) x two p; syndrome-memoized coset-ML; CI-aware trend kill-switch (pooled-Wilson-propagated ratio CI)",
+  "bb_spine_selection": [
+    {
+      "l": 3,
+      "m": 2,
+      "A_terms": [
+        [
+          "x",
+          1
+        ],
+        [
+          "x",
+          2
+        ],
+        [
+          "y",
+          0
+        ]
+      ],
+      "B_terms": [
+        [
+          "x",
+          1
+        ],
+        [
+          "x",
+          2
+        ],
+        [
+          "y",
+          1
+        ]
+      ],
+      "criterion": "strong bivariate: A and B each mix x and y"
+    },
+    {
+      "l": 3,
+      "m": 3,
+      "A_terms": [
+        [
+          "x",
+          0
+        ],
+        [
+          "y",
+          1
+        ],
+        [
+          "y",
+          2
+        ]
+      ],
+      "B_terms": [
+        [
+          "x",
+          0
+        ],
+        [
+          "x",
+          1
+        ],
+        [
+          "y",
+          1
+        ]
+      ],
+      "criterion": "strong bivariate: A and B each mix x and y"
+    },
+    {
+      "l": 3,
+      "m": 4,
+      "A_terms": [
+        [
+          "x",
+          1
+        ],
+        [
+          "x",
+          2
+        ],
+        [
+          "y",
+          2
+        ]
+      ],
+      "B_terms": [
+        [
+          "x",
+          1
+        ],
+        [
+          "x",
+          2
+        ],
+        [
+          "y",
+          3
+        ]
+      ],
+      "criterion": "strong bivariate: A and B each mix x and y"
+    }
+  ],
+  "wiring_anchor": {
+    "scale": "WIRING-ANCHOR BB(3,3) x0x1x2|x0x1y1",
+    "kind": "bb-anchor",
+    "bb": false,
+    "n": 18,
+    "p": 0.05,
+    "shots": 8000,
+    "beam": 64,
+    "fails_cml": 1885,
+    "fails_mle": 1899,
+    "ler_cosetML": 0.235625,
+    "ler_MLE": 0.237375,
+    "ci_cosetML": [
+      0.22645342840213203,
+      0.2450503554808474
+    ],
+    "ci_MLE": [
+      0.22817882781699161,
+      0.24682327617267255
+    ],
+    "ratio": 1.0074270557029177
+  },
+  "beam_convergence_check": {
+    "code": "n=18 spine",
+    "p": 0.05,
+    "shots": 4000,
+    "seed": 0,
+    "fails_by_beam": {
+      "16": 829,
+      "32": 829,
+      "64": 829,
+      "128": 829
+    },
+    "beam64_converged": true
+  },
+  "methodology_validation": {
+    "issue": "the ORIGINAL trend kill-switch was a strict point-estimate rule (fire C on any strictly-increasing BB ratio sequence). At these scales all BB ratios sit in a ~1% sampling-noise band around 1.0, so a monotone ordering can arise from RNG noise alone -> the rule was a noise detector and could flip the decisive label by seed.",
+    "counterexample": {
+      "p": 0.01,
+      "seed": 123,
+      "bb_ratios_ascending_n": [
+        0.9851,
+        0.9953,
+        1.0013
+      ],
+      "note": "strictly increasing by sampling noise alone; every ratio ~1.0 within CI",
+      "old_strict_rule_verdict": "C",
+      "new_ci_aware_rule_verdict": "B-MLE"
+    },
+    "resolution": "TREND switch is now CI-aware (fires only if BB ratios strictly increase AND the largest-n ratio_lo > smallest-n ratio_hi, i.e. growth exceeds sampling noise), applied to MULTI-SEED pooled ratios. LEVEL switch unchanged (strict ratio>2.0; 2x is ~100 sigma outside the noise band, so it needs no CI-awareness)."
+  },
+  "per_p": {
+    "0.05": {
+      "verdict": "B-MLE",
+      "reason": "all gaps <=2x and no significant increasing BB trend (CI-aware)",
+      "gaps": [
+        {
+          "scale": "surface-d3",
+          "kind": "surface",
+          "bb": false,
+          "n": 9,
+          "p": 0.05,
+          "beam": 64,
+          "seeds": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "shots_per_seed": 6000,
+          "total_shots": 30000,
+          "total_fails_cml": 1500,
+          "total_fails_mle": 1500,
+          "ler_cosetML": 0.05,
+          "ler_MLE": 0.05,
+          "ci_cosetML": [
+            0.04759082230152565,
+            0.05252441094247334
+          ],
+          "ci_MLE": [
+            0.04759082230152565,
+            0.05252441094247334
+          ],
+          "ratio": 1.0,
+          "ratio_lo": 0.9060705574337399,
+          "ratio_hi": 1.1036668080599552,
+          "ratio_ci_method": "pooled-Wilson-propagated",
+          "per_seed_ratios": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "per_seed": [
+            {
+              "scale": "surface-d3",
+              "kind": "surface",
+              "bb": false,
+              "n": 9,
+              "p": 0.05,
+              "shots": 6000,
+              "beam": 64,
+              "fails_cml": 296,
+              "fails_mle": 296,
+              "ler_cosetML": 0.04933333333333333,
+              "ler_MLE": 0.04933333333333333,
+              "ci_cosetML": [
+                0.0441360633062467,
+                0.05510732779187953
+              ],
+              "ci_MLE": [
+                0.0441360633062467,
+                0.05510732779187953
+              ],
+              "ratio": 1.0
+            },
+            {
+              "scale": "surface-d3",
+              "kind": "surface",
+              "bb": false,
+              "n": 9,
+              "p": 0.05,
+              "shots": 6000,
+              "beam": 64,
+              "fails_cml": 297,
+              "fails_mle": 297,
+              "ler_cosetML": 0.0495,
+              "ler_MLE": 0.0495,
+              "ci_cosetML": [
+                0.04429387639267762,
+                0.05528263475311943
+              ],
+              "ci_MLE": [
+                0.04429387639267762,
+                0.05528263475311943
+              ],
+              "ratio": 1.0
+            },
+            {
+              "scale": "surface-d3",
+              "kind": "surface",
+              "bb": false,
+              "n": 9,
+              "p": 0.05,
+              "shots": 6000,
+              "beam": 64,
+              "fails_cml": 329,
+              "fails_mle": 329,
+              "ler_cosetML": 0.05483333333333333,
+              "ler_MLE": 0.05483333333333333,
+              "ci_cosetML": [
+                0.04935252176992272,
+                0.06088383090134028
+              ],
+              "ci_MLE": [
+                0.04935252176992272,
+                0.06088383090134028
+              ],
+              "ratio": 1.0
+            },
+            {
+              "scale": "surface-d3",
+              "kind": "surface",
+              "bb": false,
+              "n": 9,
+              "p": 0.05,
+              "shots": 6000,
+              "beam": 64,
+              "fails_cml": 278,
+              "fails_mle": 278,
+              "ler_cosetML": 0.04633333333333333,
+              "ler_MLE": 0.04633333333333333,
+              "ci_cosetML": [
+                0.04129845410420807,
+                0.051948776135843554
+              ],
+              "ci_MLE": [
+                0.04129845410420807,
+                0.051948776135843554
+              ],
+              "ratio": 1.0
+            },
+            {
+              "scale": "surface-d3",
+              "kind": "surface",
+              "bb": false,
+              "n": 9,
+              "p": 0.05,
+              "shots": 6000,
+              "beam": 64,
+              "fails_cml": 300,
+              "fails_mle": 300,
+              "ler_cosetML": 0.05,
+              "ler_MLE": 0.05,
+              "ci_cosetML": [
+                0.04476741811026827,
+                0.05580845317854122
+              ],
+              "ci_MLE": [
+                0.04476741811026827,
+                0.05580845317854122
+              ],
+              "ratio": 1.0
+            }
+          ]
+        },
+        {
+          "scale": "surface-d5",
+          "kind": "surface",
+          "bb": false,
+          "n": 25,
+          "p": 0.05,
+          "beam": 64,
+          "seeds": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "shots_per_seed": 6000,
+          "total_shots": 30000,
+          "total_fails_cml": 1479,
+          "total_fails_mle": 1499,
+          "ler_cosetML": 0.0493,
+          "ler_MLE": 0.049966666666666666,
+          "ci_cosetML": [
+            0.0469073269820005,
+            0.05180808551371137
+          ],
+          "ci_MLE": [
+            0.0475582718508259,
+            0.05249030326230227
+          ],
+          "ratio": 1.0135226504394863,
+          "ratio_lo": 0.9179700693290292,
+          "ratio_hi": 1.1190214117816626,
+          "ratio_ci_method": "pooled-Wilson-propagated",
+          "per_seed_ratios": [
+            1.0062893081761006,
+            1.0192307692307692,
+            1.0313588850174216,
+            1.0239520958083832,
+            0.9857142857142857
+          ],
+          "per_seed": [
+            {
+              "scale": "surface-d5",
+              "kind": "surface",
+              "bb": false,
+              "n": 25,
+              "p": 0.05,
+              "shots": 6000,
+              "beam": 64,
+              "fails_cml": 318,
+              "fails_mle": 320,
+              "ler_cosetML": 0.053,
+              "ler_MLE": 0.05333333333333334,
+              "ci_cosetML": [
+                0.04761178773320078,
+                0.0589602444136833
+              ],
+              "ci_MLE": [
+                0.0479281474914013,
+                0.05931012475082441
+              ],
+              "ratio": 1.0062893081761006
+            },
+            {
+              "scale": "surface-d5",
+              "kind": "surface",
+              "bb": false,
+              "n": 25,
+              "p": 0.05,
+              "shots": 6000,
+              "beam": 64,
+              "fails_cml": 260,
+              "fails_mle": 265,
+              "ler_cosetML": 0.043333333333333335,
+              "ler_MLE": 0.04416666666666667,
+              "ci_cosetML": [
+                0.038466948786976436,
+                0.0487841205950006
+              ],
+              "ci_MLE": [
+                0.039252832421421774,
+                0.049663837198909315
+              ],
+              "ratio": 1.0192307692307692
+            },
+            {
+              "scale": "surface-d5",
+              "kind": "surface",
+              "bb": false,
+              "n": 25,
+              "p": 0.05,
+              "shots": 6000,
+              "beam": 64,
+              "fails_cml": 287,
+              "fails_mle": 296,
+              "ler_cosetML": 0.04783333333333333,
+              "ler_MLE": 0.04933333333333333,
+              "ci_cosetML": [
+                0.04271653017589896,
+                0.053528780493189966
+              ],
+              "ci_MLE": [
+                0.0441360633062467,
+                0.05510732779187953
+              ],
+              "ratio": 1.0313588850174216
+            },
+            {
+              "scale": "surface-d5",
+              "kind": "surface",
+              "bb": false,
+              "n": 25,
+              "p": 0.05,
+              "shots": 6000,
+              "beam": 64,
+              "fails_cml": 334,
+              "fails_mle": 342,
+              "ler_cosetML": 0.05566666666666667,
+              "ler_MLE": 0.057,
+              "ci_cosetML": [
+                0.050144362718491396,
+                0.06175759019112567
+              ],
+              "ci_MLE": [
+                0.051412059826289505,
+                0.06315485346469404
+              ],
+              "ratio": 1.0239520958083832
+            },
+            {
+              "scale": "surface-d5",
+              "kind": "surface",
+              "bb": false,
+              "n": 25,
+              "p": 0.05,
+              "shots": 6000,
+              "beam": 64,
+              "fails_cml": 280,
+              "fails_mle": 276,
+              "ler_cosetML": 0.04666666666666667,
+              "ler_MLE": 0.046,
+              "ci_cosetML": [
+                0.04161345282817003,
+                0.05230001750722323
+              ],
+              "ci_MLE": [
+                0.04098353064535787,
+                0.051597459499352134
+              ],
+              "ratio": 0.9857142857142857
+            }
+          ]
+        },
+        {
+          "scale": "color-d3",
+          "kind": "color",
+          "bb": false,
+          "n": 7,
+          "p": 0.05,
+          "beam": 64,
+          "seeds": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "shots_per_seed": 8000,
+          "total_shots": 40000,
+          "total_fails_cml": 1711,
+          "total_fails_mle": 1711,
+          "ler_cosetML": 0.042775,
+          "ler_MLE": 0.042775,
+          "ci_cosetML": [
+            0.0408354922326422,
+            0.044802323111572145
+          ],
+          "ci_MLE": [
+            0.0408354922326422,
+            0.044802323111572145
+          ],
+          "ratio": 1.0,
+          "ratio_lo": 0.9114592591761086,
+          "ratio_hi": 1.0971417426862564,
+          "ratio_ci_method": "pooled-Wilson-propagated",
+          "per_seed_ratios": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "per_seed": [
+            {
+              "scale": "color-d3",
+              "kind": "color",
+              "bb": false,
+              "n": 7,
+              "p": 0.05,
+              "shots": 8000,
+              "beam": 64,
+              "fails_cml": 343,
+              "fails_mle": 343,
+              "ler_cosetML": 0.042875,
+              "ler_MLE": 0.042875,
+              "ci_cosetML": [
+                0.03865092537351825,
+                0.04753788675889578
+              ],
+              "ci_MLE": [
+                0.03865092537351825,
+                0.04753788675889578
+              ],
+              "ratio": 1.0
+            },
+            {
+              "scale": "color-d3",
+              "kind": "color",
+              "bb": false,
+              "n": 7,
+              "p": 0.05,
+              "shots": 8000,
+              "beam": 64,
+              "fails_cml": 326,
+              "fails_mle": 326,
+              "ler_cosetML": 0.04075,
+              "ler_MLE": 0.04075,
+              "ci_cosetML": [
+                0.03663333871584945,
+                0.045307513287018784
+              ],
+              "ci_MLE": [
+                0.03663333871584945,
+                0.045307513287018784
+              ],
+              "ratio": 1.0
+            },
+            {
+              "scale": "color-d3",
+              "kind": "color",
+              "bb": false,
+              "n": 7,
+              "p": 0.05,
+              "shots": 8000,
+              "beam": 64,
+              "fails_cml": 345,
+              "fails_mle": 345,
+              "ler_cosetML": 0.043125,
+              "ler_MLE": 0.043125,
+              "ci_cosetML": [
+                0.03888848748529212,
+                0.047800084662362574
+              ],
+              "ci_MLE": [
+                0.03888848748529212,
+                0.047800084662362574
+              ],
+              "ratio": 1.0
+            },
+            {
+              "scale": "color-d3",
+              "kind": "color",
+              "bb": false,
+              "n": 7,
+              "p": 0.05,
+              "shots": 8000,
+              "beam": 64,
+              "fails_cml": 339,
+              "fails_mle": 339,
+              "ler_cosetML": 0.042375,
+              "ler_MLE": 0.042375,
+              "ci_cosetML": [
+                0.03817592451940001,
+                0.047013367582532654
+              ],
+              "ci_MLE": [
+                0.03817592451940001,
+                0.047013367582532654
+              ],
+              "ratio": 1.0
+            },
+            {
+              "scale": "color-d3",
+              "kind": "color",
+              "bb": false,
+              "n": 7,
+              "p": 0.05,
+              "shots": 8000,
+              "beam": 64,
+              "fails_cml": 358,
+              "fails_mle": 358,
+              "ler_cosetML": 0.04475,
+              "ler_MLE": 0.04475,
+              "ci_cosetML": [
+                0.04043361781979658,
+                0.049503394426922545
+              ],
+              "ci_MLE": [
+                0.04043361781979658,
+                0.049503394426922545
+              ],
+              "ratio": 1.0
+            }
+          ]
+        },
+        {
+          "scale": "BB n=12",
+          "kind": "bb",
+          "bb": true,
+          "n": 12,
+          "p": 0.05,
+          "beam": 64,
+          "seeds": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "shots_per_seed": 6000,
+          "total_shots": 30000,
+          "total_fails_cml": 4999,
+          "total_fails_mle": 5414,
+          "ler_cosetML": 0.16663333333333333,
+          "ler_MLE": 0.18046666666666666,
+          "ci_cosetML": [
+            0.16245915940048308,
+            0.17089287376049714
+          ],
+          "ci_MLE": [
+            0.17615578160223097,
+            0.18485937587013745
+          ],
+          "ratio": 1.083016603320664,
+          "ratio_lo": 1.0307965319203989,
+          "ratio_hi": 1.137882139439334,
+          "ratio_ci_method": "pooled-Wilson-propagated",
+          "per_seed_ratios": [
+            1.0735887096774193,
+            1.0648055832502492,
+            1.0888223552894212,
+            1.095837366892546,
+            1.0918472652218782
+          ],
+          "per_seed": [
+            {
+              "scale": "BB n=12",
+              "kind": "bb",
+              "bb": true,
+              "n": 12,
+              "p": 0.05,
+              "shots": 6000,
+              "beam": 64,
+              "fails_cml": 992,
+              "fails_mle": 1065,
+              "ler_cosetML": 0.16533333333333333,
+              "ler_MLE": 0.1775,
+              "ci_cosetML": [
+                0.15614827099221285,
+                0.17494667328479804
+              ],
+              "ci_MLE": [
+                0.16803900144870632,
+                0.18737370630827377
+              ],
+              "ratio": 1.0735887096774193
+            },
+            {
+              "scale": "BB n=12",
+              "kind": "bb",
+              "bb": true,
+              "n": 12,
+              "p": 0.05,
+              "shots": 6000,
+              "beam": 64,
+              "fails_cml": 1003,
+              "fails_mle": 1068,
+              "ler_cosetML": 0.16716666666666666,
+              "ler_MLE": 0.178,
+              "ci_cosetML": [
+                0.1579388958747139,
+                0.17682036892667588
+              ],
+              "ci_MLE": [
+                0.16852802976621584,
+                0.1878840381337767
+              ],
+              "ratio": 1.0648055832502492
+            },
+            {
+              "scale": "BB n=12",
+              "kind": "bb",
+              "bb": true,
+              "n": 12,
+              "p": 0.05,
+              "shots": 6000,
+              "beam": 64,
+              "fails_cml": 1002,
+              "fails_mle": 1091,
+              "ler_cosetML": 0.167,
+              "ler_MLE": 0.18183333333333335,
+              "ci_cosetML": [
+                0.15777609482919694,
+                0.17665004992452207
+              ],
+              "ci_MLE": [
+                0.1722781773075135,
+                0.19179565168890775
+              ],
+              "ratio": 1.0888223552894212
+            },
+            {
+              "scale": "BB n=12",
+              "kind": "bb",
+              "bb": true,
+              "n": 12,
+              "p": 0.05,
+              "shots": 6000,
+              "beam": 64,
+              "fails_cml": 1033,
+              "fails_mle": 1132,
+              "ler_cosetML": 0.17216666666666666,
+              "ler_MLE": 0.18866666666666668,
+              "ci_cosetML": [
+                0.16282447967010635,
+                0.1819283865614078
+              ],
+              "ci_MLE": [
+                0.1789672094759785,
+                0.198764541474946
+              ],
+              "ratio": 1.095837366892546
+            },
+            {
+              "scale": "BB n=12",
+              "kind": "bb",
+              "bb": true,
+              "n": 12,
+              "p": 0.05,
+              "shots": 6000,
+              "beam": 64,
+              "fails_cml": 969,
+              "fails_mle": 1058,
+              "ler_cosetML": 0.1615,
+              "ler_MLE": 0.17633333333333334,
+              "ci_cosetML": [
+                0.15240558168293075,
+                0.1710276014976515
+              ],
+              "ci_MLE": [
+                0.16689804560777632,
+                0.1861828218155081
+              ],
+              "ratio": 1.0918472652218782
+            }
+          ]
+        },
+        {
+          "scale": "BB n=18",
+          "kind": "bb",
+          "bb": true,
+          "n": 18,
+          "p": 0.05,
+          "beam": 64,
+          "seeds": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "shots_per_seed": 6000,
+          "total_shots": 30000,
+          "total_fails_cml": 6192,
+          "total_fails_mle": 6207,
+          "ler_cosetML": 0.2064,
+          "ler_MLE": 0.2069,
+          "ci_cosetML": [
+            0.20185788197901072,
+            0.21101730131085167
+          ],
+          "ci_MLE": [
+            0.2023537196624654,
+            0.21152133559045921
+          ],
+          "ratio": 1.002422480620155,
+          "ratio_lo": 0.9589437378140674,
+          "ratio_hi": 1.047872560222609,
+          "ratio_ci_method": "pooled-Wilson-propagated",
+          "per_seed_ratios": [
+            1.016679904686259,
+            1.0100334448160535,
+            0.9934640522875817,
+            0.9733333333333334,
+            1.0193861066235865
+          ],
+          "per_seed": [
+            {
+              "scale": "BB n=18",
+              "kind": "bb",
+              "bb": true,
+              "n": 18,
+              "p": 0.05,
+              "shots": 6000,
+              "beam": 64,
+              "fails_cml": 1259,
+              "fails_mle": 1280,
+              "ler_cosetML": 0.20983333333333334,
+              "ler_MLE": 0.21333333333333335,
+              "ci_cosetML": [
+                0.1997173056719439,
+                0.22032069133317364
+              ],
+              "ci_MLE": [
+                0.2031525963965967,
+                0.22388092160960787
+              ],
+              "ratio": 1.016679904686259
+            },
+            {
+              "scale": "BB n=18",
+              "kind": "bb",
+              "bb": true,
+              "n": 18,
+              "p": 0.05,
+              "shots": 6000,
+              "beam": 64,
+              "fails_cml": 1196,
+              "fails_mle": 1208,
+              "ler_cosetML": 0.19933333333333333,
+              "ler_MLE": 0.20133333333333334,
+              "ci_cosetML": [
+                0.18941839775642905,
+                0.20963303624542734
+              ],
+              "ci_MLE": [
+                0.19137927160086476,
+                0.21166960297304135
+              ],
+              "ratio": 1.0100334448160535
+            },
+            {
+              "scale": "BB n=18",
+              "kind": "bb",
+              "bb": true,
+              "n": 18,
+              "p": 0.05,
+              "shots": 6000,
+              "beam": 64,
+              "fails_cml": 1224,
+              "fails_mle": 1216,
+              "ler_cosetML": 0.204,
+              "ler_MLE": 0.20266666666666666,
+              "ci_cosetML": [
+                0.1939943788578564,
+                0.2143844164787827
+              ],
+              "ci_MLE": [
+                0.19268673879348225,
+                0.21302709616179036
+              ],
+              "ratio": 0.9934640522875817
+            },
+            {
+              "scale": "BB n=18",
+              "kind": "bb",
+              "bb": true,
+              "n": 18,
+              "p": 0.05,
+              "shots": 6000,
+              "beam": 64,
+              "fails_cml": 1275,
+              "fails_mle": 1241,
+              "ler_cosetML": 0.2125,
+              "ler_MLE": 0.20683333333333334,
+              "ci_cosetML": [
+                0.2023345671803521,
+                0.22303335058749837
+              ],
+              "ci_MLE": [
+                0.19677368225463893,
+                0.217268153892404
+              ],
+              "ratio": 0.9733333333333334
+            },
+            {
+              "scale": "BB n=18",
+              "kind": "bb",
+              "bb": true,
+              "n": 18,
+              "p": 0.05,
+              "shots": 6000,
+              "beam": 64,
+              "fails_cml": 1238,
+              "fails_mle": 1262,
+              "ler_cosetML": 0.20633333333333334,
+              "ler_MLE": 0.21033333333333334,
+              "ci_cosetML": [
+                0.19628316116341343,
+                0.21675931484061706
+              ],
+              "ci_MLE": [
+                0.20020799180331497,
+                0.22082936534481498
+              ],
+              "ratio": 1.0193861066235865
+            }
+          ]
+        },
+        {
+          "scale": "BB n=24",
+          "kind": "bb",
+          "bb": true,
+          "n": 24,
+          "p": 0.05,
+          "beam": 64,
+          "seeds": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "shots_per_seed": 6000,
+          "total_shots": 30000,
+          "total_fails_cml": 3186,
+          "total_fails_mle": 3358,
+          "ler_cosetML": 0.1062,
+          "ler_MLE": 0.11193333333333333,
+          "ci_cosetML": [
+            0.10276387420997071,
+            0.10973696768222216
+          ],
+          "ci_MLE": [
+            0.10841512360471318,
+            0.11555091679725983
+          ],
+          "ratio": 1.0539861895794098,
+          "ratio_lo": 0.9879544322626375,
+          "ratio_hi": 1.1244313012290894,
+          "ratio_ci_method": "pooled-Wilson-propagated",
+          "per_seed_ratios": [
+            1.0575079872204474,
+            1.0906040268456376,
+            1.047112462006079,
+            1.053375196232339,
+            1.0254110612855007
+          ],
+          "per_seed": [
+            {
+              "scale": "BB n=24",
+              "kind": "bb",
+              "bb": true,
+              "n": 24,
+              "p": 0.05,
+              "shots": 6000,
+              "beam": 64,
+              "fails_cml": 626,
+              "fails_mle": 662,
+              "ler_cosetML": 0.10433333333333333,
+              "ler_MLE": 0.11033333333333334,
+              "ci_cosetML": [
+                0.0968497482959017,
+                0.11232325853359225
+              ],
+              "ci_MLE": [
+                0.10265357499840595,
+                0.11851175354723723
+              ],
+              "ratio": 1.0575079872204474
+            },
+            {
+              "scale": "BB n=24",
+              "kind": "bb",
+              "bb": true,
+              "n": 24,
+              "p": 0.05,
+              "shots": 6000,
+              "beam": 64,
+              "fails_cml": 596,
+              "fails_mle": 650,
+              "ler_cosetML": 0.09933333333333333,
+              "ler_MLE": 0.10833333333333334,
+              "ci_cosetML": [
+                0.09201927915195425,
+                0.10716012624741536
+              ],
+              "ci_MLE": [
+                0.10071811832651203,
+                0.11644976964708141
+              ],
+              "ratio": 1.0906040268456376
+            },
+            {
+              "scale": "BB n=24",
+              "kind": "bb",
+              "bb": true,
+              "n": 24,
+              "p": 0.05,
+              "shots": 6000,
+              "beam": 64,
+              "fails_cml": 658,
+              "fails_mle": 689,
+              "ler_cosetML": 0.10966666666666666,
+              "ler_MLE": 0.11483333333333333,
+              "ci_cosetML": [
+                0.10200833060286033,
+                0.11782451775209958
+              ],
+              "ci_MLE": [
+                0.1070113246829471,
+                0.12314824514980795
+              ],
+              "ratio": 1.047112462006079
+            },
+            {
+              "scale": "BB n=24",
+              "kind": "bb",
+              "bb": true,
+              "n": 24,
+              "p": 0.05,
+              "shots": 6000,
+              "beam": 64,
+              "fails_cml": 637,
+              "fails_mle": 671,
+              "ler_cosetML": 0.10616666666666667,
+              "ler_MLE": 0.11183333333333334,
+              "ci_cosetML": [
+                0.09862232307123388,
+                0.11421500428263902
+              ],
+              "ci_MLE": [
+                0.1041057072346669,
+                0.12005770174001357
+              ],
+              "ratio": 1.053375196232339
+            },
+            {
+              "scale": "BB n=24",
+              "kind": "bb",
+              "bb": true,
+              "n": 24,
+              "p": 0.05,
+              "shots": 6000,
+              "beam": 64,
+              "fails_cml": 669,
+              "fails_mle": 686,
+              "ler_cosetML": 0.1115,
+              "ler_MLE": 0.11433333333333333,
+              "ci_cosetML": [
+                0.10378297170092818,
+                0.11971419717841067
+              ],
+              "ci_MLE": [
+                0.10652693175674768,
+                0.12263327793299494
+              ],
+              "ratio": 1.0254110612855007
+            }
+          ]
+        }
+      ]
+    },
+    "0.01": {
+      "verdict": "B-MLE",
+      "reason": "all gaps <=2x and no significant increasing BB trend (CI-aware)",
+      "gaps": [
+        {
+          "scale": "surface-d3",
+          "kind": "surface",
+          "bb": false,
+          "n": 9,
+          "p": 0.01,
+          "beam": 64,
+          "seeds": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "shots_per_seed": 24000,
+          "total_shots": 120000,
+          "total_fails_cml": 1164,
+          "total_fails_mle": 1164,
+          "ler_cosetML": 0.0097,
+          "ler_MLE": 0.0097,
+          "ci_cosetML": [
+            0.009160940096434124,
+            0.01027045117329336
+          ],
+          "ci_MLE": [
+            0.009160940096434124,
+            0.01027045117329336
+          ],
+          "ratio": 1.0,
+          "ratio_lo": 0.89197056116246,
+          "ratio_hi": 1.1211132334869334,
+          "ratio_ci_method": "pooled-Wilson-propagated",
+          "per_seed_ratios": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "per_seed": [
+            {
+              "scale": "surface-d3",
+              "kind": "surface",
+              "bb": false,
+              "n": 9,
+              "p": 0.01,
+              "shots": 24000,
+              "beam": 64,
+              "fails_cml": 225,
+              "fails_mle": 225,
+              "ler_cosetML": 0.009375,
+              "ler_MLE": 0.009375,
+              "ci_cosetML": [
+                0.008231847457482835,
+                0.010675192822269721
+              ],
+              "ci_MLE": [
+                0.008231847457482835,
+                0.010675192822269721
+              ],
+              "ratio": 1.0
+            },
+            {
+              "scale": "surface-d3",
+              "kind": "surface",
+              "bb": false,
+              "n": 9,
+              "p": 0.01,
+              "shots": 24000,
+              "beam": 64,
+              "fails_cml": 237,
+              "fails_mle": 237,
+              "ler_cosetML": 0.009875,
+              "ler_MLE": 0.009875,
+              "ci_cosetML": [
+                0.008700063993650262,
+                0.011206816245052865
+              ],
+              "ci_MLE": [
+                0.008700063993650262,
+                0.011206816245052865
+              ],
+              "ratio": 1.0
+            },
+            {
+              "scale": "surface-d3",
+              "kind": "surface",
+              "bb": false,
+              "n": 9,
+              "p": 0.01,
+              "shots": 24000,
+              "beam": 64,
+              "fails_cml": 239,
+              "fails_mle": 239,
+              "ler_cosetML": 0.009958333333333333,
+              "ler_MLE": 0.009958333333333333,
+              "ci_cosetML": [
+                0.00877818081282279,
+                0.011295339419038765
+              ],
+              "ci_MLE": [
+                0.00877818081282279,
+                0.011295339419038765
+              ],
+              "ratio": 1.0
+            },
+            {
+              "scale": "surface-d3",
+              "kind": "surface",
+              "bb": false,
+              "n": 9,
+              "p": 0.01,
+              "shots": 24000,
+              "beam": 64,
+              "fails_cml": 236,
+              "fails_mle": 236,
+              "ler_cosetML": 0.009833333333333333,
+              "ler_MLE": 0.009833333333333333,
+              "ci_cosetML": [
+                0.008661014034138673,
+                0.011162546207985239
+              ],
+              "ci_MLE": [
+                0.008661014034138673,
+                0.011162546207985239
+              ],
+              "ratio": 1.0
+            },
+            {
+              "scale": "surface-d3",
+              "kind": "surface",
+              "bb": false,
+              "n": 9,
+              "p": 0.01,
+              "shots": 24000,
+              "beam": 64,
+              "fails_cml": 227,
+              "fails_mle": 227,
+              "ler_cosetML": 0.009458333333333332,
+              "ler_MLE": 0.009458333333333332,
+              "ci_cosetML": [
+                0.008309824396026762,
+                0.01076385587688422
+              ],
+              "ci_MLE": [
+                0.008309824396026762,
+                0.01076385587688422
+              ],
+              "ratio": 1.0
+            }
+          ]
+        },
+        {
+          "scale": "surface-d5",
+          "kind": "surface",
+          "bb": false,
+          "n": 25,
+          "p": 0.01,
+          "beam": 64,
+          "seeds": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "shots_per_seed": 24000,
+          "total_shots": 120000,
+          "total_fails_cml": 1201,
+          "total_fails_mle": 1205,
+          "ler_cosetML": 0.010008333333333333,
+          "ler_MLE": 0.010041666666666667,
+          "ci_cosetML": [
+            0.009460610428020584,
+            0.010587427767449984
+          ],
+          "ci_MLE": [
+            0.009493015490869504,
+            0.010621687237113833
+          ],
+          "ratio": 1.003330557868443,
+          "ratio_lo": 0.8966309569596173,
+          "ratio_hi": 1.1227274728123624,
+          "ratio_ci_method": "pooled-Wilson-propagated",
+          "per_seed_ratios": [
+            1.0083682008368202,
+            1.003875968992248,
+            1.0086206896551724,
+            1.0041322314049588,
+            0.991304347826087
+          ],
+          "per_seed": [
+            {
+              "scale": "surface-d5",
+              "kind": "surface",
+              "bb": false,
+              "n": 25,
+              "p": 0.01,
+              "shots": 24000,
+              "beam": 64,
+              "fails_cml": 239,
+              "fails_mle": 241,
+              "ler_cosetML": 0.009958333333333333,
+              "ler_MLE": 0.010041666666666667,
+              "ci_cosetML": [
+                0.00877818081282279,
+                0.011295339419038765
+              ],
+              "ci_MLE": [
+                0.008856319933714602,
+                0.011383840291305384
+              ],
+              "ratio": 1.0083682008368202
+            },
+            {
+              "scale": "surface-d5",
+              "kind": "surface",
+              "bb": false,
+              "n": 25,
+              "p": 0.01,
+              "shots": 24000,
+              "beam": 64,
+              "fails_cml": 258,
+              "fails_mle": 259,
+              "ler_cosetML": 0.01075,
+              "ler_MLE": 0.010791666666666666,
+              "ci_cosetML": [
+                0.009521365716046584,
+                0.01213523445082004
+              ],
+              "ci_MLE": [
+                0.009560532296186128,
+                0.012179387867259712
+              ],
+              "ratio": 1.003875968992248
+            },
+            {
+              "scale": "surface-d5",
+              "kind": "surface",
+              "bb": false,
+              "n": 25,
+              "p": 0.01,
+              "shots": 24000,
+              "beam": 64,
+              "fails_cml": 232,
+              "fails_mle": 234,
+              "ler_cosetML": 0.009666666666666667,
+              "ler_MLE": 0.00975,
+              "ci_cosetML": [
+                0.00850487136066662,
+                0.010985408895140436
+              ],
+              "ci_MLE": [
+                0.00858293119233838,
+                0.011073989056627105
+              ],
+              "ratio": 1.0086206896551724
+            },
+            {
+              "scale": "surface-d5",
+              "kind": "surface",
+              "bb": false,
+              "n": 25,
+              "p": 0.01,
+              "shots": 24000,
+              "beam": 64,
+              "fails_cml": 242,
+              "fails_mle": 243,
+              "ler_cosetML": 0.010083333333333333,
+              "ler_MLE": 0.010125,
+              "ci_cosetML": [
+                0.008895397771720702,
+                0.011428082449878495
+              ],
+              "ci_MLE": [
+                0.008934481083158273,
+                0.01147231913502014
+              ],
+              "ratio": 1.0041322314049588
+            },
+            {
+              "scale": "surface-d5",
+              "kind": "surface",
+              "bb": false,
+              "n": 25,
+              "p": 0.01,
+              "shots": 24000,
+              "beam": 64,
+              "fails_cml": 230,
+              "fails_mle": 228,
+              "ler_cosetML": 0.009583333333333333,
+              "ler_MLE": 0.0095,
+              "ci_cosetML": [
+                0.00842683483314404,
+                0.010896805429504587
+              ],
+              "ci_MLE": [
+                0.00834882191015833,
+                0.01080817835933187
+              ],
+              "ratio": 0.991304347826087
+            }
+          ]
+        },
+        {
+          "scale": "color-d3",
+          "kind": "color",
+          "bb": false,
+          "n": 7,
+          "p": 0.01,
+          "beam": 64,
+          "seeds": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "shots_per_seed": 36000,
+          "total_shots": 180000,
+          "total_fails_cml": 345,
+          "total_fails_mle": 345,
+          "ler_cosetML": 0.0019166666666666666,
+          "ler_MLE": 0.0019166666666666666,
+          "ci_cosetML": [
+            0.0017249611611740603,
+            0.0021296321287949246
+          ],
+          "ci_MLE": [
+            0.0017249611611740603,
+            0.0021296321287949246
+          ],
+          "ratio": 1.0,
+          "ratio_lo": 0.8099808121086848,
+          "ratio_hi": 1.2345971473035562,
+          "ratio_ci_method": "pooled-Wilson-propagated",
+          "per_seed_ratios": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "per_seed": [
+            {
+              "scale": "color-d3",
+              "kind": "color",
+              "bb": false,
+              "n": 7,
+              "p": 0.01,
+              "shots": 36000,
+              "beam": 64,
+              "fails_cml": 68,
+              "fails_mle": 68,
+              "ler_cosetML": 0.001888888888888889,
+              "ler_MLE": 0.001888888888888889,
+              "ci_cosetML": [
+                0.0014903869281731774,
+                0.0023936874868192497
+              ],
+              "ci_MLE": [
+                0.0014903869281731774,
+                0.0023936874868192497
+              ],
+              "ratio": 1.0
+            },
+            {
+              "scale": "color-d3",
+              "kind": "color",
+              "bb": false,
+              "n": 7,
+              "p": 0.01,
+              "shots": 36000,
+              "beam": 64,
+              "fails_cml": 70,
+              "fails_mle": 70,
+              "ler_cosetML": 0.0019444444444444444,
+              "ler_MLE": 0.0019444444444444444,
+              "ci_cosetML": [
+                0.0015394466993477584,
+                0.002455726971230773
+              ],
+              "ci_MLE": [
+                0.0015394466993477584,
+                0.002455726971230773
+              ],
+              "ratio": 1.0
+            },
+            {
+              "scale": "color-d3",
+              "kind": "color",
+              "bb": false,
+              "n": 7,
+              "p": 0.01,
+              "shots": 36000,
+              "beam": 64,
+              "fails_cml": 73,
+              "fails_mle": 73,
+              "ler_cosetML": 0.0020277777777777777,
+              "ler_MLE": 0.0020277777777777777,
+              "ci_cosetML": [
+                0.001613206494703059,
+                0.002548616059254628
+              ],
+              "ci_MLE": [
+                0.001613206494703059,
+                0.002548616059254628
+              ],
+              "ratio": 1.0
+            },
+            {
+              "scale": "color-d3",
+              "kind": "color",
+              "bb": false,
+              "n": 7,
+              "p": 0.01,
+              "shots": 36000,
+              "beam": 64,
+              "fails_cml": 61,
+              "fails_mle": 61,
+              "ler_cosetML": 0.0016944444444444444,
+              "ler_MLE": 0.0016944444444444444,
+              "ci_cosetML": [
+                0.0013194577490119807,
+                0.0021757692714290825
+              ],
+              "ci_MLE": [
+                0.0013194577490119807,
+                0.0021757692714290825
+              ],
+              "ratio": 1.0
+            },
+            {
+              "scale": "color-d3",
+              "kind": "color",
+              "bb": false,
+              "n": 7,
+              "p": 0.01,
+              "shots": 36000,
+              "beam": 64,
+              "fails_cml": 73,
+              "fails_mle": 73,
+              "ler_cosetML": 0.0020277777777777777,
+              "ler_MLE": 0.0020277777777777777,
+              "ci_cosetML": [
+                0.001613206494703059,
+                0.002548616059254628
+              ],
+              "ci_MLE": [
+                0.001613206494703059,
+                0.002548616059254628
+              ],
+              "ratio": 1.0
+            }
+          ]
+        },
+        {
+          "scale": "BB n=12",
+          "kind": "bb",
+          "bb": true,
+          "n": 12,
+          "p": 0.01,
+          "beam": 64,
+          "seeds": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "shots_per_seed": 15000,
+          "total_shots": 75000,
+          "total_fails_cml": 2321,
+          "total_fails_mle": 2319,
+          "ler_cosetML": 0.030946666666666667,
+          "ler_MLE": 0.03092,
+          "ci_cosetML": [
+            0.029731104935386773,
+            0.03221027701110809
+          ],
+          "ci_MLE": [
+            0.029704956554843658,
+            0.032183094789982394
+          ],
+          "ratio": 0.999138302455838,
+          "ratio_lo": 0.9222198413444118,
+          "ratio_hi": 1.0824722074717512,
+          "ratio_ci_method": "pooled-Wilson-propagated",
+          "per_seed_ratios": [
+            1.0192771084337349,
+            1.0601336302895323,
+            1.004255319148936,
+            0.969387755102041,
+            0.9517102615694164
+          ],
+          "per_seed": [
+            {
+              "scale": "BB n=12",
+              "kind": "bb",
+              "bb": true,
+              "n": 12,
+              "p": 0.01,
+              "shots": 15000,
+              "beam": 64,
+              "fails_cml": 415,
+              "fails_mle": 423,
+              "ler_cosetML": 0.027666666666666666,
+              "ler_MLE": 0.0282,
+              "ci_cosetML": [
+                0.025160353129818954,
+                0.03041485368921331
+              ],
+              "ci_MLE": [
+                0.025669133280798045,
+                0.03097246709440186
+              ],
+              "ratio": 1.0192771084337349
+            },
+            {
+              "scale": "BB n=12",
+              "kind": "bb",
+              "bb": true,
+              "n": 12,
+              "p": 0.01,
+              "shots": 15000,
+              "beam": 64,
+              "fails_cml": 449,
+              "fails_mle": 476,
+              "ler_cosetML": 0.029933333333333333,
+              "ler_MLE": 0.031733333333333336,
+              "ci_cosetML": [
+                0.02732436102955516,
+                0.03278301840318958
+              ],
+              "ci_MLE": [
+                0.029045814059969217,
+                0.03466064362484133
+              ],
+              "ratio": 1.0601336302895323
+            },
+            {
+              "scale": "BB n=12",
+              "kind": "bb",
+              "bb": true,
+              "n": 12,
+              "p": 0.01,
+              "shots": 15000,
+              "beam": 64,
+              "fails_cml": 470,
+              "fails_mle": 472,
+              "ler_cosetML": 0.03133333333333333,
+              "ler_MLE": 0.031466666666666664,
+              "ci_cosetML": [
+                0.028663054398772966,
+                0.03424360811891185
+              ],
+              "ci_MLE": [
+                0.028790627653151626,
+                0.03438263325357509
+              ],
+              "ratio": 1.004255319148936
+            },
+            {
+              "scale": "BB n=12",
+              "kind": "bb",
+              "bb": true,
+              "n": 12,
+              "p": 0.01,
+              "shots": 15000,
+              "beam": 64,
+              "fails_cml": 490,
+              "fails_mle": 475,
+              "ler_cosetML": 0.03266666666666666,
+              "ler_MLE": 0.03166666666666667,
+              "ci_cosetML": [
+                0.02993937704641029,
+                0.03563326936169362
+              ],
+              "ci_MLE": [
+                0.028982012496396342,
+                0.03459114599389325
+              ],
+              "ratio": 0.969387755102041
+            },
+            {
+              "scale": "BB n=12",
+              "kind": "bb",
+              "bb": true,
+              "n": 12,
+              "p": 0.01,
+              "shots": 15000,
+              "beam": 64,
+              "fails_cml": 497,
+              "fails_mle": 473,
+              "ler_cosetML": 0.033133333333333334,
+              "ler_MLE": 0.03153333333333333,
+              "ci_cosetML": [
+                0.030386392141613077,
+                0.036119348628137524
+              ],
+              "ci_MLE": [
+                0.02885441928287186,
+                0.03445214081837581
+              ],
+              "ratio": 0.9517102615694164
+            }
+          ]
+        },
+        {
+          "scale": "BB n=18",
+          "kind": "bb",
+          "bb": true,
+          "n": 18,
+          "p": 0.01,
+          "beam": 64,
+          "seeds": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "shots_per_seed": 15000,
+          "total_shots": 75000,
+          "total_fails_cml": 3055,
+          "total_fails_mle": 3057,
+          "ler_cosetML": 0.04073333333333334,
+          "ler_MLE": 0.04076,
+          "ci_cosetML": [
+            0.03934197836225218,
+            0.04217173439669537
+          ],
+          "ci_MLE": [
+            0.03936820042158268,
+            0.04219884293903368
+          ],
+          "ratio": 1.0006546644844516,
+          "ratio_lo": 0.9335210179230289,
+          "ratio_hi": 1.0726161900267477,
+          "ratio_ci_method": "pooled-Wilson-propagated",
+          "per_seed_ratios": [
+            0.9966887417218543,
+            1.0265339966832505,
+            1.0093312597200623,
+            0.9740680713128039,
+            0.9965986394557823
+          ],
+          "per_seed": [
+            {
+              "scale": "BB n=18",
+              "kind": "bb",
+              "bb": true,
+              "n": 18,
+              "p": 0.01,
+              "shots": 15000,
+              "beam": 64,
+              "fails_cml": 604,
+              "fails_mle": 602,
+              "ler_cosetML": 0.040266666666666666,
+              "ler_MLE": 0.04013333333333333,
+              "ci_cosetML": [
+                0.03723657949589571,
+                0.043532175087597096
+              ],
+              "ci_MLE": [
+                0.03710826964778617,
+                0.04339388654666473
+              ],
+              "ratio": 0.9966887417218543
+            },
+            {
+              "scale": "BB n=18",
+              "kind": "bb",
+              "bb": true,
+              "n": 18,
+              "p": 0.01,
+              "shots": 15000,
+              "beam": 64,
+              "fails_cml": 603,
+              "fails_mle": 619,
+              "ler_cosetML": 0.0402,
+              "ler_MLE": 0.04126666666666667,
+              "ci_cosetML": [
+                0.03717242340167359,
+                0.04346303198729826
+              ],
+              "ci_MLE": [
+                0.03819919802384386,
+                0.04456904447746328
+              ],
+              "ratio": 1.0265339966832505
+            },
+            {
+              "scale": "BB n=18",
+              "kind": "bb",
+              "bb": true,
+              "n": 18,
+              "p": 0.01,
+              "shots": 15000,
+              "beam": 64,
+              "fails_cml": 643,
+              "fails_mle": 649,
+              "ler_cosetML": 0.042866666666666664,
+              "ler_MLE": 0.04326666666666667,
+              "ci_cosetML": [
+                0.039740435602535,
+                0.046226987567275064
+              ],
+              "ci_MLE": [
+                0.040125939740536916,
+                0.04664127859639888
+              ],
+              "ratio": 1.0093312597200623
+            },
+            {
+              "scale": "BB n=18",
+              "kind": "bb",
+              "bb": true,
+              "n": 18,
+              "p": 0.01,
+              "shots": 15000,
+              "beam": 64,
+              "fails_cml": 617,
+              "fails_mle": 601,
+              "ler_cosetML": 0.041133333333333334,
+              "ler_MLE": 0.04006666666666667,
+              "ci_cosetML": [
+                0.0380708191933793,
+                0.04443082491888593
+              ],
+              "ci_MLE": [
+                0.03704411823981361,
+                0.04332473876011634
+              ],
+              "ratio": 0.9740680713128039
+            },
+            {
+              "scale": "BB n=18",
+              "kind": "bb",
+              "bb": true,
+              "n": 18,
+              "p": 0.01,
+              "shots": 15000,
+              "beam": 64,
+              "fails_cml": 588,
+              "fails_mle": 586,
+              "ler_cosetML": 0.0392,
+              "ler_MLE": 0.039066666666666666,
+              "ci_cosetML": [
+                0.03621036599587345,
+                0.042425601475284076
+              ],
+              "ci_MLE": [
+                0.036082132496108914,
+                0.0422872365860067
+              ],
+              "ratio": 0.9965986394557823
+            }
+          ]
+        },
+        {
+          "scale": "BB n=24",
+          "kind": "bb",
+          "bb": true,
+          "n": 24,
+          "p": 0.01,
+          "beam": 64,
+          "seeds": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "shots_per_seed": 15000,
+          "total_shots": 75000,
+          "total_fails_cml": 313,
+          "total_fails_mle": 316,
+          "ler_cosetML": 0.004173333333333334,
+          "ler_MLE": 0.004213333333333334,
+          "ci_cosetML": [
+            0.003736662247446585,
+            0.004660795623564654
+          ],
+          "ci_MLE": [
+            0.0037744671680829786,
+            0.0047029866054314725
+          ],
+          "ratio": 1.0095846645367412,
+          "ratio_lo": 0.8098332286872951,
+          "ratio_hi": 1.2586062892479022,
+          "ratio_ci_method": "pooled-Wilson-propagated",
+          "per_seed_ratios": [
+            1.03125,
+            1.037037037037037,
+            1.1041666666666665,
+            0.9473684210526315,
+            0.971830985915493
+          ],
+          "per_seed": [
+            {
+              "scale": "BB n=24",
+              "kind": "bb",
+              "bb": true,
+              "n": 24,
+              "p": 0.01,
+              "shots": 15000,
+              "beam": 64,
+              "fails_cml": 64,
+              "fails_mle": 66,
+              "ler_cosetML": 0.004266666666666667,
+              "ler_MLE": 0.0044,
+              "ci_cosetML": [
+                0.003342932287727769,
+                0.005444257254449217
+              ],
+              "ci_MLE": [
+                0.003460251602195856,
+                0.00559353632902304
+              ],
+              "ratio": 1.03125
+            },
+            {
+              "scale": "BB n=24",
+              "kind": "bb",
+              "bb": true,
+              "n": 24,
+              "p": 0.01,
+              "shots": 15000,
+              "beam": 64,
+              "fails_cml": 54,
+              "fails_mle": 56,
+              "ler_cosetML": 0.0036,
+              "ler_MLE": 0.0037333333333333333,
+              "ci_cosetML": [
+                0.0027603600818586326,
+                0.0046938375151088
+              ],
+              "ci_MLE": [
+                0.0028762925461796665,
+                0.004844503439829677
+              ],
+              "ratio": 1.037037037037037
+            },
+            {
+              "scale": "BB n=24",
+              "kind": "bb",
+              "bb": true,
+              "n": 24,
+              "p": 0.01,
+              "shots": 15000,
+              "beam": 64,
+              "fails_cml": 48,
+              "fails_mle": 53,
+              "ler_cosetML": 0.0032,
+              "ler_MLE": 0.003533333333333333,
+              "ci_cosetML": [
+                0.0024145732593105576,
+                0.004239829170531144
+              ],
+              "ci_MLE": [
+                0.002702513691342534,
+                0.004618384711103944
+              ],
+              "ratio": 1.1041666666666665
+            },
+            {
+              "scale": "BB n=24",
+              "kind": "bb",
+              "bb": true,
+              "n": 24,
+              "p": 0.01,
+              "shots": 15000,
+              "beam": 64,
+              "fails_cml": 76,
+              "fails_mle": 72,
+              "ler_cosetML": 0.005066666666666666,
+              "ler_MLE": 0.0048,
+              "ci_cosetML": [
+                0.0040502535515232795,
+                0.006336526324905167
+              ],
+              "ci_MLE": [
+                0.003813609553371689,
+                0.006039973544972937
+              ],
+              "ratio": 0.9473684210526315
+            },
+            {
+              "scale": "BB n=24",
+              "kind": "bb",
+              "bb": true,
+              "n": 24,
+              "p": 0.01,
+              "shots": 15000,
+              "beam": 64,
+              "fails_cml": 71,
+              "fails_mle": 69,
+              "ler_cosetML": 0.004733333333333333,
+              "ler_MLE": 0.0046,
+              "ci_cosetML": [
+                0.0037545779299172346,
+                0.005965705973906438
+              ],
+              "ci_MLE": [
+                0.0036366775026597325,
+                0.0058170080121220285
+              ],
+              "ratio": 0.971830985915493
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
