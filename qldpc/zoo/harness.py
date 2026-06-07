@@ -104,7 +104,8 @@ def _decoder_dem_hash(decoder):
     return dem_hash(dem)
 
 
-def run_matched(circuit, decoders, shots, rounds, seed=0, label=None):
+def run_matched(circuit, decoders, shots, rounds, seed=0, label=None,
+                keep_per_shot=False):
     """Matched cross-decoder run on ONE shared DEM and ONE sampled shot set.
 
     Args:
@@ -118,6 +119,13 @@ def run_matched(circuit, decoders, shots, rounds, seed=0, label=None):
         rounds: number of syndrome rounds (for the per-round lambda).
         seed: detector-sampler seed (fixed-seed reproducibility).
         label: optional free-text label recorded in the manifest.
+        keep_per_shot: if True, ALSO return the per-decoder per-shot fail mask
+            (``fail_mask``: bool[shots], aligned to the shared shots) plus the
+            shared truth observables (``obs``: bool[shots, n_obs]), so the gap
+            analysis (T6) can feed decoder-vs-Tesseract masks straight into
+            ``analysis.gap_to_mle_bootstrap`` / ``analysis.gate_a`` WITHOUT
+            re-decoding. Default False -> the manifest schema is unchanged (no
+            per-shot arrays). Gates G1/G2 are enforced identically either way.
 
     Gates (fail-fast, BEFORE any decoding):
         * G1: rebuild the shared DEM from ``circuit``, hash it, assert every
@@ -125,7 +133,10 @@ def run_matched(circuit, decoders, shots, rounds, seed=0, label=None):
           ``.dem is dem``. Mismatch -> ValueError.
         * G2: assert every decoder's ``.tie_break`` is in APPROVED_TIE_BREAKS.
 
-    Returns: a JSON-serializable manifest dict.
+    Returns: a JSON-serializable manifest dict. With ``keep_per_shot=True`` the
+    per-shot arrays (``obs`` at top level, ``fail_mask`` per decoder) are numpy
+    bool arrays (NOT JSON-serializable) — they are an in-process hand-off for the
+    gap analysis, deliberately gated off the default manifest.
     """
     if not decoders:
         raise ValueError("run_matched: no decoders supplied")
@@ -199,10 +210,11 @@ def run_matched(circuit, decoders, shots, rounds, seed=0, label=None):
         pred = np.asarray(pred, dtype=bool)
         if pred.ndim == 1:
             pred = pred.reshape(-1, 1)
-        fails = int(np.any(pred != obs, axis=1).sum())
+        fail_mask = np.any(pred != obs, axis=1)   # per-shot fail mask
+        fails = int(fail_mask.sum())
         ler = fails / shots if shots else 0.0
         lo, hi = stats.wilson_ci(fails, shots)
-        records.append({
+        rec = {
             "name": d.name,
             "config": dict(d.config),
             "tie_break": d.tie_break,
@@ -211,9 +223,14 @@ def run_matched(circuit, decoders, shots, rounds, seed=0, label=None):
             "ler_ci": [lo, hi],
             "lambda_per_round": _lambda_per_round(ler, rounds),
             "decode_s": decode_s,
-        })
+        }
+        if keep_per_shot:
+            # per-shot fail mask aligned to the shared shots (bool[shots]); the
+            # gap analysis pairs decoder-vs-Tesseract masks straight from here.
+            rec["fail_mask"] = fail_mask
+        records.append(rec)
 
-    return {
+    manifest = {
         "dem_hash": h,
         "n_det": dem.num_detectors,
         "n_obs": dem.num_observables,
@@ -224,6 +241,11 @@ def run_matched(circuit, decoders, shots, rounds, seed=0, label=None):
         "git_head": _git_head(),
         "decoders": records,
     }
+    if keep_per_shot:
+        # shared truth observables (bool[shots, n_obs]) — exposed once, so the
+        # paired bootstrap / Gate-A can recompute / verify masks if needed.
+        manifest["obs"] = obs
+    return manifest
 
 
 def smoke_grid(code_factory, decoders_factory=build_decoders, p=0.005, rounds=2,
