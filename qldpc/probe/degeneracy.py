@@ -497,24 +497,30 @@ def bb_HZ_LX(l, m, A_terms, B_terms):
 # --------------------------------------------------------------------------- #
 # Decisive experiment wiring (STEP C/D)
 # --------------------------------------------------------------------------- #
-# The BB spine: >=3 GENUINELY-BIVARIATE toys of strictly-INCREASING n, each
-# coset-ML-tractable (contraction_width(HZ, logicals_X) <= 28) and low-k (k=4 ->
-# 16 coset classes -> cheap exact contraction). "Genuinely bivariate" here is the
-# STRONG criterion: A and B EACH mix x and y (so neither block is a degenerate
-# all-x / all-y quasi-1D circulant whose treewidth is artificially low). The
-# prior enumerate_bb.json was lexicographically x-biased (its viable list is
-# dominated by all-x A,B codes); these three were re-selected for the strong
-# bivariate property and verified CSS + width-gated.
+# The BB spine: 3 GENUINELY-BIVARIATE toys of strictly-INCREASING n, each
+# coset-ML-tractable and low-k (k=4 -> 16 coset classes -> cheap exact contraction).
+# DERIVED, NOT CURATED: the output of `spine_selection.derive_spine()` (committed) --
+# the MINIMUM exact-coset-ML-tie-fraction (A, B) per (l, m) (lex tiebreak) passing:
+#   1. STRONG bivariate: A and B EACH mix x and y (no quasi-1D all-x/all-y block);
+#   2. A != B as monomial sets (removes the A==B universal-tie symmetry);
+#   3. CSS valid; 4. k == 4; 5. contraction_width(HZ, logicals_X) <= 28.
+# Selection MINIMIZES tie fraction (discriminability): A!=B alone leaves exact ties
+# (inherent to small degenerate codes -- the lex-smallest A!=B (3,3) code still ties
+# 68% of syndromes), so we pick the least-tied gated code at each scale. Residual ties
+# (7%/10%/5% below) are made BIT-REPRODUCIBLE by tn_mld._argmax_deterministic. The rule
+# reproduces n=12 (already the min-tie pick) and selects cleaner n=18 (was A==B, 100%
+# tied) and n=24 (was 36% tied). Verified by test_spine_selection; regenerate with
+# `python3 -m qldpc.probe.spine_selection`.
 _BB_SPINE = [
-    # n=12: l=3,m=2  A=(x1,x2,y0) B=(x1,x2,y1)  k=4 width=9
+    # n=12: l=3,m=2  A=(x1,x2,y0) B=(x1,x2,y1)  k=4 width=8   tie_frac=7%
     dict(l=3, m=2, A_terms=(("x", 1), ("x", 2), ("y", 0)),
          B_terms=(("x", 1), ("x", 2), ("y", 1))),
-    # n=18: l=3,m=3  A=(x0,x1,y1) B=(x0,x1,y1)  k=4 width=19
-    dict(l=3, m=3, A_terms=(("x", 0), ("x", 1), ("y", 1)),
+    # n=18: l=3,m=3  A=(x0,y1,y2) B=(x0,x1,y1)  k=4 width=10  tie_frac=10%  (min-tie derived)
+    dict(l=3, m=3, A_terms=(("x", 0), ("y", 1), ("y", 2)),
          B_terms=(("x", 0), ("x", 1), ("y", 1))),
-    # n=24: l=3,m=4  A=(x1,x2,y0) B=(x1,x2,y1)  k=4 width=13
-    dict(l=3, m=4, A_terms=(("x", 1), ("x", 2), ("y", 0)),
-         B_terms=(("x", 1), ("x", 2), ("y", 1))),
+    # n=24: l=3,m=4  A=(x1,x2,y2) B=(x1,x2,y3)  k=4 width=15  tie_frac=5%   (min-tie derived)
+    dict(l=3, m=4, A_terms=(("x", 1), ("x", 2), ("y", 2)),
+         B_terms=(("x", 1), ("x", 2), ("y", 3))),
 ]
 
 
@@ -626,7 +632,9 @@ def main(p=0.05, shots=6000, beam=64, seed=7):
 # regenerates the decisive artifact bit-for-bit (same seeds + deterministic decoders).
 _SHOTS_BY_P = {
     0.05: {"surface": 6000, "color": 8000, "bb": 6000},
-    0.01: {"surface": 24000, "color": 36000, "bb": 9000},
+    # p=0.01 BB bumped to 15000/seed (75k pooled): the min-tie n=24 code is cleaner
+    # (lower LER) and needed more shots to clear the ~300-failure target.
+    0.01: {"surface": 24000, "color": 36000, "bb": 15000},
 }
 
 

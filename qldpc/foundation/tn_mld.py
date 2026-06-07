@@ -132,12 +132,32 @@ def _coset_prob(H, L, priors, syndrome):
     return data.reshape(-1)
 
 
+def _argmax_deterministic(probs, rtol=1e-9):
+    """argmax with a TOLERANCE tie-break: among classes within ``rtol`` of the max
+    probability (i.e. EXACT coset-ML ties, equal up to contraction roundoff), return
+    the LOWEST index.
+
+    Small degenerate codes have many exactly-tied syndromes (two+ logical cosets with
+    identical weight enumerators). Plain ``np.argmax`` resolves such a tie by whichever
+    tied value is ~1 ULP larger, which depends on the cotengra contraction ORDER -- so
+    the coset-ML prediction (and LER) would not be bit-reproducible across runs / quimb
+    versions. This deterministic rule fixes that for ANY code. On an exact tie the
+    optimal decoder must guess and BOTH coset-ML and MLE are equally limited by the
+    genuine degeneracy, so pinning the tied class does not bias the MLE/coset-ML ratio
+    (it only removes the reproducibility artifact)."""
+    probs = np.asarray(probs).reshape(-1)
+    m = float(probs.max())
+    tied = np.nonzero(probs >= m - rtol * abs(m))[0]
+    return int(tied[0])
+
+
 def coset_ml_ler(H, L, priors, syndromes, observables):
     """Logical error rate of the coset-ML (tensor-network) decoder.
 
-    For each shot: contract the TN to get the coset-probability vector,
-    ``argmax`` -> predicted logical-class bits, compare to ``observables``.
-    Returns the fraction of shots whose predicted class != observed class.
+    For each shot: contract the TN to get the coset-probability vector, take the
+    deterministic (tolerance-tie-broken) ``argmax`` -> predicted logical-class bits,
+    compare to ``observables``. Returns the fraction of shots whose predicted class
+    != observed class.
     """
     L = np.asarray(L) % 2
     n_log = L.shape[0]
@@ -153,7 +173,7 @@ def coset_ml_ler(H, L, priors, syndromes, observables):
     fails = 0
     for i in range(n_shots):
         probs = _coset_prob(H, L, priors, syndromes[i])
-        best = int(np.argmax(probs))
+        best = _argmax_deterministic(probs)
         pred = np.array([(best >> b) & 1 for b in range(n_log)], dtype=np.int64)
         if not np.array_equal(pred, observables[i]):
             fails += 1
@@ -193,7 +213,7 @@ def coset_ml_ler_memoized(H, L, priors, syndromes, observables):
         pred = cache.get(key)
         if pred is None:
             probs = _coset_prob(H, L, priors, syndromes[i])
-            best = int(np.argmax(probs))
+            best = _argmax_deterministic(probs)
             pred = np.array([(best >> b) & 1 for b in range(n_log)], dtype=np.int64)
             cache[key] = pred
         if not np.array_equal(pred, observables[i]):
