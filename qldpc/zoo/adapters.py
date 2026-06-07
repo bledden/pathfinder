@@ -50,6 +50,25 @@ import numpy as np
 from canon_dem import extract
 
 
+# Pre-committed deterministic tie-break policy per adapter (gate G2). Each adapter
+# declares its concrete tie-break (verified deterministic in the T1 review); the
+# matched harness asserts every decoder's ``.tie_break`` is one of these BEFORE
+# the LER grid runs, so no adapter can silently fall back to a default ordering.
+#   BP        -> "min_sum_parallel_hard_decision" (hard decision off the parallel
+#                min-sum messages; no post-processing, fully deterministic)
+#   BPOSD-0   -> "osd0_reliability_order"  (OSD-0 pivots by BP reliability order)
+#   BPOSD-10  -> "osd_cs_order10"          (combination-sweep order 10)
+#   BPLSD     -> "lsd_cs_order10"          (localised-statistics combination-sweep)
+#   Tesseract -> "astar_beam64_lowest_cost" (A* beam, lowest-cost coset wins ties)
+APPROVED_TIE_BREAKS = {
+    "min_sum_parallel_hard_decision",
+    "osd0_reliability_order",
+    "osd_cs_order10",
+    "lsd_cs_order10",
+    "astar_beam64_lowest_cost",
+}
+
+
 # Pinned min-sum BP hyperparameters shared across the BP-family adapters. These
 # are the provenance constants the prereg/grid commit to. ``bp_method='ms'`` and
 # ``osd_method='osd_cs'`` mirror what canon_dem.decode_bposd already uses; the
@@ -65,10 +84,13 @@ class _LdpcAdapter:
     """Base for ldpc-family adapters: build H/Lo/priors from the shared DEM,
     decode each shot's syndrome to an error estimate, map to observables."""
 
-    def __init__(self, dem, name, config, decoder):
+    def __init__(self, dem, name, config, decoder, tie_break):
         self.dem = dem
         self.name = name
         self.config = dict(config)
+        # Declared deterministic tie-break (gate G2). No silent default: the
+        # matched harness asserts this is in APPROVED_TIE_BREAKS.
+        self.tie_break = tie_break
         self._decoder = decoder
         ex = extract(dem)
         # Lo: (n_obs x n_err) GF2 map from error mechanisms to observables.
@@ -108,7 +130,7 @@ def make_bp(dem):
     dec = BpDecoder(H, error_channel=_priors(dem), max_iter=_BP_MAX_ITER,
                     bp_method=_BP_METHOD, ms_scaling_factor=_BP_MS_SCALING,
                     schedule=_BP_SCHEDULE)
-    return _LdpcAdapter(dem, "BP", cfg, dec)
+    return _LdpcAdapter(dem, "BP", cfg, dec, "min_sum_parallel_hard_decision")
 
 
 def make_bposd0(dem):
@@ -122,7 +144,7 @@ def make_bposd0(dem):
     dec = BpOsdDecoder(H, error_channel=_priors(dem), max_iter=_BP_MAX_ITER,
                        bp_method=_BP_METHOD, ms_scaling_factor=_BP_MS_SCALING,
                        schedule=_BP_SCHEDULE, osd_method="osd_0", osd_order=0)
-    return _LdpcAdapter(dem, "BPOSD-0", cfg, dec)
+    return _LdpcAdapter(dem, "BPOSD-0", cfg, dec, "osd0_reliability_order")
 
 
 def make_bposd10(dem):
@@ -136,7 +158,7 @@ def make_bposd10(dem):
     dec = BpOsdDecoder(H, error_channel=_priors(dem), max_iter=_BP_MAX_ITER,
                        bp_method=_BP_METHOD, ms_scaling_factor=_BP_MS_SCALING,
                        schedule=_BP_SCHEDULE, osd_method="osd_cs", osd_order=10)
-    return _LdpcAdapter(dem, "BPOSD-10", cfg, dec)
+    return _LdpcAdapter(dem, "BPOSD-10", cfg, dec, "osd_cs_order10")
 
 
 def make_bplsd(dem):
@@ -152,7 +174,7 @@ def make_bplsd(dem):
                        bp_method=_BP_METHOD, ms_scaling_factor=_BP_MS_SCALING,
                        schedule=_BP_SCHEDULE, lsd_method="lsd_cs",
                        lsd_order=lsd_order)
-    return _LdpcAdapter(dem, "BPLSD", cfg, dec)
+    return _LdpcAdapter(dem, "BPLSD", cfg, dec, "lsd_cs_order10")
 
 
 class TesseractAdapter:
@@ -164,6 +186,9 @@ class TesseractAdapter:
         self.name = "Tesseract"
         self.det_beam = int(det_beam)
         self.config = dict(decoder="Tesseract", det_beam=self.det_beam)
+        # Declared deterministic tie-break (gate G2): A* beam search, lowest-cost
+        # coset wins ties (beam width = det_beam = 64).
+        self.tie_break = "astar_beam64_lowest_cost"
         from qldpc.probe.tesseract_anchor import _build_decoder
 
         self._decoder = _build_decoder(dem, self.det_beam)
