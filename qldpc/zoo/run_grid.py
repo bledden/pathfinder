@@ -37,15 +37,27 @@ bound, not a 300-failure point estimate; see the prereg's tesseract_low_p_rule).
 
 Sliding-window cost handling (BINDING)
 --------------------------------------
-The sliding-window decoder runs per-window OSD in an isolated subprocess; at large
-shot counts it can be far slower than the core decoders and must NOT be allowed to
-stall the grid. ``run_grid`` therefore COST-PROBES it: it times the streaming
-decoder on a small probe-shot batch on the FIRST cell, projects the per-cell cost
-to the cell's full shot count, and if the projection exceeds a sane cap
-(``sliding_window_time_cap_s``) it runs sliding-window on a CAPPED shot count for
-that cell (recorded as ``sliding_window_shots`` + a note) rather than the full
-budget. The probe, the cap, the rule, and the actual measured cost are recorded in
-the result under ``sliding_window`` and per cell.
+The sliding-window decoder runs per-window OSD in an isolated subprocess. Its
+subprocess STARTUP cost (~1s, fixed) dominates a tiny probe batch, but its
+AMORTIZED per-shot cost on a real batch is ~10x cheaper (one subprocess decodes
+the whole batch). At the prereg's full shots sliding-window is therefore feasible
+(~tens of seconds for a 16k-shot cell, a few minutes for a 200k-shot cell), so it
+runs at the FULL prereg shots/cell like every other decoder.
+
+To measure the realistic cost (not the startup-dominated tiny probe), ``run_grid``
+cost-probes on a SMALL-BATCH-AMORTIZED basis: it times the streaming decoder on a
+modest probe batch on the FIRST cell, then fits an affine cost model
+(``total ~= startup + per_shot * n``) using the known fixed startup so the
+projection reflects the marginal per-shot rate, NOT the startup-inflated
+per-probe-shot number. The projection only ever triggers a CAP as a generous
+backstop: if a cell's projected wall-time exceeds ``sliding_window_time_cap_s``
+(default 20 min — NOT expected to fire at the real amortized rate), that cell's
+sliding-window is down-scoped to the **failure-target shot count** for that p
+(enough shots for ~``failure_target`` failures at the cell's pilot LER, floored to
+a sane minimum), recorded as ``sliding_window_shots`` + a note — never to the
+1-5-shot garbage the old startup-dominated probe produced. The probe, the cap,
+the rule, and the actual measured cost are recorded under ``sliding_window`` and
+per cell. No other decoder is ever down-scoped.
 
 NOT the full grid: this module is the driver. The full pre-registered budget grid
 is run only after the gated sign-off; a small pilot validation (``p_subset=[0.005]``,
@@ -94,12 +106,18 @@ _GATE_A_DECODER = "BPOSD-10"
 _DEFAULT_SEED = 0
 
 # --- sliding-window cost-probe defaults (BINDING; see module docstring) ------
-# Probe the streaming decoder on this many shots on the first cell, then project
-# to each cell's full shots. If the projection exceeds the time cap, run SW on a
-# capped shot count for that cell (recorded separately).
-_SW_PROBE_SHOTS = 50
-_SW_TIME_CAP_S = 180.0          # a few minutes per cell
-_SW_CAPPED_SHOTS = 200          # capped SW shots when the full budget is too slow
+# Probe the streaming decoder on this many shots on the first cell, fit the affine
+# cost model (startup + per_shot * n) so the projection reflects the AMORTIZED
+# marginal per-shot rate (the subprocess startup is fixed, not per-shot). At that
+# rate sliding-window runs FULL prereg shots/cell; the time cap is a generous
+# backstop that is not expected to fire. If it ever does, the cell's SW is
+# down-scoped to the failure-target shot count for that p (a meaningful set), NOT
+# to a few shots.
+_SW_PROBE_SHOTS = 400           # amortized probe batch (past the startup hump)
+_SW_TIME_CAP_S = 1200.0         # 20-min/cell backstop (not expected to trigger)
+_SW_STARTUP_S = 1.0             # fixed subprocess-startup cost subtracted in the
+                                # affine fit so the per-shot rate is amortized
+_SW_FLOOR_SHOTS = 1000          # never down-scope SW below this many shots
 
 
 def load_prereg(path):
@@ -191,13 +209,21 @@ def _strip_mask(rec):
     return {k: v for k, v in rec.items() if k != "fail_mask"}
 
 
-def _sliding_window_cost_probe(circ, dem, rounds, seed, probe_shots):
-    """Time the sliding-window streaming decoder on a small probe batch.
+def _sliding_window_cost_probe(circ, dem, rounds, seed, probe_shots,
+                               startup_s=_SW_STARTUP_S):
+    """Time the sliding-window streaming decoder on a probe batch and return its
+    AMORTIZED marginal per-shot rate.
 
-    Returns ``(seconds_per_shot, probe_shots, probe_total_s)`` or None if the
-    sliding-window decoder is unavailable / fails. This is the cost measurement
-    the per-cell down-scope rule uses to project full-cell cost without ever
-    running the full (potentially CPU-hours) sliding-window batch.
+    The sliding-window subprocess pays a fixed STARTUP cost (~1s) once per
+    ``decode_batch`` call regardless of batch size; the marginal per-shot decode
+    cost is ~10x cheaper. Projecting a full cell from a startup-dominated tiny
+    probe massively over-estimates the cost (the old defect). Here we fit the
+    affine model ``total = startup + per_shot * n`` by subtracting the (known,
+    fixed) ``startup_s`` from the measured probe total, so the projection uses the
+    realistic MARGINAL per-shot rate.
+
+    Returns ``(amortized_seconds_per_shot, probe_shots, probe_total_s)`` or None
+    if the sliding-window decoder is unavailable, or ``{"error": ...}`` on failure.
     """
     try:
         if not adapters.sliding_window_available():
@@ -209,10 +235,27 @@ def _sliding_window_cost_probe(circ, dem, rounds, seed, probe_shots):
         t0 = time.perf_counter()
         sw.decode_batch(dets)
         dt = time.perf_counter() - t0
-        per_shot = dt / probe_shots if probe_shots else float("inf")
-        return (per_shot, probe_shots, dt)
+        if not probe_shots:
+            return (float("inf"), probe_shots, dt)
+        # Affine fit: marginal per-shot = (total - fixed startup) / probe_shots,
+        # clamped to >= 0 (a tiny/fast probe can dip below the nominal startup).
+        marginal = max(0.0, dt - startup_s) / probe_shots
+        return (marginal, probe_shots, dt)
     except Exception as exc:  # never let the probe stall / break the grid
         return {"error": repr(exc)}
+
+
+def _sw_failure_target_shots(prereg, p, failure_target, floor_shots):
+    """Shots needed for ~``failure_target`` failures at p (the SANE backstop floor
+    when the time cap fires): ``failure_target / pilot_ler`` for that p, floored to
+    ``floor_shots`` and never above the cell's full budget (set by the caller)."""
+    spc = prereg.get("shots_per_cell", {}).get(str(p), {})
+    pilot_ler = spc.get("pilot_ler")
+    if pilot_ler and pilot_ler > 0:
+        target = int(round(failure_target / float(pilot_ler)))
+    else:
+        target = floor_shots
+    return max(int(floor_shots), target)
 
 
 def run_grid(prereg_path, out_path, p_subset=None, shots_override=None,
@@ -220,7 +263,7 @@ def run_grid(prereg_path, out_path, p_subset=None, shots_override=None,
              dry_scale=None, include_external=True, n_boot=10000,
              sliding_window_probe_shots=_SW_PROBE_SHOTS,
              sliding_window_time_cap_s=_SW_TIME_CAP_S,
-             sliding_window_capped_shots=_SW_CAPPED_SHOTS):
+             sliding_window_floor_shots=_SW_FLOOR_SHOTS):
     """Run the matched cross-decoder LER grid over the pre-registered cells.
 
     Args:
@@ -245,8 +288,11 @@ def run_grid(prereg_path, out_path, p_subset=None, shots_override=None,
             sliding-window when ``include_sliding_window``). Sliding-window also
             requires ``rounds`` (always supplied here).
         n_boot: bootstrap resamples for the gap-to-MLE paired bootstrap.
-        sliding_window_probe_shots / _time_cap_s / _capped_shots: the
-            sliding-window cost-probe + down-scope parameters (see module docstring).
+        sliding_window_probe_shots / _time_cap_s / _floor_shots: the
+            sliding-window cost-probe + backstop parameters (see module docstring).
+            Sliding-window runs at the FULL prereg shots/cell; the time cap is a
+            generous backstop and, if it ever fires, the cell's SW is down-scoped
+            to the failure-target shot count (floored to ``_floor_shots``).
 
     Returns:
         a JSON-serializable dict:
@@ -284,19 +330,25 @@ def run_grid(prereg_path, out_path, p_subset=None, shots_override=None,
         "available": (adapters.sliding_window_available() if want_sw else False),
         "probe_shots": sliding_window_probe_shots,
         "time_cap_s": sliding_window_time_cap_s,
-        "capped_shots": sliding_window_capped_shots,
+        "floor_shots": sliding_window_floor_shots,
+        "startup_s": _SW_STARTUP_S,
         "down_scope_rule": (
-            "Cost-probe the streaming sliding-window decoder on "
-            f"{sliding_window_probe_shots} shots on the first cell; project its "
-            "per-cell cost to the cell's full shots. If the projection exceeds "
-            f"{sliding_window_time_cap_s:.0f}s/cell, run sliding-window on a "
-            f"CAPPED {sliding_window_capped_shots} shots for that cell "
-            "(recorded as sliding_window_shots + a note) instead of the full "
-            "budget, so sliding-window never stalls the grid. The probe + the "
-            "actual measured cost are recorded here."
+            "Sliding-window runs at the FULL prereg shots/cell, like every other "
+            "decoder. To measure realistic cost, cost-probe the streaming decoder "
+            f"on {sliding_window_probe_shots} shots on the first cell and fit the "
+            f"affine model total = startup(~{_SW_STARTUP_S:.0f}s) + per_shot * n, "
+            "so the projection uses the AMORTIZED marginal per-shot rate (NOT the "
+            "startup-dominated per-probe-shot number). The time cap "
+            f"({sliding_window_time_cap_s:.0f}s/cell) is a generous backstop that "
+            "is NOT expected to fire at the amortized rate. If a cell's projected "
+            "wall-time ever exceeds the cap, that cell's sliding-window is "
+            "down-scoped to the failure-target shot count for its p (enough shots "
+            f"for ~{failure_target} failures at the pilot LER, floored to "
+            f"{sliding_window_floor_shots}), recorded as sliding_window_shots + a "
+            "note. No other decoder is ever down-scoped."
         ),
         "probe": None,            # filled by the first probe
-        "sec_per_shot": None,
+        "sec_per_shot": None,     # AMORTIZED marginal per-shot rate
     }
 
     cells = []
@@ -342,26 +394,36 @@ def run_grid(prereg_path, out_path, p_subset=None, shots_override=None,
                     if isinstance(probe, tuple):
                         sw_block["sec_per_shot"] = probe[0]
                 sps = sw_block.get("sec_per_shot")
+                # Backstop floor: shots for ~failure_target failures at this p
+                # (a MEANINGFUL set), never below the floor, never above the cell
+                # budget. Only used if the (never-expected) time cap fires.
+                floor = min(
+                    shots,
+                    _sw_failure_target_shots(prereg, p, failure_target,
+                                             sliding_window_floor_shots),
+                )
                 if sps is None:
-                    # probe failed -> cannot project; down-scope to capped shots
-                    # defensively (never stall the grid).
-                    sw_shots = min(shots, sliding_window_capped_shots)
-                    sw_note = ("sliding-window cost-probe failed; capped to "
-                               f"{sw_shots} shots defensively (see "
-                               "sliding_window.probe).")
+                    # probe failed -> cannot project; down-scope to the
+                    # failure-target floor defensively (never stall the grid),
+                    # NOT to a few shots.
+                    sw_shots = floor
+                    sw_note = ("sliding-window cost-probe failed; down-scoped to "
+                               f"the failure-target {sw_shots}-shot floor "
+                               "defensively (see sliding_window.probe).")
                 else:
-                    projected = sps * shots
-                    if projected > sliding_window_time_cap_s and \
-                            shots > sliding_window_capped_shots:
-                        sw_shots = sliding_window_capped_shots
+                    # Amortized affine projection (fixed startup + marginal/shot).
+                    projected = _SW_STARTUP_S + sps * shots
+                    if projected > sliding_window_time_cap_s and shots > floor:
+                        sw_shots = floor
                         sw_note = (
                             f"sliding-window projected ~{projected:.1f}s for "
                             f"{shots} shots (> {sliding_window_time_cap_s:.0f}s "
-                            f"cap at {sps:.4f}s/shot); DOWN-SCOPED to {sw_shots} "
-                            f"shots for this cell (gap-to-MLE / LER on the capped "
-                            f"set, marked conditional).")
+                            f"backstop at {sps:.5f}s/shot amortized); DOWN-SCOPED "
+                            f"to the failure-target {sw_shots}-shot floor for this "
+                            f"cell (gap-to-MLE / LER on the floor set, marked "
+                            f"conditional).")
                     else:
-                        sw_shots = shots  # full budget fits the cap
+                        sw_shots = shots  # full budget fits the cap (expected)
 
             # 3. build the full decoder zoo from the shared DEM. Sliding-window
             #    is built into the matched run ONLY when it is NOT down-scoped
