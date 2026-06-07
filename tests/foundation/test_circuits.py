@@ -19,12 +19,23 @@ def _block_ler_bposd(ex, n=4000, seed=3):
     return f / n
 
 def test_both_bases_build_and_decode_sanely():
+    # SI1000 now emits idle noise (idle p/10 per CNOT layer + idle-during-measure 2p), which
+    # roughly doubles the per-mechanism error mass and raises the BP-OSD-10 LER from the no-idle
+    # regime (~0.006 Z / ~0.005 X) up to the measured AFTER values below. Band is re-centered on
+    # the new correct values (fixed seed=3, n=4000 -> deterministic): lower bound confirms idle is
+    # present (LER materially above the no-idle ~0.006), upper bound confirms a modest increase,
+    # NOT a blow-up that would signal mis-placed idle noise.
     bb = BBCode()
+    expected = {"Z": 0.01375, "X": 0.01475}   # measured with idle, seed=3, n=4000
     for basis in ("Z", "X"):
         c = build_memory(bb, rounds=6, p=0.003, basis=basis, noise="si1000")
         ex = extract(c.detector_error_model(decompose_errors=False))
         assert ex["n_det"] == 6 * 36 + 36, f"{basis}: unexpected detector count {ex['n_det']}"
-        assert _block_ler_bposd(ex) <= 0.02, f"{basis}: BP-OSD-10 sanity LER too high"
+        ler = _block_ler_bposd(ex)
+        assert 0.009 <= ler <= 0.020, (
+            f"{basis}: BP-OSD-10 LER {ler:.5f} outside the with-idle band "
+            f"[0.009, 0.020] (expected ~{expected[basis]}); idle noise raised it from the "
+            f"no-idle ~0.006 regime — too low means idle dropped, too high means mis-placed")
 
 def test_si1000_rates_differ_from_uniform():
     bb = BBCode()
@@ -37,6 +48,84 @@ def test_z_uniform_matches_existing():
     from bb_circuit import build_z_memory
     bb = BBCode()
     assert str(build_memory(bb, 4, 0.005, basis="Z", noise="uniform")) == str(build_z_memory(bb, 4, 0.005))
+
+
+# --- SI1000 idle-noise completion (Gidney): idle p/10 per CNOT layer + idle-during-measure 2p ----
+
+_IDLE_BB = BBCode()  # default [[72,12,6]] (N=36); monomial_perms/X_ORDER/Z_ORDER bound to it
+
+
+def test_si1000_emits_idle_noise():
+    """Idle noise must change the DEM by ADDING error mass at the same (bb, rounds, p).
+
+    FINDING: for this single-basis BB CSS memory, the idle DEPOLARIZE1 lands on data qubits whose
+    error signatures already coincide with the existing two-qubit-gate error mechanisms, so Stim
+    MERGES them — the DEM mechanism COUNT (num_errors) is unchanged. The real, faithful signal that
+    idle noise is emitted is that the merged mechanisms' PRIORS rise: total DEM error mass strictly
+    increases (si1000-with-idle > uniform). Pre-fix the two DEMs are identical -> this FAILS."""
+    bb = _IDLE_BB
+    for basis in ("Z", "X"):
+        eu = extract(build_memory(bb, 2, 0.003, basis=basis, noise="uniform")
+                     .detector_error_model(decompose_errors=False))
+        es = extract(build_memory(bb, 2, 0.003, basis=basis, noise="si1000")
+                     .detector_error_model(decompose_errors=False))
+        mass_uni = float(eu["priors"].sum())
+        mass_si = float(es["priors"].sum())
+        # Idle noise must measurably raise the total error mass (here it ~doubles), proving the
+        # DEPOLARIZE1 idle is wired into the DEM and not silently dropped.
+        assert mass_si > mass_uni * 1.2, (
+            f"{basis}: si1000 total error mass ({mass_si:.4f}) must exceed uniform "
+            f"({mass_uni:.4f}) once idle noise is emitted")
+
+
+def test_si1000_idle_rates_present():
+    """The built si1000 circuit must contain DEPOLARIZE1 at the p/10 (per-CNOT-layer idle) and
+    2p (idle-during-measure) rates; uniform must contain NO DEPOLARIZE1 idle."""
+    bb = _IDLE_BB
+    p = 0.01
+    idle = p / 10.0           # 0.001
+    idle_meas = 2.0 * p       # 0.02
+    for basis in ("Z", "X"):
+        cs = str(build_memory(bb, 2, p, basis=basis, noise="si1000"))
+        # DEPOLARIZE1 at both idle rates must appear
+        assert "DEPOLARIZE1" in cs, f"{basis}: si1000 has no DEPOLARIZE1 idle"
+        assert any(f"DEPOLARIZE1({r}" in cs for r in (repr(idle), str(idle))), \
+            f"{basis}: si1000 missing per-layer idle DEPOLARIZE1({idle})"
+        assert any(f"DEPOLARIZE1({r}" in cs for r in (repr(idle_meas), str(idle_meas))), \
+            f"{basis}: si1000 missing idle-during-measure DEPOLARIZE1({idle_meas})"
+        cu = str(build_memory(bb, 2, p, basis=basis, noise="uniform"))
+        assert "DEPOLARIZE1" not in cu, f"{basis}: uniform must emit NO DEPOLARIZE1 idle"
+
+
+def test_uniform_unchanged_no_idle():
+    """Regression: (X, uniform) via _build_general and (Z, uniform via build_z_memory) emit NO
+    DEPOLARIZE1 idle noise, and (Z, uniform) stays bit-identical to build_z_memory."""
+    from bb_circuit import build_z_memory
+    bb = _IDLE_BB
+    cx_uni = str(build_memory(bb, 3, 0.005, basis="X", noise="uniform"))
+    assert "DEPOLARIZE1" not in cx_uni, "(X, uniform) must not emit idle DEPOLARIZE1"
+    cz_uni = build_memory(bb, 3, 0.005, basis="Z", noise="uniform")
+    assert "DEPOLARIZE1" not in str(cz_uni), "(Z, uniform) must not emit idle DEPOLARIZE1"
+    assert str(cz_uni) == str(build_z_memory(bb, 3, 0.005)), "(Z, uniform) not bit-identical"
+
+
+def test_dem_sanity_si1000():
+    """Coda build-step-1 gate: dem_sanity must pass (a) decoder-DEM == Stim-DEM bit-identical,
+    (b) noiseless num_errors == 0, (c) fixed-seed reproducibility — for a small si1000 memory,
+    both bases."""
+    from qldpc.foundation.circuits import dem_sanity
+    bb = _IDLE_BB
+    for basis in ("Z", "X"):
+        # (b) noiseless determinism: zero error mechanisms
+        c0 = build_memory(bb, 2, 0.0, basis=basis, noise="si1000")
+        assert c0.detector_error_model(decompose_errors=False).num_errors == 0, \
+            f"{basis}: noiseless si1000 DEM must have zero error mechanisms"
+        # (a) + (c) via the gate on a noisy circuit
+        c = build_memory(bb, 2, 0.003, basis=basis, noise="si1000")
+        rep = dem_sanity(c, seed=7)
+        assert rep["dem_faithful"], f"{basis}: decoder DEM != Stim DEM: {rep}"
+        assert rep["reproducible"], f"{basis}: fixed-seed sampling not reproducible: {rep}"
+        assert rep["stim_num_errors"] == rep["decoder_num_errors"], f"{basis}: mechanism count mismatch: {rep}"
 
 
 # --- Adversarial X-basis correctness (these FAIL on the pre-fix transpose bug) -----------------

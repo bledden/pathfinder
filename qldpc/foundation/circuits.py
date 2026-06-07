@@ -54,11 +54,11 @@ class _Noise:
             self.idle_meas = p
         elif model == "si1000":
             self.two_qubit = p
-            # TODO(frontier): emit idle DEPOLARIZE1 (p/10) + idle-during-measure (2p); currently
-            # unemitted. one_qubit/idle/idle_meas below are defined per the Gidney SI1000 model but
-            # the schedule has NO idle locations yet, so these fields are presently dead. Idle noise
-            # is only needed for the later circuit-level frontier comparison, not the code-capacity
-            # degeneracy probe; do not wire it in until that escalation.
+            # Gidney SI1000 superconducting rates. Idle noise IS now emitted in _build_general:
+            #   idle      = p/10  -> DEPOLARIZE1 on qubits untouched by each CNOT layer
+            #   idle_meas = 2p    -> DEPOLARIZE1 on all data qubits during ancilla measure+reset
+            # one_qubit (p/10) is reserved for explicit single-qubit gate locations (none in this
+            # CSS extraction schedule). Idle emission is gated strictly on noise == "si1000".
             self.one_qubit = p / 10.0
             self.idle = p / 10.0
             self.meas_flip = 5.0 * p
@@ -144,6 +144,12 @@ def _build_general(bb, rounds, p, basis, noise):
                 pairs += [Anc(cc), dq]      # CX X-anc -> data (anc control, data target)
         return pairs
 
+    # SI1000 idle (Gidney): a qubit not engaged in a gate at a layer accrues single-qubit
+    # depolarizing noise. We emit it ONLY for noise == "si1000" (uniform has no idle, preserving
+    # the regression lock). All-qubit universe used to compute the per-step idle complement.
+    si1000_idle = (noise == "si1000")
+    all_qubits = set(data) | set(anc)   # real indices only: data 0..2N-1, anc 2N..3N-1
+
     def noisy_round(circ):
         circ.append(reset_op, anc)
         if p > 0 and nz.reset > 0:
@@ -153,8 +159,20 @@ def _build_general(bb, rounds, p, basis, noise):
             circ.append("CX", pairs)
             if p > 0 and nz.two_qubit > 0:
                 circ.append("DEPOLARIZE2", pairs, nz.two_qubit)
+            # Idle-during-CNOT-layer: DEPOLARIZE1(p/10) on every qubit NOT touched by this layer's
+            # CX pairs (active = qubits appearing in `pairs`; all N ancillas are active each step,
+            # ~half the 2N data qubits idle). SI1000 only; emit only when p>0 and rate>0.
+            if si1000_idle and p > 0 and nz.idle > 0:
+                active = set(pairs)
+                idle_qubits = sorted(all_qubits - active)
+                if idle_qubits:
+                    circ.append("DEPOLARIZE1", idle_qubits, nz.idle)
         if p > 0 and nz.meas_flip > 0:
             circ.append(anc_flip_err, anc, nz.meas_flip)   # classical measurement flip
+        # Idle-during-measurement: DATA qubits idle through the longer ancilla measure+reset layer,
+        # so they accrue DEPOLARIZE1(2p). Once per round, on ALL data qubits. SI1000 only.
+        if si1000_idle and p > 0 and nz.idle_meas > 0:
+            circ.append("DEPOLARIZE1", data, nz.idle_meas)
         circ.append(meas_op, anc)
 
     c.append(reset_op, data)
@@ -228,3 +246,95 @@ def build_memory(bb, rounds, p, basis="Z", noise="si1000"):
     if noise not in ("uniform", "si1000"):
         raise ValueError(f"unknown noise model {noise!r}")
     return _build_general(bb, rounds, p, basis, noise)
+
+
+def dem_sanity(circuit, seed=0):
+    """Coda build-step-1 DEM-sanity gate for a memory circuit.
+
+    Asserts (and reports) three properties; raises AssertionError on (a) failure (a faithfulness
+    violation is a real bug, not a soft warning):
+
+      (a) Decoder DEM == Stim DEM, faithfully. The decoder consumes
+          canon_dem.extract(circuit.detector_error_model(decompose_errors=False)). We rebuild the
+          mechanism set from that extraction (detectors, observables, prior per mechanism) and
+          assert it is bit-identical, mechanism-by-mechanism, to the same Stim DEM enumerated via
+          dem.flattened(). extract performs NO lossy transform (it is a faithful re-encoding of the
+          flattened DEM into sparse H/Lo + priors), so equality must hold exactly. If it ever
+          diverges, extract is unfaithful — that is reported as a finding, not silently absorbed.
+      (b) Noiseless determinism is reported as stim_num_errors (the caller checks == 0 at p=0).
+      (c) Fixed-seed reproducibility: two compile_detector_sampler(seed=seed).sample calls with the
+          same seed yield bit-identical detector AND observable arrays.
+
+    Returns a dict with the comparison outcome; never papers over a mismatch.
+    """
+    # Import here so circuits.py has no hard import-time dependency on canon_dem.
+    from canon_dem import extract
+
+    dem = circuit.detector_error_model(decompose_errors=False)
+
+    # --- (a) faithfulness: decoder extraction vs raw Stim DEM, mechanism-by-mechanism ----------
+    # Raw Stim mechanisms (frozenset(detectors), tuple(sorted obs), prior) from flattened().
+    stim_mechs = []
+    for inst in dem.flattened():
+        if inst.type != "error":
+            continue
+        pr = inst.args_copy()[0]
+        dets, obs = [], []
+        for t in inst.targets_copy():
+            if t.is_relative_detector_id():
+                dets.append(t.val)
+            elif t.is_logical_observable_id():
+                obs.append(t.val)
+        stim_mechs.append((frozenset(dets), tuple(sorted(obs)), pr))
+
+    # Decoder's view: canon_dem.extract -> H (ndet x E), Lo (nobs x E), priors. Reconstruct each
+    # mechanism's (detectors, observables, prior) from the sparse columns to compare faithfully.
+    ex = extract(dem)
+    H = ex["H"].tocsc()
+    Lo = ex["Lo"].tocsc()
+    priors = ex["priors"]
+    E = ex["n_err"]
+    dec_mechs = []
+    for j in range(E):
+        dets = frozenset(int(d) for d in H.indices[H.indptr[j]:H.indptr[j + 1]])
+        obs = tuple(sorted(int(o) for o in Lo.indices[Lo.indptr[j]:Lo.indptr[j + 1]]))
+        dec_mechs.append((dets, obs, float(priors[j])))
+
+    # extract preserves DEM mechanism ORDER (one column per flattened error, in order), so compare
+    # element-wise; priors must match exactly (no clipping/transform in extract).
+    faithful = (len(stim_mechs) == len(dec_mechs))
+    first_mismatch = None
+    if faithful:
+        for j, (sm, dm) in enumerate(zip(stim_mechs, dec_mechs)):
+            if sm[0] != dm[0] or sm[1] != dm[1] or sm[2] != dm[2]:
+                faithful = False
+                first_mismatch = (j, sm, dm)
+                break
+    # Order-independent set comparison as a backstop (faithful up to reordering).
+    faithful_as_set = (sorted(stim_mechs) == sorted(dec_mechs))
+
+    assert faithful, (
+        f"dem_sanity(a): canon_dem.extract is NOT faithful to the Stim DEM. "
+        f"stim mechanisms={len(stim_mechs)} decoder mechanisms={len(dec_mechs)} "
+        f"first_mismatch={first_mismatch} (faithful_as_set={faithful_as_set})"
+    )
+
+    # --- (c) fixed-seed reproducibility --------------------------------------------------------
+    n_shots = 64
+    s1 = circuit.compile_detector_sampler(seed=seed)
+    det1, obs1 = s1.sample(n_shots, separate_observables=True)
+    s2 = circuit.compile_detector_sampler(seed=seed)
+    det2, obs2 = s2.sample(n_shots, separate_observables=True)
+    reproducible = bool(np.array_equal(det1, det2) and np.array_equal(obs1, obs2))
+    assert reproducible, "dem_sanity(c): fixed-seed sampling not reproducible"
+
+    return dict(
+        dem_faithful=faithful,
+        faithful_as_set=faithful_as_set,
+        stim_num_errors=dem.num_errors,
+        decoder_num_errors=E,
+        num_detectors=dem.num_detectors,
+        num_observables=dem.num_observables,
+        reproducible=reproducible,
+        seed=seed,
+    )
