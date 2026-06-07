@@ -79,6 +79,7 @@ if _HAVE_TRITON:
         ms,
         MAXDEG_C: tl.constexpr,
         BLOCK_S: tl.constexpr,
+        INF: tl.constexpr,
     ):
         """One check's exclude-self min-sum over a BLOCK_S tile of shots.
 
@@ -95,8 +96,8 @@ if _HAVE_TRITON:
         # First pass: accumulate sign parity (count of negatives, mod 2) and the
         # two smallest magnitudes over the (real) incident edges, per shot.
         neg_par = tl.zeros((BLOCK_S,), dtype=tl.int32)
-        min1 = tl.full((BLOCK_S,), _INF, dtype=tl.float32)
-        min2 = tl.full((BLOCK_S,), _INF, dtype=tl.float32)
+        min1 = tl.full((BLOCK_S,), INF, dtype=tl.float32)
+        min2 = tl.full((BLOCK_S,), INF, dtype=tl.float32)
 
         for k in tl.static_range(MAXDEG_C):
             e = tl.load(CEDGE_ptr + c * MAXDEG_C + k)     # scalar edge idx or -1
@@ -105,7 +106,7 @@ if _HAVE_TRITON:
             mu = tl.load(MU_ptr + e_safe * S + s_off,
                          mask=s_mask & real, other=0.0)    # (BLOCK_S,)
             a = tl.abs(mu)
-            a = tl.where(real, a, _INF)                    # pad never wins min
+            a = tl.where(real, a, INF)                     # pad never wins min
             # sign parity: count mu<0 on real edges.
             isneg = (mu < 0.0) & real
             neg_par = neg_par ^ isneg.to(tl.int32)
@@ -135,7 +136,7 @@ if _HAVE_TRITON:
             # is this edge (one of) the global min? exact-equality match.
             is_min1 = a == min1
             min_others = tl.where(is_min1, min2, min1)
-            min_others = tl.where(min_others >= _INF, 0.0, min_others)
+            min_others = tl.where(min_others >= INF, 0.0, min_others)
             nu = ms * ssign * sign_others * min_others
             tl.store(NU_ptr + e_safe * S + s_off,
                      nu, mask=s_mask & real)
@@ -248,10 +249,32 @@ class BpTriton:
         self.lam = torch.as_tensor(lam, dtype=torch.float32)
         self.cedge = torch.as_tensor(cedge, dtype=torch.int32)
         self.bedge = torch.as_tensor(bedge, dtype=torch.int32)
+        self.edge_bit = torch.as_tensor(edge_bit, dtype=torch.long)
+
+        # device-resident static-tensor cache (built lazily per device) so the
+        # hot decode path moves index/LLR tensors to the GPU exactly once.
+        self._dev_cache = {}
 
         self._dem = None
         self._Lo = None
         self._n_obs = None
+
+    def _device_tensors(self, dev):
+        """Cache + return (lam, cedge, bedge, edge_bit, mu_init) on ``dev``.
+
+        ``mu_init`` is the flooding-init bit->check message per edge (lam gathered
+        through edge_bit), shape (E,), broadcast over shots at launch."""
+        key = str(dev)
+        cached = self._dev_cache.get(key)
+        if cached is None:
+            lam = self.lam.to(dev)
+            cedge = self.cedge.to(dev)
+            bedge = self.bedge.to(dev)
+            edge_bit = self.edge_bit.to(dev)
+            mu_init = lam[edge_bit].contiguous()           # (E,)
+            cached = (lam, cedge, bedge, edge_bit, mu_init)
+            self._dev_cache[key] = cached
+        return cached
 
     @classmethod
     def from_dem(cls, dem, max_iter=30, ms_scaling_factor=0.625, block_s=256):
@@ -276,34 +299,55 @@ class BpTriton:
             raise RuntimeError("Triton not available in this environment")
         if n_iter is None:
             n_iter = self.max_iter
-        syn = np.asarray(syndromes, dtype=np.int64)
-        if syn.ndim == 1:
-            syn = syn[None, :]
-        syn = syn % 2
-        if syn.shape[1] != self.n_checks:
-            raise ValueError(
-                f"syndrome width {syn.shape[1]} != n_checks {self.n_checks}")
-        S = int(syn.shape[0])
         dev = torch.device(device)
-
-        lam = self.lam.to(dev)
-        cedge = self.cedge.to(dev)
-        bedge = self.bedge.to(dev)
-
-        # Per-check coset sign (-1)^{s_c}, laid out CHECK-MAJOR (C, S).
-        ssign_np = np.where(syn == 0, 1.0, -1.0).astype(np.float32)  # (S, C)
-        ssign = torch.as_tensor(ssign_np.T.copy(), device=dev)       # (C, S)
-
         E, N, C = self.n_edges, self.n_bits, self.n_checks
+        lam, cedge, bedge, edge_bit, mu_init = self._device_tensors(dev)
+
+        # Accept numpy or a device tensor; build the (C, S) coset-sign grid
+        # entirely on-device to keep the hot path off the host.
+        if isinstance(syndromes, torch.Tensor):
+            syn_t = syndromes.to(dev)
+            if syn_t.ndim == 1:
+                syn_t = syn_t[None, :]
+        else:
+            syn = np.asarray(syndromes)
+            if syn.ndim == 1:
+                syn = syn[None, :]
+            syn_t = torch.as_tensor(syn, device=dev)
+        if syn_t.shape[1] != C:
+            raise ValueError(
+                f"syndrome width {int(syn_t.shape[1])} != n_checks {C}")
+        S = int(syn_t.shape[0])
+        # (-1)^{s_c} per (check, shot): fired check (odd) -> -1, else +1.
+        syn_par = (syn_t.to(torch.int32) & 1)                  # (S, C)
+        ssign = torch.where(syn_par.t() == 0,                  # (C, S)
+                            torch.ones((), dtype=torch.float32, device=dev),
+                            -torch.ones((), dtype=torch.float32, device=dev))
+        ssign = ssign.contiguous()
+
+        post, mu, nu = self._run_core(syn_t, ssign, lam, cedge, bedge,
+                                      mu_init, n_iter, dev, S, E, N, C)
+
+        post_np = post.detach().cpu().numpy().T  # (S, N)
+        if not return_messages:
+            return post_np
+        hard = (post_np < 0.0).astype(np.uint8)
+        return dict(posterior=post_np, hard=hard,
+                    mu=mu.detach().cpu().numpy().T,   # (S, E)
+                    nu=nu.detach().cpu().numpy().T)
+
+    def _run_core(self, syn_t, ssign, lam, cedge, bedge, mu_init,
+                  n_iter, dev, S, E, N, C):
+        """Device-resident iteration core: returns (post, mu, nu) on ``dev``.
+
+        ``post`` is (N, S), ``mu``/``nu`` are (E, S). No host transfers -- the
+        callers decide whether to copy to host (run_iterations_batch) or keep on
+        device (decode_batch's GPU observable projection)."""
         # Edge-major message buffers (E, S): shot is the contiguous fast axis.
-        mu = torch.empty((E, S), dtype=torch.float32, device=dev)
         nu = torch.empty((E, S), dtype=torch.float32, device=dev)
         post = torch.empty((N, S), dtype=torch.float32, device=dev)
-
         # Flooding init: mu_e = prior LLR of bit(e), for all shots.
-        edge_bit_t = torch.as_tensor(self._edge_bit_np, dtype=torch.long,
-                                     device=dev)
-        mu[:] = lam[edge_bit_t].unsqueeze(1)                          # (E, S)
+        mu = mu_init.unsqueeze(1).expand(E, S).contiguous()   # (E, S)
 
         BLOCK_S = self.block_s
         grid_s = triton.cdiv(S, BLOCK_S)
@@ -314,21 +358,14 @@ class BpTriton:
             _check_update_kernel[grid_chk](
                 mu, nu, ssign, cedge,
                 S, E, C, self.ms,
-                MAXDEG_C=self.MAXDEG_C, BLOCK_S=BLOCK_S,
+                MAXDEG_C=self.MAXDEG_C, BLOCK_S=BLOCK_S, INF=_INF,
             )
             _bit_update_kernel[grid_bit](
                 nu, mu, post, lam, bedge,
                 S, E, N,
                 MAXDEG_B=self.MAXDEG_B, BLOCK_S=BLOCK_S,
             )
-
-        post_np = post.detach().cpu().numpy().T  # (S, N)
-        if not return_messages:
-            return post_np
-        hard = (post_np < 0.0).astype(np.uint8)
-        return dict(posterior=post_np, hard=hard,
-                    mu=mu.detach().cpu().numpy().T,   # (S, E)
-                    nu=nu.detach().cpu().numpy().T)
+        return post, mu, nu
 
     def run_iterations(self, syndrome, n_iter=None, device="cuda",
                        return_messages=False):
@@ -347,18 +384,48 @@ class BpTriton:
         return res
 
     def decode_batch(self, dets, device="cuda"):
+        """Decode -> predicted observables, fully on-GPU.
+
+        Runs the Triton BP core on-device, takes the hard decision, then projects
+        through the observable map ``Lo`` on the GPU (int32 matmul, mod 2) so the
+        ONLY host transfers are the (S, n_checks) syndrome up and the small
+        (S, n_obs) prediction down -- the float posterior never leaves the GPU.
+        Result equals ``(Lo @ e_hat) % 2`` exactly (GF2)."""
         if self._Lo is None:
             raise RuntimeError(
                 "decode_batch requires construction via BpTriton.from_dem")
         dets = np.asarray(dets, dtype=bool)
         if dets.ndim == 1:
             dets = dets[None, :]
-        syn = dets.astype(np.uint8)
-        post = self.run_iterations_batch(syn, n_iter=self.max_iter,
-                                         device=device)            # (S, n_bits)
-        e_hat = (post < 0.0).astype(np.uint8)
-        pred = (self._Lo @ e_hat.T) & 1                            # (n_obs, S)
-        return pred.T.astype(bool)
+        dev = torch.device(device)
+        E, N, C = self.n_edges, self.n_bits, self.n_checks
+        lam, cedge, bedge, edge_bit, mu_init = self._device_tensors(dev)
+        Lo = self._Lo_dev(dev)                                  # (n_obs, N) int32
+
+        syn_t = torch.as_tensor(dets, device=dev)              # (S, C) bool
+        S = int(syn_t.shape[0])
+        syn_par = syn_t.to(torch.int32) & 1
+        ssign = torch.where(
+            syn_par.t() == 0,
+            torch.ones((), dtype=torch.float32, device=dev),
+            -torch.ones((), dtype=torch.float32, device=dev)).contiguous()  # (C,S)
+
+        post, _, _ = self._run_core(syn_t, ssign, lam, cedge, bedge, mu_init,
+                                    self.max_iter, dev, S, E, N, C)  # post (N,S)
+        e_hat = (post < 0.0).to(torch.float32)                 # (N, S) 0/1
+        # GF2 observable projection: (Lo @ e_hat) % 2. Entries are exact small
+        # integers in float32 (n_bits=1584 << 2^24), so fmod(.,2) is exact.
+        pred = torch.remainder(Lo @ e_hat, 2.0)                # (n_obs, S)
+        return (pred > 0.5).t().cpu().numpy()                  # (S, n_obs) bool
+
+    def _Lo_dev(self, dev):
+        """Cache + return the observable map ``Lo`` (n_obs, n_bits) float32 on dev."""
+        key = "Lo:" + str(dev)
+        cached = self._dev_cache.get(key)
+        if cached is None:
+            cached = torch.as_tensor(self._Lo.astype(np.float32), device=dev)
+            self._dev_cache[key] = cached
+        return cached
 
     # ------------------------------------------------------------------ #
     # Latency benchmark (matches BpGpu.bench_latency exactly).            #

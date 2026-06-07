@@ -83,7 +83,7 @@ def main():
         n=n_val)
     print("FULL_DECODE", out["full_decode"])
 
-    # ---- head-to-head latency ----
+    # ---- head-to-head: END-TO-END decode_batch (bench_latency harness) ----
     bench = []
     for shots in SHOTS_GRID:
         n_iter = 50 if shots <= 4096 else 20
@@ -103,16 +103,51 @@ def main():
             torch_mean_ms=round(rg["mean_ms"], 4),
             torch_p99_9_ms=round(rg["p99_9_ms"], 4),
             torch_throughput=round(rg["throughput_shots_per_s"], 1),
-            speedup_torch_over_triton=round(speedup, 3),
+            speedup_triton_over_torch=round(speedup, 3),
         )
         bench.append(row)
-        print("BENCH", row)
-    out["bench"] = bench
+        print("BENCH(decode_batch)", row)
+    out["bench_decode_batch"] = bench
 
-    best_speedup = max(r["speedup_torch_over_triton"] for r in bench)
+    # ---- FAIR head-to-head: BP-CORE ONLY (run_iterations_batch -> numpy) ----
+    # Isolates the kernel from the observable projection: BOTH classes return the
+    # (S, n_bits) posterior to host the same way, so this is the honest kernel
+    # speedup (no GPU-vs-CPU Lo-matmul confound).
+    def _bench_core(dec, shots, n=30, warm=8):
+        rng = np.random.default_rng(0)
+        syn = rng.integers(0, 2, size=(shots, dec.n_checks)).astype(np.uint8)
+        for _ in range(warm):
+            dec.run_iterations_batch(syn, n_iter=MAX_ITER, device="cuda")
+        torch.cuda.synchronize()
+        ev0 = torch.cuda.Event(enable_timing=True)
+        ev1 = torch.cuda.Event(enable_timing=True)
+        ts = []
+        for _ in range(n):
+            ev0.record()
+            dec.run_iterations_batch(syn, n_iter=MAX_ITER, device="cuda")
+            ev1.record(); torch.cuda.synchronize()
+            ts.append(ev0.elapsed_time(ev1))
+        return float(np.mean(ts))
+
+    core = []
+    for shots in SHOTS_GRID:
+        tt = _bench_core(trt, shots)
+        tg = _bench_core(gpu, shots)
+        row = dict(shots=shots, triton_mean_ms=round(tt, 4),
+                   torch_mean_ms=round(tg, 4),
+                   speedup_triton_over_torch=round(tg / tt, 3) if tt > 0 else 0.0)
+        core.append(row)
+        print("BENCH(bp_core)", row)
+    out["bench_bp_core"] = core
+
+    best_e2e = max(r["speedup_triton_over_torch"] for r in bench)
+    best_core = max(r["speedup_triton_over_torch"] for r in core)
     out["verdict"] = dict(
-        triton_beats_torch=bool(best_speedup > 1.0),
-        best_speedup_triton_over_torch=best_speedup,
+        triton_beats_torch=bool(best_core > 1.0),
+        best_speedup_e2e_decode_batch=best_e2e,
+        best_speedup_bp_core_only=best_core,
+        note=("BP-core-only is the honest kernel speedup; end-to-end additionally "
+              "moves the observable projection to the GPU."),
     )
     print("VERDICT", out["verdict"])
 
