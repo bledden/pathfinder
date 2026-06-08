@@ -1,0 +1,339 @@
+{
+  "kind": "cycle-time-budget",
+  "code": "[[72,12,6]] BB (BBCode default)",
+  "rounds": 6,
+  "p": 0.003,
+  "basis": "Z",
+  "gpu": "NVIDIA H200",
+  "platforms": {
+    "superconducting": {
+      "cycle_us": 1.0,
+      "block_budget_us": 6.0,
+      "note": "conceded to FPGA (Relay-BP FPGA 24 ns/iter); GPU band shown for ref"
+    },
+    "trapped-ion": {
+      "cycle_us": 1000.0,
+      "block_budget_us": 1000.0,
+      "note": "~1 ms gate/measurement cycle"
+    },
+    "neutral-atom": {
+      "cycle_us": 4450.0,
+      "block_budget_us": 4450.0,
+      "note": "4.45 ms measured cycle; often transversal (per-block)"
+    }
+  },
+  "per_decoder": {
+    "bp_triton": {
+      "available": true,
+      "is_gpu": true,
+      "us_per_syndrome": 0.794828908983618,
+      "us_per_block": 4.768973453901708,
+      "batch": 16384,
+      "throughput_shots_per_s": 1258132.3964156553,
+      "verdicts": {
+        "superconducting": {
+          "fits_per_syndrome": true,
+          "fits_per_block": true,
+          "syndrome_budget_us": 1.0,
+          "block_budget_us": 6.0,
+          "min_batch_under_syndrome_budget": 4096,
+          "min_batch_under_block_budget": 4096
+        },
+        "trapped-ion": {
+          "fits_per_syndrome": true,
+          "fits_per_block": true,
+          "syndrome_budget_us": 1000.0,
+          "block_budget_us": 1000.0,
+          "min_batch_under_syndrome_budget": 256,
+          "min_batch_under_block_budget": 256
+        },
+        "neutral-atom": {
+          "fits_per_syndrome": true,
+          "fits_per_block": true,
+          "syndrome_budget_us": 4450.0,
+          "block_budget_us": 4450.0,
+          "min_batch_under_syndrome_budget": 256,
+          "min_batch_under_block_budget": 256
+        }
+      }
+    },
+    "bp_gpu": {
+      "available": true,
+      "is_gpu": true,
+      "us_per_syndrome": 43.565174862742424,
+      "us_per_block": 261.39104917645454,
+      "batch": 16384,
+      "throughput_shots_per_s": 22954.114224277215,
+      "verdicts": {
+        "superconducting": {
+          "fits_per_syndrome": false,
+          "fits_per_block": false,
+          "syndrome_budget_us": 1.0,
+          "block_budget_us": 6.0,
+          "min_batch_under_syndrome_budget": null,
+          "min_batch_under_block_budget": null
+        },
+        "trapped-ion": {
+          "fits_per_syndrome": true,
+          "fits_per_block": true,
+          "syndrome_budget_us": 1000.0,
+          "block_budget_us": 1000.0,
+          "min_batch_under_syndrome_budget": 256,
+          "min_batch_under_block_budget": 256
+        },
+        "neutral-atom": {
+          "fits_per_syndrome": true,
+          "fits_per_block": true,
+          "syndrome_budget_us": 4450.0,
+          "block_budget_us": 4450.0,
+          "min_batch_under_syndrome_budget": 256,
+          "min_batch_under_block_budget": 256
+        }
+      }
+    },
+    "BP": {
+      "available": true,
+      "is_gpu": false,
+      "us_per_syndrome": 265.31718506501215,
+      "us_per_block": 1591.903110390073,
+      "batch": 1024,
+      "throughput_shots_per_s": 3769.0736080852216,
+      "verdicts": {
+        "superconducting": {
+          "fits_per_syndrome": false,
+          "fits_per_block": false,
+          "syndrome_budget_us": 1.0,
+          "block_budget_us": 6.0
+        },
+        "trapped-ion": {
+          "fits_per_syndrome": true,
+          "fits_per_block": false,
+          "syndrome_budget_us": 1000.0,
+          "block_budget_us": 1000.0
+        },
+        "neutral-atom": {
+          "fits_per_syndrome": true,
+          "fits_per_block": true,
+          "syndrome_budget_us": 4450.0,
+          "block_budget_us": 4450.0
+        }
+      }
+    },
+    "BPOSD-0": {
+      "available": true,
+      "is_gpu": false,
+      "us_per_syndrome": 281.95926513742756,
+      "us_per_block": 1691.7555908245654,
+      "batch": 256,
+      "throughput_shots_per_s": 3546.6115983548116,
+      "verdicts": {
+        "superconducting": {
+          "fits_per_syndrome": false,
+          "fits_per_block": false,
+          "syndrome_budget_us": 1.0,
+          "block_budget_us": 6.0
+        },
+        "trapped-ion": {
+          "fits_per_syndrome": true,
+          "fits_per_block": false,
+          "syndrome_budget_us": 1000.0,
+          "block_budget_us": 1000.0
+        },
+        "neutral-atom": {
+          "fits_per_syndrome": true,
+          "fits_per_block": true,
+          "syndrome_budget_us": 4450.0,
+          "block_budget_us": 4450.0
+        }
+      }
+    },
+    "BPOSD-10": {
+      "available": true,
+      "is_gpu": false,
+      "us_per_syndrome": 787.8698256212779,
+      "us_per_block": 4727.218953727667,
+      "batch": 128,
+      "throughput_shots_per_s": 1269.2452071145715,
+      "verdicts": {
+        "superconducting": {
+          "fits_per_syndrome": false,
+          "fits_per_block": false,
+          "syndrome_budget_us": 1.0,
+          "block_budget_us": 6.0
+        },
+        "trapped-ion": {
+          "fits_per_syndrome": true,
+          "fits_per_block": false,
+          "syndrome_budget_us": 1000.0,
+          "block_budget_us": 1000.0
+        },
+        "neutral-atom": {
+          "fits_per_syndrome": true,
+          "fits_per_block": false,
+          "syndrome_budget_us": 4450.0,
+          "block_budget_us": 4450.0
+        }
+      }
+    },
+    "BPLSD": {
+      "available": true,
+      "is_gpu": false,
+      "us_per_syndrome": 295.68623839521837,
+      "us_per_block": 1774.11743037131,
+      "batch": 256,
+      "throughput_shots_per_s": 3381.9632777883494,
+      "verdicts": {
+        "superconducting": {
+          "fits_per_syndrome": false,
+          "fits_per_block": false,
+          "syndrome_budget_us": 1.0,
+          "block_budget_us": 6.0
+        },
+        "trapped-ion": {
+          "fits_per_syndrome": true,
+          "fits_per_block": false,
+          "syndrome_budget_us": 1000.0,
+          "block_budget_us": 1000.0
+        },
+        "neutral-atom": {
+          "fits_per_syndrome": true,
+          "fits_per_block": true,
+          "syndrome_budget_us": 4450.0,
+          "block_budget_us": 4450.0
+        }
+      }
+    },
+    "RelayBP": {
+      "available": true,
+      "is_gpu": false,
+      "us_per_syndrome": 1557.1007580244138,
+      "us_per_block": 9342.604548146483,
+      "batch": 512,
+      "throughput_shots_per_s": 642.2191979848236,
+      "verdicts": {
+        "superconducting": {
+          "fits_per_syndrome": false,
+          "fits_per_block": false,
+          "syndrome_budget_us": 1.0,
+          "block_budget_us": 6.0
+        },
+        "trapped-ion": {
+          "fits_per_syndrome": false,
+          "fits_per_block": false,
+          "syndrome_budget_us": 1000.0,
+          "block_budget_us": 1000.0
+        },
+        "neutral-atom": {
+          "fits_per_syndrome": true,
+          "fits_per_block": false,
+          "syndrome_budget_us": 4450.0,
+          "block_budget_us": 4450.0
+        }
+      }
+    },
+    "SlidingWindow": {
+      "available": true,
+      "is_gpu": false,
+      "us_per_syndrome": 1609.498544793395,
+      "us_per_block": 9656.99126876037,
+      "batch": 128,
+      "throughput_shots_per_s": 621.3115278885612,
+      "verdicts": {
+        "superconducting": {
+          "fits_per_syndrome": false,
+          "fits_per_block": false,
+          "syndrome_budget_us": 1.0,
+          "block_budget_us": 6.0
+        },
+        "trapped-ion": {
+          "fits_per_syndrome": false,
+          "fits_per_block": false,
+          "syndrome_budget_us": 1000.0,
+          "block_budget_us": 1000.0
+        },
+        "neutral-atom": {
+          "fits_per_syndrome": true,
+          "fits_per_block": false,
+          "syndrome_budget_us": 4450.0,
+          "block_budget_us": 4450.0
+        }
+      }
+    },
+    "Tesseract": {
+      "available": true,
+      "is_gpu": false,
+      "us_per_syndrome": 3433.0500752831645,
+      "us_per_block": 20598.300451698986,
+      "batch": 256,
+      "throughput_shots_per_s": 291.28616771414795,
+      "verdicts": {
+        "superconducting": {
+          "fits_per_syndrome": false,
+          "fits_per_block": false,
+          "syndrome_budget_us": 1.0,
+          "block_budget_us": 6.0
+        },
+        "trapped-ion": {
+          "fits_per_syndrome": false,
+          "fits_per_block": false,
+          "syndrome_budget_us": 1000.0,
+          "block_budget_us": 1000.0
+        },
+        "neutral-atom": {
+          "fits_per_syndrome": true,
+          "fits_per_block": false,
+          "syndrome_budget_us": 4450.0,
+          "block_budget_us": 4450.0
+        }
+      }
+    }
+  },
+  "summary_fits_per_block": {
+    "superconducting": {
+      "fits_per_block": [
+        "bp_triton"
+      ],
+      "does_not_fit": [
+        "bp_gpu",
+        "BP",
+        "BPOSD-0",
+        "BPOSD-10",
+        "BPLSD",
+        "RelayBP",
+        "SlidingWindow",
+        "Tesseract"
+      ]
+    },
+    "trapped-ion": {
+      "fits_per_block": [
+        "bp_triton",
+        "bp_gpu"
+      ],
+      "does_not_fit": [
+        "BP",
+        "BPOSD-0",
+        "BPOSD-10",
+        "BPLSD",
+        "RelayBP",
+        "SlidingWindow",
+        "Tesseract"
+      ]
+    },
+    "neutral-atom": {
+      "fits_per_block": [
+        "bp_triton",
+        "bp_gpu",
+        "BP",
+        "BPOSD-0",
+        "BPLSD"
+      ],
+      "does_not_fit": [
+        "BPOSD-10",
+        "RelayBP",
+        "SlidingWindow",
+        "Tesseract"
+      ]
+    }
+  },
+  "framing": "'block' = R syndrome rounds; per-syndrome latency for GPU decoders is amortized over the batch (batch-dependent verdict); CPU decoders are ~batch-independent. The binding metric for a memory experiment is throughput/backlog (decode-rate >= syndrome-rate); per-syndrome latency fit + min-batch reported."
+}
