@@ -638,7 +638,8 @@ def run_all(device="cuda", cpu_batch=DEFAULT_BATCH, gpu_batches=GPU_BATCH_SWEEP,
             rounds=CANON_ROUNDS, p=CANON_P, basis=CANON_BASIS,
             include_gpu=True, include_sw=True, ext_dir=None, det_beam=64,
             both_workloads=True, clock_variance_runs=3,
-            both_workloads_batch=128):
+            both_workloads_batch=64, both_workloads_warmup=3,
+            both_workloads_reps=30):
     """Measure latency for every available decoder on the canonical DEM.
 
     Returns the full results manifest (dict). Each decoder that cannot be timed
@@ -752,8 +753,14 @@ def run_all(device="cuda", cpu_batch=DEFAULT_BATCH, gpu_batches=GPU_BATCH_SWEEP,
                 rounds=rounds, p=p, basis=basis, noise=CANON_NOISE,
                 dem_sha256=dem_sha,
                 batch=int(both_workloads_batch),
-                discipline=dict(n_warmup=n_warmup, n_reps=n_reps,
-                                drop_frac=DROP_FRAC, seed=seed),
+                discipline=dict(n_warmup=int(both_workloads_warmup),
+                                n_reps=int(both_workloads_reps),
+                                drop_frac=DROP_FRAC, seed=seed,
+                                note=("smaller batch/reps than the main figure "
+                                      "discipline: the uniform-random OSD "
+                                      "worst-case is ms/shot; the inflation "
+                                      "RATIO is robust at fewer reps and is the "
+                                      "reported quantity (not a figure point)")),
                 workloads=dict(
                     realistic=("circuit detector syndromes at the operational "
                                f"grid p={p} (sparse; the HEADLINE workload)"),
@@ -764,7 +771,8 @@ def run_all(device="cuda", cpu_batch=DEFAULT_BATCH, gpu_batches=GPU_BATCH_SWEEP,
                 results=measure_both_workloads(
                     dem, realistic_dets=bw_dets, n_det=dem.num_detectors,
                     batch=both_workloads_batch, seed=seed,
-                    n_warmup=n_warmup, n_reps=n_reps),
+                    n_warmup=int(both_workloads_warmup),
+                    n_reps=int(both_workloads_reps)),
             )
         except Exception as e:
             import traceback
@@ -902,7 +910,9 @@ def main(argv=None):
     ap.add_argument("--no-sw", action="store_true")
     ap.add_argument("--no-both-workloads", action="store_true")
     ap.add_argument("--clock-variance-runs", type=int, default=3)
-    ap.add_argument("--both-workloads-batch", type=int, default=128)
+    ap.add_argument("--both-workloads-batch", type=int, default=64)
+    ap.add_argument("--both-workloads-warmup", type=int, default=3)
+    ap.add_argument("--both-workloads-reps", type=int, default=30)
     ap.add_argument("--ext-dir", default=None)
     ap.add_argument("--det-beam", type=int, default=64)
     args = ap.parse_args(argv)
@@ -915,7 +925,9 @@ def main(argv=None):
         ext_dir=args.ext_dir, det_beam=args.det_beam,
         both_workloads=not args.no_both_workloads,
         clock_variance_runs=args.clock_variance_runs,
-        both_workloads_batch=args.both_workloads_batch)
+        both_workloads_batch=args.both_workloads_batch,
+        both_workloads_warmup=args.both_workloads_warmup,
+        both_workloads_reps=args.both_workloads_reps)
 
     # Split the sub-artifacts into their own committed JSON files.
     both_wl = manifest.pop("_both_workloads", None)
