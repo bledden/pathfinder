@@ -94,20 +94,22 @@ if _HAVE_TRITON:
         MAXDEG_C: tl.constexpr,
         BLOCK_S: tl.constexpr,
         INF: tl.constexpr,
+        DT: tl.constexpr,    # message dtype (tl.float32 or tl.float64)
     ):
         """One check's exclude-self min-sum over a BLOCK_S tile of shots.
 
         IDENTICAL to bp_triton's check update: program_id(0)=shot-tile,
         program_id(1)=check; two-smallest-magnitude / sign-parity exclude-self
-        min-sum, writes nu per edge."""
+        min-sum, writes nu per edge. ``DT`` selects fp32 (fast) or fp64
+        (LER-tightening, matches the relay_bp F64 oracle's precision)."""
         pid_s = tl.program_id(0)
         c = tl.program_id(1)
         s_off = pid_s * BLOCK_S + tl.arange(0, BLOCK_S)
         s_mask = s_off < S
 
         neg_par = tl.zeros((BLOCK_S,), dtype=tl.int32)
-        min1 = tl.full((BLOCK_S,), INF, dtype=tl.float32)
-        min2 = tl.full((BLOCK_S,), INF, dtype=tl.float32)
+        min1 = tl.full((BLOCK_S,), INF, dtype=DT)
+        min2 = tl.full((BLOCK_S,), INF, dtype=DT)
 
         for k in tl.static_range(MAXDEG_C):
             e = tl.load(CEDGE_ptr + c * MAXDEG_C + k)
@@ -147,6 +149,7 @@ if _HAVE_TRITON:
         S, E, N,
         MAXDEG_B: tl.constexpr,
         BLOCK_S: tl.constexpr,
+        DT: tl.constexpr,    # message dtype (tl.float32 or tl.float64)
     ):
         """One bit's Relay-BP memory bit-update over a BLOCK_S tile of shots.
 
@@ -172,7 +175,7 @@ if _HAVE_TRITON:
         gam = tl.load(GAMMA_ptr + b)                        # scalar per-bit gamma
         mprev = tl.load(MPREV_ptr + b * S + s_off, mask=s_mask, other=0.0)
 
-        incoming = tl.zeros((BLOCK_S,), dtype=tl.float32)
+        incoming = tl.zeros((BLOCK_S,), dtype=DT)
         for k in tl.static_range(MAXDEG_B):
             e = tl.load(BEDGE_ptr + b * MAXDEG_B + k)
             real = e >= 0
@@ -203,11 +206,15 @@ class RelayBpTriton:
     def __init__(self, H, priors, gamma0=0.1, pre_iter=80, num_sets=60,
                  set_max_iter=60, gamma_dist_interval=(-0.24, 0.66),
                  stop_nconv=5, stopping_criterion="nconv", alpha=1.0,
-                 gamma_seed=12345, block_s=256):
+                 gamma_seed=12345, block_s=256, dtype="float64"):
         if sp.issparse(H):
             H = H.toarray()
         self.H = (np.asarray(H, dtype=np.uint8) % 2)
         self.n_checks, self.n_bits = self.H.shape
+        # Message precision: fp64 matches the relay_bp F64 oracle (tightest LER);
+        # fp32 is ~2x faster with a few extra near-tie logical flips (reported).
+        self.dtype = str(dtype)
+        self._tdt = torch.float64 if self.dtype == "float64" else torch.float32
         self.gamma0 = float(gamma0)
         self.pre_iter = int(pre_iter)
         self.num_sets = int(num_sets)
@@ -225,7 +232,8 @@ class RelayBpTriton:
             raise ValueError(
                 f"priors length {priors.shape[0]} != n_bits {self.n_bits}")
         p = np.clip(priors, _P_LO, _P_HI)
-        lam = np.log((1.0 - p) / p).astype(np.float32)
+        _np_dt = np.float64 if self.dtype == "float64" else np.float32
+        lam = np.log((1.0 - p) / p).astype(_np_dt)
         self._lam_np = lam
         # weight LLR for lowest-weight selection: w(e) = sum_v e_v * log((1-p)/p).
         self._wllr_np = np.log((1.0 - p) / p).astype(np.float64)
@@ -263,7 +271,7 @@ class RelayBpTriton:
                 bedge[b, j] = edge_of[(c, b)]
         self._bedge_np = bedge
 
-        self.lam = torch.as_tensor(lam, dtype=torch.float32)
+        self.lam = torch.as_tensor(lam, dtype=self._tdt)
         self.cedge = torch.as_tensor(cedge, dtype=torch.int32)
         self.bedge = torch.as_tensor(bedge, dtype=torch.int32)
         self.edge_bit = torch.as_tensor(edge_bit, dtype=torch.long)
@@ -286,8 +294,10 @@ class RelayBpTriton:
             edge_bit = self.edge_bit.to(dev)
             mu_init = lam[edge_bit].contiguous()           # (E,) flooding init
             wllr = self.wllr.to(dev)
-            # H as a (n_checks, n_bits) float32 dense matrix for GF2 residual on GPU.
-            H_dev = torch.as_tensor(self.H.astype(np.float32), device=dev)
+            # H as a (n_checks, n_bits) dense matrix (message dtype) for the GF2
+            # syndrome residual on GPU. Entries 0/1 are exact in fp32 and fp64.
+            _ndt = np.float64 if self.dtype == "float64" else np.float32
+            H_dev = torch.as_tensor(self.H.astype(_ndt), device=dev)
             cached = (lam, cedge, bedge, edge_bit, mu_init, wllr, H_dev)
             self._dev_cache[key] = cached
         return cached
@@ -296,14 +306,14 @@ class RelayBpTriton:
     def from_dem(cls, dem, gamma0=0.1, pre_iter=80, num_sets=60, set_max_iter=60,
                  gamma_dist_interval=(-0.24, 0.66), stop_nconv=5,
                  stopping_criterion="nconv", alpha=1.0, gamma_seed=12345,
-                 block_s=256):
+                 block_s=256, dtype="float64"):
         from canon_dem import extract
         ex = extract(dem)
         obj = cls(ex["H"], priors=ex["priors"], gamma0=gamma0, pre_iter=pre_iter,
                   num_sets=num_sets, set_max_iter=set_max_iter,
                   gamma_dist_interval=gamma_dist_interval, stop_nconv=stop_nconv,
                   stopping_criterion=stopping_criterion, alpha=alpha,
-                  gamma_seed=gamma_seed, block_s=block_s)
+                  gamma_seed=gamma_seed, block_s=block_s, dtype=dtype)
         obj._dem = dem
         obj.dem = dem
         obj._Lo = ex["Lo"].toarray().astype(np.uint8)
@@ -314,12 +324,12 @@ class RelayBpTriton:
     # Low-level: one memory-BP leg over a batch (the kernel inner loop).  #
     # ------------------------------------------------------------------ #
     def _ssign(self, syn_t, dev):
-        """(-1)^{s_c} per (check, shot) -> (C, S) float32 (fired check -> -1)."""
+        """(-1)^{s_c} per (check, shot) -> (C, S) message-dtype (fired -> -1)."""
         syn_par = (syn_t.to(torch.int32) & 1)               # (S, C)
         return torch.where(
             syn_par.t() == 0,
-            torch.ones((), dtype=torch.float32, device=dev),
-            -torch.ones((), dtype=torch.float32, device=dev)).contiguous()
+            torch.ones((), dtype=self._tdt, device=dev),
+            -torch.ones((), dtype=self._tdt, device=dev)).contiguous()
 
     def _run_leg(self, ssign, lam, cedge, bedge, gamma, mu, M, n_iter,
                  dev, S, E, N, C):
@@ -329,8 +339,9 @@ class RelayBpTriton:
         messages (carried in from the previous leg / flooding init); ``M`` is
         (N, S) the previous posterior (the memory M(t-1), seeded from the relayed
         posterior). Returns (mu, M, post) with post = M (the final posterior)."""
-        post = torch.empty((N, S), dtype=torch.float32, device=dev)
-        nu = torch.empty((E, S), dtype=torch.float32, device=dev)
+        post = torch.empty((N, S), dtype=self._tdt, device=dev)
+        nu = torch.empty((E, S), dtype=self._tdt, device=dev)
+        dt = tl.float64 if self.dtype == "float64" else tl.float32
         BLOCK_S = self.block_s
         grid_s = triton.cdiv(S, BLOCK_S)
         grid_chk = (grid_s, C)
@@ -338,10 +349,10 @@ class RelayBpTriton:
         for _ in range(int(n_iter)):
             _check_update_kernel[grid_chk](
                 mu, nu, ssign, cedge, S, E, C, self.ms,
-                MAXDEG_C=self.MAXDEG_C, BLOCK_S=BLOCK_S, INF=_INF)
+                MAXDEG_C=self.MAXDEG_C, BLOCK_S=BLOCK_S, INF=_INF, DT=dt)
             _bit_update_relay_kernel[grid_bit](
                 nu, mu, post, M, lam, gamma, bedge, S, E, N,
-                MAXDEG_B=self.MAXDEG_B, BLOCK_S=BLOCK_S)
+                MAXDEG_B=self.MAXDEG_B, BLOCK_S=BLOCK_S, DT=dt)
             # M(t-1) <- M(t): the memory feedback. Copy so next iter reads it.
             M = post.clone()
         return mu, M, post
@@ -373,7 +384,7 @@ class RelayBpTriton:
             ssign = self._ssign(syn_t, dev)
             mu = mu_init.unsqueeze(1).expand(E, S).contiguous()
             M = lam.unsqueeze(1).expand(N, S).contiguous()    # M(0) = lam0
-            gamma_t = torch.full((N,), float(gamma), dtype=torch.float32, device=dev)
+            gamma_t = torch.full((N,), float(gamma), dtype=self._tdt, device=dev)
             _, _, post = self._run_leg(ssign, lam, cedge, bedge, gamma_t, mu, M,
                                        n_iter, dev, S, E, N, C)
             return post.detach().cpu().numpy().T              # (S, N)
@@ -388,11 +399,12 @@ class RelayBpTriton:
         seeded by (gamma_seed, leg_idx) so runs reproduce. Pre leg = uniform
         gamma0; relay legs = per-node Uniform(lo, hi) (DISORDERED, may be < 0)."""
         if leg_idx == 0:
-            return torch.full((self.n_bits,), self.gamma0, dtype=torch.float32,
+            return torch.full((self.n_bits,), self.gamma0, dtype=self._tdt,
                               device=dev)
         rng = np.random.default_rng((self.gamma_seed, leg_idx))
+        _ndt = np.float64 if self.dtype == "float64" else np.float32
         g = rng.uniform(self.gamma_lo, self.gamma_hi,
-                        size=self.n_bits).astype(np.float32)
+                        size=self.n_bits).astype(_ndt)
         return torch.as_tensor(g, device=dev)
 
     def _relay_posteriors(self, syn_t, dev):
@@ -403,7 +415,7 @@ class RelayBpTriton:
         lam, cedge, bedge, edge_bit, mu_init, wllr, H_dev = self._device_tensors(dev)
         S = int(syn_t.shape[0])
         ssign = self._ssign(syn_t, dev)                       # (C, S)
-        syn_cs = syn_t.to(torch.float32).t().contiguous()     # (C, S) 0/1
+        syn_cs = syn_t.to(self._tdt).t().contiguous()         # (C, S) 0/1
 
         # relayed state: mu (E,S) flooding init, M (N,S) = lam0 broadcast.
         mu = mu_init.unsqueeze(1).expand(E, S).contiguous()
@@ -411,9 +423,8 @@ class RelayBpTriton:
 
         big = torch.full((), _INF, dtype=torch.float64, device=dev)
         best_w = big.expand(S).clone()                        # (S,) best weight
-        best_eh = torch.zeros((N, S), dtype=torch.float32, device=dev)
+        best_eh = torch.zeros((N, S), dtype=self._tdt, device=dev)
         nconv = torch.zeros((S,), dtype=torch.int32, device=dev)
-        wllr32 = wllr.to(torch.float32)
 
         n_legs = 1 + self.num_sets
         for leg in range(n_legs):
@@ -422,7 +433,7 @@ class RelayBpTriton:
             mu, M, post = self._run_leg(ssign, lam, cedge, bedge, gamma, mu, M,
                                         n_iter, dev, S, E, N, C)
             # hard decision + GF2 syndrome residual for THIS leg.
-            eh = (post < 0.0).to(torch.float32)               # (N, S)
+            eh = (post < 0.0).to(self._tdt)                   # (N, S)
             resid = torch.remainder(H_dev @ eh, 2.0)          # (C, S)
             valid = (torch.abs(resid - syn_cs).sum(dim=0) == 0)   # (S,) bool
             # leg weight w = sum_v e_v * wllr_v (only meaningful where valid).
@@ -462,7 +473,8 @@ class RelayBpTriton:
         key = "Lo:" + str(dev)
         cached = self._dev_cache.get(key)
         if cached is None:
-            cached = torch.as_tensor(self._Lo.astype(np.float32), device=dev)
+            _ndt = np.float64 if self.dtype == "float64" else np.float32
+            cached = torch.as_tensor(self._Lo.astype(_ndt), device=dev)
             self._dev_cache[key] = cached
         return cached
 
