@@ -1,0 +1,414 @@
+{
+  "kind": "decoder-amenability-taxonomy",
+  "code": "[[72,12,6]] BB (BBCode default)",
+  "rounds": 6,
+  "basis": "Z",
+  "noise": "si1000",
+  "committed_p_grid": [
+    0.001,
+    0.002,
+    0.003,
+    0.005
+  ],
+  "dem_structure": {
+    "n_checks": 252,
+    "n_bits": 1584,
+    "n_edges": 4536,
+    "MAXDEG_C": 20,
+    "MAXDEG_B": 3,
+    "basis": "check-degree 13/20, bit-degree 2/3 (irregular circuit-level DEM)"
+  },
+  "env": {
+    "python": "3.11.10",
+    "platform": "Linux-6.8.0-57-generic-x86_64-with-glibc2.35",
+    "numpy": "2.2.6",
+    "scipy": "1.17.1",
+    "stim": "1.15.0",
+    "ldpc": "2.4.1",
+    "relay_bp": "0.2.2",
+    "tesseract_decoder": "0.1.1.dev20260526203925",
+    "torch": "2.4.1+cu124",
+    "triton": "3.0.0",
+    "qldpc_ext": null,
+    "cuda": "12.4",
+    "gpu_name": "NVIDIA H200",
+    "gpu_driver": "580.126.09"
+  },
+  "gpu": "NVIDIA H200",
+  "fallthrough": {
+    "kind": "osd-lsd-fallthrough-vs-p",
+    "p_grid": [
+      0.001,
+      0.002,
+      0.003,
+      0.005
+    ],
+    "shots": 4000,
+    "seed": 0,
+    "bp_us_per_syndrome": 265.31718506501215,
+    "osd_post_increment_us": 522.5526405562657,
+    "osd_increment_basis": "reasoned-from-measured (BPOSD-10 us/syn - BP us/syn, T9 amortized)",
+    "bposd10_total_us": 787.8698256212779,
+    "rows": [
+      {
+        "p": 0.001,
+        "shots": 4000,
+        "n_fallthrough": 36,
+        "fallthrough_rate": 0.009,
+        "mean_iter": 1.62775,
+        "config": {
+          "bp_method": "minimum_sum",
+          "ms_scaling_factor": 0.625,
+          "max_iter": 30,
+          "schedule": "parallel"
+        },
+        "basis": "measured",
+        "effective_latency_us": 270.02015883001854
+      },
+      {
+        "p": 0.002,
+        "shots": 4000,
+        "n_fallthrough": 144,
+        "fallthrough_rate": 0.036,
+        "mean_iter": 3.39775,
+        "config": {
+          "bp_method": "minimum_sum",
+          "ms_scaling_factor": 0.625,
+          "max_iter": 30,
+          "schedule": "parallel"
+        },
+        "basis": "measured",
+        "effective_latency_us": 284.1290801250377
+      },
+      {
+        "p": 0.003,
+        "shots": 4000,
+        "n_fallthrough": 416,
+        "fallthrough_rate": 0.104,
+        "mean_iter": 6.459,
+        "config": {
+          "bp_method": "minimum_sum",
+          "ms_scaling_factor": 0.625,
+          "max_iter": 30,
+          "schedule": "parallel"
+        },
+        "basis": "measured",
+        "effective_latency_us": 319.66265968286376
+      },
+      {
+        "p": 0.005,
+        "shots": 4000,
+        "n_fallthrough": 1569,
+        "fallthrough_rate": 0.39225,
+        "mean_iter": 15.87975,
+        "config": {
+          "bp_method": "minimum_sum",
+          "ms_scaling_factor": 0.625,
+          "max_iter": 30,
+          "schedule": "parallel"
+        },
+        "basis": "measured",
+        "effective_latency_us": 470.28845832320735
+      }
+    ],
+    "note": "fallthrough = fraction of shots where bare min-sum BP does NOT converge (would invoke OSD/LSD post-processing); effective latency = BP_us + fallthrough*OSD_increment_us. Fallthrough is MEASURED; latencies are MEASURED (T9), so the effective-latency curve is fully empirical."
+  },
+  "amdahl": {
+    "kind": "amdahl-serial-fraction",
+    "columns": [
+      "decoder",
+      "total_us",
+      "parallel_us",
+      "serial_us",
+      "serial_fraction",
+      "speedup_ceiling",
+      "serial_kind",
+      "split_basis",
+      "basis"
+    ],
+    "rows": [
+      {
+        "decoder": "BP",
+        "total_us": 265.31718506501215,
+        "parallel_us": 252.05132581176153,
+        "serial_us": 13.265859253250625,
+        "serial_fraction": 0.050000000000000065,
+        "speedup_ceiling": 19.999999999999975,
+        "serial_kind": "host launch/marshalling (no post-processing)",
+        "split_basis": "reasoned-share",
+        "basis": "reasoned: receipt shows BP is launch-bound & embarrassingly parallel across shots/edges; serial = residual host overhead after fusion (110->24 launches/iter)."
+      },
+      {
+        "decoder": "BPOSD-0",
+        "total_us": 281.95926513742756,
+        "parallel_us": 265.31718506501215,
+        "serial_us": 16.64208007241541,
+        "serial_fraction": 0.059022994205577974,
+        "speedup_ceiling": 16.942549483629804,
+        "serial_kind": "OSD-0 single GF2 back-substitution (sequential elimination)",
+        "split_basis": "measured-increment",
+        "basis": "reasoned-from-measured: serial = (BPOSD-0 - BP) us/syn measured increment (the OSD-0 elimination); parallel = the BP base."
+      },
+      {
+        "decoder": "BPOSD-10",
+        "total_us": 787.8698256212779,
+        "parallel_us": 265.31718506501215,
+        "serial_us": 522.5526405562657,
+        "serial_fraction": 0.6632474344911036,
+        "speedup_ceiling": 1.5077329334372471,
+        "serial_kind": "OSD-cs order-10 dense Gaussian elimination + combo sweep",
+        "split_basis": "measured-increment",
+        "basis": "reasoned-from-measured: serial = (BPOSD-10 - BP) us/syn measured increment (the dense GE + order-10 combination sweep); parallel = the BP base. The GE inner loop is the serial bottleneck."
+      },
+      {
+        "decoder": "BPLSD",
+        "total_us": 295.68623839521837,
+        "parallel_us": 265.31718506501215,
+        "serial_us": 30.369053330206214,
+        "serial_fraction": 0.1027070231439534,
+        "speedup_ceiling": 9.736432518333313,
+        "serial_kind": "LSD localised cluster solves (sparse, irregular; small GE per cluster)",
+        "split_basis": "measured-increment",
+        "basis": "reasoned-from-measured: serial = (BPLSD - BP) us/syn measured increment (the localised cluster solves); parallel = BP base. LSD's localised solves are cheaper & more parallel than OSD-cs."
+      },
+      {
+        "decoder": "Tesseract",
+        "total_us": 3433.0500752831645,
+        "parallel_us": 514.9575112924747,
+        "serial_us": 2918.09256399069,
+        "serial_fraction": 0.8500000000000001,
+        "speedup_ceiling": 1.176470588235294,
+        "serial_kind": "A* beam-search frontier expansion (priority-queue sequential)",
+        "split_basis": "reasoned-share",
+        "basis": "reasoned: A* beam expansion is sequential (each step depends on the prior frontier); only per-node cost eval parallelizes. Search-bound -> dominantly serial."
+      },
+      {
+        "decoder": "RelayBP",
+        "total_us": 1557.1007580244138,
+        "parallel_us": 1245.6806064195312,
+        "serial_us": 311.4201516048827,
+        "serial_fraction": 0.19999999999999993,
+        "speedup_ceiling": 5.000000000000002,
+        "serial_kind": "relay handoff + nconv stopping across the disjoint ensemble",
+        "split_basis": "reasoned-share",
+        "basis": "reasoned: the disjoint-ensemble BP solvers parallelize (min-sum BP, launch-bound); serial = the relay schedule handoff + nconv stopping coordination across ensemble members."
+      },
+      {
+        "decoder": "SlidingWindow",
+        "total_us": 1609.498544793395,
+        "parallel_us": 482.8495634380185,
+        "serial_us": 1126.6489813553765,
+        "serial_fraction": 0.7,
+        "speedup_ceiling": 1.4285714285714286,
+        "serial_kind": "per-window OSD-cs GE + strict inter-window commit/carry stitch",
+        "split_basis": "reasoned-share",
+        "basis": "reasoned: windows must run in time order (window k+1 needs k's committed correction -> serial stitch) and each window's inner BP-OSD-cs has the OSD GE serial part; only intra-window BP parallelizes."
+      }
+    ],
+    "note": "total_us = MEASURED T9 us/syndrome; serial/parallel split is measured-increment (anchored to bare-BP gap) or reasoned-share per the algorithmic structure; ceiling = 1/serial_fraction (Amdahl, perfect parallelization of the parallel part)."
+  },
+  "roofline": {
+    "kind": "roofline-position",
+    "columns": [
+      "decoder",
+      "flop_per_byte",
+      "bound_type",
+      "tensor_core_path",
+      "throughput_shots_per_s",
+      "basis",
+      "note"
+    ],
+    "rows": [
+      {
+        "decoder": "BP (min-sum, kernel target)",
+        "flop_per_byte": 0.1667,
+        "bound_type": "memory-bandwidth-bound",
+        "tensor_core_path": false,
+        "throughput_shots_per_s": 3769.0736080852216,
+        "basis": "measured (launch-overhead receipt: 0.17 flop/byte, no GEMM ops)",
+        "note": "min-sum is a min/sum semiring -> NO GEMM / tensor-core path; the kernel win is launch fusion (110->24 launches/iter) + coalesced fp32, NOT tensor cores. Forecloses 'why not cuBLAS'."
+      },
+      {
+        "decoder": "BPOSD-10",
+        "flop_per_byte": null,
+        "bound_type": "compute-bound (dense GF2 Gaussian elimination)",
+        "tensor_core_path": true,
+        "throughput_shots_per_s": 1269.2452071145715,
+        "basis": "reasoned (OSD-cs inner loop is a dense GE; GE has a GEMM path)",
+        "note": "FUTURE-WORK OPPORTUNITY: the OSD-cs order-10 inner loop is a DENSE Gaussian elimination over GF2 columns \u2014 a dense linear-algebra kernel that DOES have a tensor-core / blocked-GEMM path (GF2 GE can be tiled as boolean matmul). Unlike min-sum BP, OSD's serial GE is the natural tensor-core target. This is the single largest unexploited GPU lever for the practical decoder bar (see Amdahl: OSD's GE is ~66% serial of BPOSD-10)."
+      },
+      {
+        "decoder": "BPLSD",
+        "flop_per_byte": null,
+        "bound_type": "memory-latency-bound (sparse, irregular cluster solves)",
+        "tensor_core_path": false,
+        "throughput_shots_per_s": 3381.9632777883494,
+        "basis": "reasoned (LSD does localised sparse cluster solves, not dense GE)",
+        "note": "LSD replaces OSD's global dense GE with LOCALISED cluster solves on the residual syndrome -> sparse, irregular memory access; gather/scatter-bound, NOT a clean GEMM target. Faster than OSD-cs but harder to tensor-core."
+      },
+      {
+        "decoder": "Tesseract",
+        "flop_per_byte": null,
+        "bound_type": "search-bound (A* beam expansion, branch-heavy)",
+        "tensor_core_path": false,
+        "throughput_shots_per_s": 291.28616771414795,
+        "basis": "reasoned (A* beam search: control-flow/branch-bound, no GEMM)",
+        "note": "A* beam search over the DEM is dominated by priority-queue / branchy frontier expansion -> control-flow-bound, no dense linear-algebra inner loop -> NO tensor-core path. The MLE anchor is a reference point, not a kernel target."
+      },
+      {
+        "decoder": "RelayBP",
+        "flop_per_byte": 0.1667,
+        "bound_type": "memory-bandwidth-bound (ensemble min-sum BP)",
+        "tensor_core_path": false,
+        "throughput_shots_per_s": 642.2191979848236,
+        "basis": "reasoned (disjoint-ensemble of the same min-sum BP semiring)",
+        "note": "Relay-BP is an ensemble of min-sum BP solvers -> the SAME min/sum semiring as bare BP -> bandwidth-bound, no tensor-core path. Shares the BP kernel front-end (5/8 zoo decoders)."
+      }
+    ],
+    "note": "kernel-BP point MEASURED (receipt: 0.17 flop/byte, no GEMM); others REASONED bound-type classifications. tensor_core_path flags BP-OSD-10's dense-GE GEMM future-work opportunity."
+  },
+  "memory": {
+    "kind": "memory-footprint",
+    "edges": 4536,
+    "fp32_bytes": 4,
+    "bp_msg_model": "2 * edges * fp32 (bi-directional message arrays)",
+    "device_memory_gb": {
+      "H200": 143.0,
+      "A100-80GB": 80.0,
+      "RTX-4090-24GB": 24.0
+    },
+    "usable_fraction": 0.8,
+    "rows": [
+      {
+        "decoder": "BP",
+        "bp_msg_bytes_per_shot": 36288,
+        "aux_bytes_per_shot": 0,
+        "total_bytes_per_shot": 36288,
+        "aux_kind": "none (hard decision off the BP messages)",
+        "max_batch": {
+          "H200": 3385032,
+          "A100-80GB": 1893724,
+          "RTX-4090-24GB": 568117
+        },
+        "basis": "reasoned: BP holds only the message arrays + LLR scratch."
+      },
+      {
+        "decoder": "BPOSD-0",
+        "bp_msg_bytes_per_shot": 36288,
+        "aux_bytes_per_shot": 10886,
+        "total_bytes_per_shot": 47174,
+        "aux_kind": "OSD-0 reduced column set + single solve scratch",
+        "max_batch": {
+          "H200": 2603871,
+          "A100-80GB": 1456711,
+          "RTX-4090-24GB": 437013
+        },
+        "basis": "reasoned: OSD-0 keeps the BP-ordered reduced columns + one back-substitution buffer."
+      },
+      {
+        "decoder": "BPOSD-10",
+        "bp_msg_bytes_per_shot": 36288,
+        "aux_bytes_per_shot": 54432,
+        "total_bytes_per_shot": 90720,
+        "aux_kind": "OSD-cs dense GE lattice + order-10 combination buffers",
+        "max_batch": {
+          "H200": 1354013,
+          "A100-80GB": 757489,
+          "RTX-4090-24GB": 227246
+        },
+        "basis": "reasoned: the dense GE working matrix + the order-10 combination-sweep candidate buffers dominate (a dense n_checks x reduced-cols GF2 lattice per shot)."
+      },
+      {
+        "decoder": "BPLSD",
+        "bp_msg_bytes_per_shot": 36288,
+        "aux_bytes_per_shot": 21772,
+        "total_bytes_per_shot": 58060,
+        "aux_kind": "LSD localised cluster buffers (sparse, grows with residual)",
+        "max_batch": {
+          "H200": 2115645,
+          "A100-80GB": 1183577,
+          "RTX-4090-24GB": 355073
+        },
+        "basis": "reasoned: localised cluster solves hold per-cluster scratch; sparser than OSD's dense lattice."
+      },
+      {
+        "decoder": "Tesseract",
+        "bp_msg_bytes_per_shot": 36288,
+        "aux_bytes_per_shot": 108864,
+        "total_bytes_per_shot": 145152,
+        "aux_kind": "A* beam frontier (beam=64 live nodes + cost map)",
+        "max_batch": {
+          "H200": 846258,
+          "A100-80GB": 473431,
+          "RTX-4090-24GB": 142029
+        },
+        "basis": "reasoned: the beam frontier holds up to det_beam=64 live partial cosets + priority queue + visited set per shot -> the largest aux footprint."
+      },
+      {
+        "decoder": "RelayBP",
+        "bp_msg_bytes_per_shot": 36288,
+        "aux_bytes_per_shot": 72576,
+        "total_bytes_per_shot": 108864,
+        "aux_kind": "disjoint ensemble (num_sets=60 BP states)",
+        "max_batch": {
+          "H200": 1128344,
+          "A100-80GB": 631241,
+          "RTX-4090-24GB": 189372
+        },
+        "basis": "reasoned: the relay ensemble holds multiple concurrent BP message states (one per active set in the schedule)."
+      },
+      {
+        "decoder": "SlidingWindow",
+        "bp_msg_bytes_per_shot": 36288,
+        "aux_bytes_per_shot": 54432,
+        "total_bytes_per_shot": 90720,
+        "aux_kind": "per-window OSD lattice + commit/carry buffers",
+        "max_batch": {
+          "H200": 1354013,
+          "A100-80GB": 757489,
+          "RTX-4090-24GB": 227246
+        },
+        "basis": "reasoned: a windowed OSD lattice + the committed-correction carry buffer across windows."
+      }
+    ],
+    "note": "working set = BP message arrays (edges*fp32*batch, MEASURED edge count) + per-decoder AUX state (REASONED model). max_batch = floor(usable_device_bytes / bytes_per_shot); throughput ceiling = max_batch decoded per kernel launch. Larger aux (Tesseract beam, Relay ensemble, OSD lattice) shrinks the max batch -> lower throughput ceiling at fixed memory."
+  },
+  "gate_b": {
+    "n": 15000,
+    "n_decoder_fail": 1447,
+    "n_anchor_fail": 1420,
+    "n_residual_gap": 241,
+    "population_weight": {
+      "mean": 34.33486666666667,
+      "std": 8.08247606926138,
+      "min": 6.0,
+      "max": 74.0
+    },
+    "residual_weight": {
+      "mean": 39.08298755186722,
+      "std": 8.305705932510758,
+      "min": 16.0,
+      "max": 62.0
+    },
+    "mean_shift_sigma": 9.119811487118971,
+    "cohens_d": 0.5871998137308108,
+    "spread_ratio": 1.0276189946417964,
+    "ks_statistic": 0.2371756569847856,
+    "ks_pvalue": 3.26041011324409e-12,
+    "verdict": "STRUCTURED",
+    "verdict_reason": "residual-gap weight distribution departs from the population (KS p=3.26e-12 < 0.01, mean shift +9.12 sigma, Cohen's d=+0.59, spread ratio=1.03). STRUCTURE KIND = DIFFUSE weight-correlated SHIFT (same spread as the population, modest effect size) -> the gap is just 'heavier syndromes fail more often', NOT a sharp separable fault class. T10/AutDEC target is NARROW at best: a neural corrector would have to beat OSD on the high-weight tail where MLE's exhaustive search already wins -> low expected ROI; T10 stays SKIP.",
+    "basis": "measured (per-shot fail masks + syndrome weights from run_matched)",
+    "population_obs_flips_mean": 5.494666666666666,
+    "residual_obs_flips_mean": 5.6970954356846475,
+    "p": 0.005,
+    "shots": 15000,
+    "seed": 0,
+    "rounds": 6,
+    "basis_axis": "syndrome_weight (number of fired detectors per shot)",
+    "decoder": "BPOSD-10",
+    "anchor": "Tesseract",
+    "det_beam": 64,
+    "bposd_fails": 1447,
+    "tesseract_fails": 1420
+  }
+}
