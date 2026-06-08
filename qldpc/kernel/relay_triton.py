@@ -332,13 +332,22 @@ class RelayBpTriton:
             -torch.ones((), dtype=self._tdt, device=dev)).contiguous()
 
     def _run_leg(self, ssign, lam, cedge, bedge, gamma, mu, M, n_iter,
-                 dev, S, E, N, C):
+                 dev, S, E, N, C, conv_ctx=None):
         """Run ``n_iter`` flooding Memory-BP iterations IN PLACE on (mu, M).
 
         ``gamma`` is (N,) per-bit memory strength; ``mu`` is (E, S) check->bit
         messages (carried in from the previous leg / flooding init); ``M`` is
         (N, S) the previous posterior (the memory M(t-1), seeded from the relayed
-        posterior). Returns (mu, M, post) with post = M (the final posterior)."""
+        posterior). Returns (mu, M, post) with post = M (the final posterior).
+
+        If ``conv_ctx`` is given (the relay decode path), the FIRST-CONVERGENCE
+        solution per shot is captured DURING the leg -- relay_bp freezes a shot's
+        solution at the iteration it first satisfies the syndrome, NOT at the end
+        of the fixed iteration budget (running past convergence drifts to a
+        different solution; that drift was a ~7-LER error vs the oracle). ``conv_ctx``
+        = (H_dev (C,N), syn_cs (C,S), wllr (N,), best_w (S,), best_eh (N,S),
+        leg_conv (S,) bool) updated in place; ``leg_conv`` flags shots that
+        converged at least once in THIS leg (for the nconv count)."""
         post = torch.empty((N, S), dtype=self._tdt, device=dev)
         nu = torch.empty((E, S), dtype=self._tdt, device=dev)
         dt = tl.float64 if self.dtype == "float64" else tl.float32
@@ -355,6 +364,18 @@ class RelayBpTriton:
                 MAXDEG_B=self.MAXDEG_B, BLOCK_S=BLOCK_S, DT=dt)
             # M(t-1) <- M(t): the memory feedback. Copy so next iter reads it.
             M = post.clone()
+            if conv_ctx is not None:
+                H_dev, syn_cs, wllr, best_w, best_eh, leg_conv = conv_ctx
+                eh = (post < 0.0).to(self._tdt)               # (N, S)
+                resid = torch.remainder(H_dev @ eh, 2.0)      # (C, S)
+                valid = (torch.abs(resid - syn_cs).sum(dim=0) == 0)   # (S,) bool
+                if bool(valid.any()):
+                    w = (eh.to(torch.float64)
+                         * wllr.unsqueeze(1)).sum(dim=0)      # (S,)
+                    improve = valid & (w < best_w)
+                    best_w.copy_(torch.where(improve, w, best_w))
+                    torch.where(improve.unsqueeze(0), eh, best_eh, out=best_eh)
+                    leg_conv |= valid
         return mu, M, post
 
     # ------------------------------------------------------------------ #
@@ -430,22 +451,18 @@ class RelayBpTriton:
         for leg in range(n_legs):
             n_iter = self.pre_iter if leg == 0 else self.set_max_iter
             gamma = self._gamma_for_leg(leg, dev)
+            # FIRST-CONVERGENCE capture during the leg (relay_bp freezes a shot's
+            # solution at the iter it first satisfies the syndrome).
+            leg_conv = torch.zeros((S,), dtype=torch.bool, device=dev)
+            conv_ctx = (H_dev, syn_cs, wllr, best_w, best_eh, leg_conv)
             mu, M, post = self._run_leg(ssign, lam, cedge, bedge, gamma, mu, M,
-                                        n_iter, dev, S, E, N, C)
-            # hard decision + GF2 syndrome residual for THIS leg.
-            eh = (post < 0.0).to(self._tdt)                   # (N, S)
-            resid = torch.remainder(H_dev @ eh, 2.0)          # (C, S)
-            valid = (torch.abs(resid - syn_cs).sum(dim=0) == 0)   # (S,) bool
-            # leg weight w = sum_v e_v * wllr_v (only meaningful where valid).
-            w = (eh.to(torch.float64) * wllr.unsqueeze(1)).sum(dim=0)  # (S,)
-            # update best where valid AND lower weight.
-            improve = valid & (w < best_w)
-            best_w = torch.where(improve, w, best_w)
-            best_eh = torch.where(improve.unsqueeze(0), eh, best_eh)
-            nconv = nconv + valid.to(torch.int32)
+                                        n_iter, dev, S, E, N, C,
+                                        conv_ctx=conv_ctx)
+            # a leg counts ONE convergence toward nconv if the shot converged at
+            # least once during it (nconv = number of legs that found a solution).
+            nconv = nconv + leg_conv.to(torch.int32)
             if self.stopping_criterion == "nconv":
-                done = nconv >= self.stop_nconv
-                if bool(done.all()):
+                if bool((nconv >= self.stop_nconv).all()):
                     break
         return best_eh
 
