@@ -540,11 +540,12 @@ BOTH_WORKLOADS_REFERENCE_NOTE = (
     "family: its residual support (and thus GE work) grows with syndrome density.")
 
 
-# BP+LSD on FULLY-DENSE (p=0.5) syndromes is pathologically slow (>30 s/shot
-# measured on H200): the localized-statistics decoder thrashes over a residual
-# support that spans most of the lattice -- a regime that NEVER occurs
-# operationally (real syndromes are sparse at p=0.003). We therefore measure its
-# uniform-random worst-case on a tiny shot count and cap it; the OSD family
+# BP+LSD on FULLY-DENSE (p=0.5) syndromes is pathologically slow (a SINGLE dense
+# shot did not complete in >11 min on H200): the localized-statistics decoder's
+# clustering explodes over a residual support spanning most of the lattice -- a
+# regime that NEVER occurs operationally (real syndromes are sparse at p=0.003).
+# We SKIP its uniform-random measurement and record an explicit note rather than
+# burn unbounded compute on a non-operational bound; the OSD family
 # (BP-OSD-0/-10) carries the headline inflation finding. Honest: stated, not hidden.
 UNIFORM_PATHOLOGICAL = {"BPLSD"}
 
@@ -584,27 +585,37 @@ def measure_both_workloads(dem, *, decoders=BOTH_WORKLOADS_DECODERS,
             adapter = makers[name]()
             rec_real = time_cpu_decoder(adapter, real,
                                         n_warmup=n_warmup, n_reps=n_reps)
-            # uniform-random worst-case on a small shot count (per-shot cost is
-            # ms-to-seconds; the ratio is the reported quantity). LSD's dense
-            # cost is seconds/shot -> 1 shot, 1 rep, no warmup.
-            patho = name in UNIFORM_PATHOLOGICAL
-            u_shots = pathological_uniform_shots if patho else uniform_shots
-            u_warm = 0 if patho else uniform_warmup
-            u_reps = 1 if patho else uniform_reps
-            uni = uniform_random_detectors(n_det, u_shots, seed=seed + 1)
-            rec_uni = time_cpu_decoder(
-                adapter, uni, n_warmup=u_warm, n_reps=u_reps)
-            rec_uni["note"] = (
-                f"uniform-random timed on {u_shots} shots "
-                f"(warmup={uniform_warmup}, reps={uniform_reps}); per-shot cost "
-                "is ms-to-seconds on dense syndromes, the RATIO is the reported "
-                "quantity (per-syndrome latency is batch-invariant)")
             if name in UNIFORM_PATHOLOGICAL:
-                rec_uni["caveat"] = (
-                    "BP+LSD on FULLY-DENSE syndromes is pathologically slow "
-                    "(>30 s/shot, localized-statistics thrash) -- a regime that "
-                    "never occurs operationally; this is an extreme upper bound, "
-                    "not a representative number.")
+                # SKIP: a single dense LSD shot did not complete in >11 min --
+                # non-operational, unbounded. Record the skip honestly.
+                out[name] = dict(
+                    decoder=name,
+                    realistic=rec_real,
+                    uniform_random=dict(
+                        skipped="pathological",
+                        note=("BP+LSD on FULLY-DENSE (p=0.5) syndromes did not "
+                              "complete a single shot in >11 min on H200 "
+                              "(localized-statistics clustering explodes over a "
+                              "near-full-lattice residual support) -- a regime "
+                              "that never occurs operationally (real syndromes "
+                              "are sparse at p=0.003). Skipped: an unbounded, "
+                              "non-operational bound, not a representative "
+                              "number. The OSD family carries the inflation "
+                              "finding.")),
+                    inflation_x=None,
+                )
+                continue
+            # OSD family: uniform-random worst-case on a small shot count
+            # (per-shot cost is ms; the ratio is the reported quantity; per-
+            # syndrome latency is batch-invariant so the smaller batch is fair).
+            uni = uniform_random_detectors(n_det, uniform_shots, seed=seed + 1)
+            rec_uni = time_cpu_decoder(
+                adapter, uni, n_warmup=uniform_warmup, n_reps=uniform_reps)
+            rec_uni["note"] = (
+                f"uniform-random timed on {uniform_shots} shots "
+                f"(warmup={uniform_warmup}, reps={uniform_reps}); per-shot cost "
+                "is ms on dense syndromes, the RATIO is the reported quantity "
+                "(per-syndrome latency is batch-invariant)")
             inflation = (rec_uni["us_per_syndrome"] / rec_real["us_per_syndrome"]
                          if rec_real["us_per_syndrome"] > 0 else None)
             out[name] = dict(
