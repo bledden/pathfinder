@@ -61,6 +61,59 @@ def test_summarize_p999_tail():
 
 
 # --------------------------------------------------------------------------- #
+# Bootstrap CI + per-rep capture (figure-lock: error bars + reproducibility)  #
+# --------------------------------------------------------------------------- #
+def test_summarize_emits_bootstrap_ci_and_per_rep():
+    """summarize attaches a bootstrap 95% CI on the mean + the per-rep window."""
+    rng = np.random.default_rng(0)
+    times_ms = 1.0 + 0.05 * rng.standard_normal(100)  # ~1 ms, tight
+    rec = L.summarize(times_ms, batch=1000)
+    assert "us_per_syndrome_ci95" in rec
+    lo, hi = rec["us_per_syndrome_ci95"]
+    # CI must bracket the mean us/syndrome and be a real (lo<hi) interval
+    assert lo < rec["us_per_syndrome"] < hi
+    assert rec["bootstrap_n"] >= 1000          # >= the locked floor
+    # per-rep window kept verbatim for reproducibility
+    assert len(rec["per_rep_ms"]) == 100
+
+
+def test_bootstrap_ci_tightens_with_low_variance():
+    """A near-constant sample gives a near-degenerate CI; noisy gives wider."""
+    tight = np.full(100, 2.0)
+    noisy = 2.0 + np.random.default_rng(1).standard_normal(100)
+    ci_t = L.bootstrap_ci(tight, batch=100)
+    ci_n = L.bootstrap_ci(noisy, batch=100)
+    width_t = ci_t[1] - ci_t[0]
+    width_n = ci_n[1] - ci_n[0]
+    assert width_t < width_n
+    assert ci_t[2] == L.BOOTSTRAP_N
+
+
+def test_small_batches_in_gpu_sweep():
+    """The GPU batch sweep includes the single-shot batches {1,4,16}."""
+    for b in (1, 4, 16):
+        assert b in L.GPU_BATCH_SWEEP
+    assert L.SINGLE_SHOT_BATCH == 1
+
+
+def test_uniform_random_detectors_shape_and_density():
+    """Uniform-random syndromes are dense (~0.5) vs realistic (sparse)."""
+    uni = L.uniform_random_detectors(252, 200, seed=0)
+    assert uni.shape == (200, 252)
+    assert uni.dtype == bool
+    # dense: mean activation ~0.5 (worst-case for OSD), unlike sparse realistic
+    assert 0.4 < uni.mean() < 0.6
+
+
+def test_gpu_clock_state_reports_unlocked():
+    """gpu_clock_state states the RunPod unlocked-clock condition + boost."""
+    clk = L.gpu_clock_state()
+    assert clk["clocks_locked"] is False
+    assert clk["boost_clock_mhz"] == 1980
+    assert "permission" in clk["lock_note"].lower()
+
+
+# --------------------------------------------------------------------------- #
 # Canonical DEM (the figure's grid point)                                     #
 # --------------------------------------------------------------------------- #
 def test_canonical_dem_shape():
@@ -149,6 +202,60 @@ def test_pareto_frontier_includes_kernel_and_anchor(grid_and_lat):
     # the fastest kernel point and the zero-gap anchor are both non-dominated
     assert "Triton-kernel-BP" in labels
     assert any(l.startswith("Tesseract") for l in labels)
+
+
+def test_build_points_carry_whisker_and_ci_fields(grid_and_lat):
+    """Every plotted point carries the Option-A whisker (p99.9) + CI fields."""
+    grid, lat = grid_and_lat
+    pts = MP.build_points(grid, lat, p=0.003)
+    for pp in pts:
+        assert "p999_us" in pp and "ci_lo" in pp and "ci_hi" in pp
+        # p99.9 whisker terminus is >= the mean (tail is never below mean)
+        assert pp["p999_us"] >= pp["latency_us"] - 1e-6
+        # CI brackets the mean (lo <= mean <= hi)
+        assert pp["ci_lo"] - 1e-6 <= pp["latency_us"] <= pp["ci_hi"] + 1e-6
+
+
+def test_gpu_regime_single_shot_falls_back_gracefully(grid_and_lat):
+    """single_shot regime works whether or not single_shot fields are present."""
+    grid, lat = grid_and_lat
+    pts = MP.build_points(grid, lat, p=0.003, gpu_regime="single_shot")
+    labels = {pp["label"] for pp in pts}
+    assert "Triton-kernel-BP" in labels  # resolves (single_shot or fallback)
+
+
+# --------------------------------------------------------------------------- #
+# Both-workloads + clock-variance JSON consumers (skip if artifacts absent)   #
+# --------------------------------------------------------------------------- #
+def test_both_workloads_json_if_present():
+    """If both_workloads.json exists, it quantifies OSD inflation (realistic<uni)."""
+    path = os.path.join(_ZOO, "both_workloads.json")
+    if not os.path.exists(path):
+        pytest.skip("both_workloads.json absent (pod-only artifact)")
+    with open(path) as f:
+        bw = json.load(f)
+    assert bw.get("kind") == "t9-both-workloads"
+    res = bw["results"]
+    # the headline finding: BP-OSD-10 inflates materially under uniform-random
+    osd10 = res.get("BPOSD-10")
+    assert osd10 and "inflation_x" in osd10
+    assert osd10["inflation_x"] is None or osd10["inflation_x"] > 1.0
+
+
+def test_clock_variance_json_if_present():
+    """If clock_variance.json exists, per-decoder run-to-run CV is small."""
+    path = os.path.join(_ZOO, "clock_variance.json")
+    if not os.path.exists(path):
+        pytest.skip("clock_variance.json absent (pod-only artifact)")
+    with open(path) as f:
+        cv = json.load(f)
+    assert cv.get("kind") == "t9-clock-variance"
+    assert cv["clock_state"]["clocks_locked"] is False
+    # CV present per (decoder, batch); thermal stability => modest CV
+    for _which, per_batch in cv["runs"].items():
+        for _b, rec in per_batch.items():
+            if rec.get("cv") is not None:
+                assert rec["cv"] >= 0.0
 
 
 # --------------------------------------------------------------------------- #

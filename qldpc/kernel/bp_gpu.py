@@ -355,4 +355,6 @@ class BpGpu:
             n_warmup=int(n_warmup),
             max_iter=int(max_iter),
             used_cuda_events=bool(use_cuda),
+            # Per-rep CUDA-event sample window (ms) -- see BpTriton.bench_latency.
+            per_rep_ms=times_ms.tolist(),
         )

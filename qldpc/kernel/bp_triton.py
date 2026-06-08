@@ -479,4 +479,9 @@ class BpTriton:
             max_iter=int(max_iter),
             block_s=int(block_s),
             used_cuda_events=bool(use_cuda),
+            # Per-rep CUDA-event sample window (ms), all kept reps -- enables the
+            # harness to bootstrap a 95% CI and to drop the first 10% uniformly
+            # with the CPU path. The whole array is returned so nothing is
+            # fabricated downstream.
+            per_rep_ms=times_ms.tolist(),
         )

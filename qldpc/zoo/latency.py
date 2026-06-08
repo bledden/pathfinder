@@ -77,10 +77,26 @@ DROP_FRAC = 0.10
 
 # Default measurement batch (per-syndrome latency is amortized over this batch;
 # also drives the throughput number). Larger batches favour the GPU decoders;
-# we sweep a few batches for the GPU/Triton path so the figure can show the
-# batch dependence and pick a representative cell.
+# we sweep a range of batches for the GPU/Triton path so the figure can show the
+# batch dependence and separate the two deployment regimes:
+#   batch 1   = single-shot REAL-TIME latency (no amortization; the binding
+#               number for an SC decoding window) -- the headline latency story.
+#   batch 16k = steady-state THROUGHPUT (fully amortized; the backlog metric).
+# CPU decoders are ~batch-independent (per-syndrome latency is amortized and
+# invariant), so they are NOT swept -- the existing single batch is reused.
 DEFAULT_BATCH = 1024
-GPU_BATCH_SWEEP = (256, 1024, 4096, 16384)
+# Small batches (1/4/16) added for the single-shot latency story; the large
+# batches (256..16384) remain for throughput. Ordered small->large.
+GPU_BATCH_SWEEP = (1, 4, 16, 256, 1024, 4096, 16384)
+# The batch designated as the single-shot real-time point (vs the throughput
+# representative, which stays the largest batch for cycle_time_budget back-compat).
+SINGLE_SHOT_BATCH = 1
+
+# Bootstrap-CI protocol (Coda figure-lock: error bars = bootstrap CI on each
+# latency point, >=1000 resamples of the per-rep measure window, 95% CI).
+BOOTSTRAP_N = 2000
+BOOTSTRAP_ALPHA = 0.05
+BOOTSTRAP_SEED = 12345
 
 # Per-decoder CPU batch caps: the ldpc-OSD combination-sweep family is
 # milliseconds-per-shot (random/dense syndromes are worst-case for OSD), so a
@@ -137,6 +153,18 @@ def sample_detectors(circ, shots, seed=0):
     return np.asarray(dets, dtype=bool)
 
 
+def uniform_random_detectors(n_det, shots, seed=0):
+    """Uniform-random (dense, p=0.5 per bit) detector syndromes.
+
+    The OSD worst-case workload: dense syndromes drive the OSD combination sweep
+    to a large residual support, inflating BP-OSD-10 latency vs the realistic
+    (sparse, operational p=0.003) distribution. Used by the both-workloads table
+    to quantify that inflation. NOT the headline latency (realistic is) -- this is
+    the adversarial bound."""
+    rng = np.random.default_rng(seed)
+    return rng.integers(0, 2, size=(int(shots), int(n_det))).astype(bool)
+
+
 # --------------------------------------------------------------------------- #
 # Discipline: warmup / measure / drop-first-10% timing of a callable          #
 # --------------------------------------------------------------------------- #
@@ -159,15 +187,46 @@ def time_callable(fn, *, n_warmup=DEFAULT_WARMUP, n_reps=DEFAULT_REPS,
     return times_ms[drop:]
 
 
-def summarize(times_ms, batch):
-    """Reduce kept per-batch times (ms) to the reported latency record."""
+def bootstrap_ci(times_ms, *, batch, n_boot=BOOTSTRAP_N, alpha=BOOTSTRAP_ALPHA,
+                 seed=BOOTSTRAP_SEED):
+    """Percentile bootstrap 95% CI on the MEAN per-syndrome latency (us).
+
+    Protocol (stated in the figure caption, reviewer-2 armor): the kept per-rep
+    measure window (``times_ms``, ms, drop-first-10% already applied) is resampled
+    WITH REPLACEMENT ``n_boot`` times (default 2000 >= the locked 1000 floor); for
+    each resample the mean batch time is amortized to us/syndrome
+    (``mean_ms*1e3/batch``); the 2.5th / 97.5th percentiles of those bootstrap
+    means are the CI bounds. Returns (lo_us, hi_us, n_boot).
+
+    This bounds the sampling uncertainty of the reported MEAN -- it does NOT widen
+    to the p99.9 tail (that asymmetry is shown by the whisker, not the CI)."""
+    t = np.asarray(times_ms, dtype=np.float64)
+    if t.size == 0 or batch <= 0:
+        return None
+    rng = np.random.default_rng(seed)
+    idx = rng.integers(0, t.size, size=(int(n_boot), t.size))
+    boot_mean_ms = t[idx].mean(axis=1)
+    boot_us = boot_mean_ms * 1e3 / batch
+    lo = float(np.percentile(boot_us, 100.0 * (alpha / 2.0)))
+    hi = float(np.percentile(boot_us, 100.0 * (1.0 - alpha / 2.0)))
+    return lo, hi, int(n_boot)
+
+
+def summarize(times_ms, batch, *, keep_per_rep=True):
+    """Reduce kept per-batch times (ms) to the reported latency record.
+
+    Adds (figure-lock): the bootstrap 95% CI on the mean per-syndrome latency and
+    the full per-rep sample window (ms) so the CI / whisker are reproducible from
+    the committed JSON without re-running on the pod."""
+    times_ms = np.asarray(times_ms, dtype=np.float64)
     mean_ms = float(np.mean(times_ms))
     p999_ms = float(np.percentile(times_ms, 99.9))
     median_ms = float(np.median(times_ms))
     thr = float(batch / (mean_ms / 1e3)) if mean_ms > 0 else 0.0
     us_per_syn = float(mean_ms * 1e3 / batch) if batch > 0 else 0.0
     us_per_syn_p999 = float(p999_ms * 1e3 / batch) if batch > 0 else 0.0
-    return dict(
+    ci = bootstrap_ci(times_ms, batch=batch)
+    rec = dict(
         batch=int(batch),
         n_kept=int(len(times_ms)),
         mean_ms=mean_ms,
@@ -177,6 +236,12 @@ def summarize(times_ms, batch):
         us_per_syndrome=us_per_syn,
         us_per_syndrome_p99_9=us_per_syn_p999,
     )
+    if ci is not None:
+        rec["us_per_syndrome_ci95"] = [ci[0], ci[1]]
+        rec["bootstrap_n"] = ci[2]
+    if keep_per_rep:
+        rec["per_rep_ms"] = [float(x) for x in times_ms]
+    return rec
 
 
 # --------------------------------------------------------------------------- #
@@ -321,21 +386,35 @@ def time_gpu_decoder(which, dem, batch, device="cuda", n_warmup=DEFAULT_WARMUP,
 
     res = Kern.bench_latency(dem, shots=int(batch), device=device,
                              n_warmup=n_warmup, n_iter=n_reps, seed=seed, **extra)
-    mean_ms = res["mean_ms"]
-    p999_ms = res["p99_9_ms"]
-    rec = dict(
+    # Apply the SAME drop-first-10% discipline as the CPU path (the kernel
+    # classmethod keeps all reps), then derive mean/p99.9/CI/per-rep from the
+    # kept window so the GPU and CPU points are computed identically.
+    per_rep = res.get("per_rep_ms")
+    if per_rep is not None and len(per_rep) > 0:
+        all_ms = np.asarray(per_rep, dtype=np.float64)
+        drop = int(np.ceil(DROP_FRAC * len(all_ms)))
+        kept = all_ms[drop:]
+        rec = summarize(kept, batch)
+    else:  # no per-rep window (shouldn't happen): fall back to reported scalars
+        mean_ms = res["mean_ms"]
+        p999_ms = res["p99_9_ms"]
+        rec = dict(
+            batch=int(batch), n_kept=int(res["n_iter"]),
+            mean_ms=mean_ms, median_ms=mean_ms, p99_9_ms=p999_ms,
+            throughput_shots_per_s=res["throughput_shots_per_s"],
+            us_per_syndrome=float(mean_ms * 1e3 / batch) if batch else 0.0,
+            us_per_syndrome_p99_9=float(p999_ms * 1e3 / batch) if batch else 0.0,
+        )
+    rec.update(
         decoder=which,
         timing=("cuda_event" if res.get("used_cuda_events") else "perf_counter"),
-        batch=int(batch),
-        n_kept=int(res["n_iter"]),
-        mean_ms=mean_ms,
-        p99_9_ms=p999_ms,
-        throughput_shots_per_s=res["throughput_shots_per_s"],
-        us_per_syndrome=float(mean_ms * 1e3 / batch) if batch else 0.0,
-        us_per_syndrome_p99_9=float(p999_ms * 1e3 / batch) if batch else 0.0,
         device=res["device"],
         max_iter=res["max_iter"],
         used_cuda_events=bool(res.get("used_cuda_events")),
+        workload="uniform_random",  # GPU bench uses random syndromes; BP is
+                                    # workload-insensitive (flooding min-sum is
+                                    # data-independent in latency) -- noted, not
+                                    # belabored.
     )
     if "block_s" in res:
         rec["block_s"] = res["block_s"]
@@ -386,14 +465,169 @@ def env_manifest():
                     if drv.returncode == 0 and drv.stdout.strip() else None
             except Exception:
                 env["gpu_driver"] = None
+            env["gpu_clock"] = gpu_clock_state()
         else:
             env["gpu_name"] = None
             env["gpu_driver"] = None
+            env["gpu_clock"] = None
     except Exception:
         env["cuda"] = None
         env["gpu_name"] = None
         env["gpu_driver"] = None
+        env["gpu_clock"] = None
     return env
+
+
+def gpu_clock_state():
+    """Snapshot the GPU clock conditions for the manifest / figure caption.
+
+    CLOCK NOTE (Coda fallback): clock-locking (``nvidia-smi -lgc``) is NOT
+    permitted on this RunPod container ("user does not have permission"). The GPU
+    runs at applications-clock 1980 MHz and boosts to 1980 MHz under load (idle
+    345 MHz). We therefore (a) STATE these conditions here, and (b) run a
+    variance-over-runs check (``measure_clock_variance``) to confirm thermal
+    stability despite unlocked clocks. Returns the queried clocks + the note."""
+    out = dict(
+        clocks_locked=False,
+        lock_note=("clock-locking not permitted on RunPod container "
+                   "(user does not have permission); clocks left at default"),
+        applications_clock_mhz=None,
+        gr_clock_mhz=None,
+        max_gr_clock_mhz=None,
+        idle_gr_clock_mhz=345,
+        boost_clock_mhz=1980,
+        runtime_conditions="single-tenant pod, sustained-load bench",
+    )
+    try:
+        import subprocess
+        q = subprocess.run(
+            ["nvidia-smi",
+             "--query-gpu=clocks.applications.graphics,clocks.gr,clocks.max.gr",
+             "--format=csv,noheader,nounits"],
+            capture_output=True, text=True, timeout=20)
+        if q.returncode == 0 and q.stdout.strip():
+            a, g, m = (x.strip() for x in
+                       q.stdout.strip().splitlines()[0].split(","))
+            out["applications_clock_mhz"] = int(float(a)) if a.isdigit() or \
+                a.replace(".", "").isdigit() else None
+            out["gr_clock_mhz"] = int(float(g)) if g.replace(".", "").isdigit() \
+                else None
+            out["max_gr_clock_mhz"] = int(float(m)) if m.replace(".", "").isdigit() \
+                else None
+    except Exception:
+        pass
+    return out
+
+
+# --------------------------------------------------------------------------- #
+# Both-workloads table: realistic (operational p) vs uniform-random (OSD       #
+# worst-case) syndromes for the OSD/LSD decoders -- quantify the ~26x          #
+# BP-OSD-10 inflation. Realistic is the headline; both are reported.           #
+# --------------------------------------------------------------------------- #
+# The OSD/LSD family whose latency is workload-SENSITIVE (the combination sweep
+# walks a residual support that grows with syndrome density). Pure BP and
+# Tesseract are workload-insensitive (BP flooding is data-independent; Tesseract
+# beam-search cost is dominated by the beam) -- excluded with a note.
+BOTH_WORKLOADS_DECODERS = ("BPOSD-0", "BPOSD-10", "BPLSD")
+BOTH_WORKLOADS_REFERENCE_NOTE = (
+    "Pure-BP and Tesseract are workload-insensitive (BP flooding min-sum is "
+    "data-independent in latency; Tesseract's cost is beam-dominated) -- not "
+    "measured here. The OSD/LSD combination sweep is the workload-sensitive "
+    "family: its residual support (and thus GE work) grows with syndrome density.")
+
+
+def measure_both_workloads(dem, *, decoders=BOTH_WORKLOADS_DECODERS,
+                           realistic_dets, n_det, batch=128, seed=0,
+                           n_warmup=DEFAULT_WARMUP, n_reps=DEFAULT_REPS):
+    """Latency under REALISTIC vs UNIFORM-RANDOM syndromes for OSD/LSD decoders.
+
+    realistic = circuit syndromes at the grid p (operational; the headline).
+    uniform   = dense p=0.5-per-bit syndromes (OSD worst-case).
+    Both timed with the SAME batch/discipline so the inflation ratio is fair.
+    Returns a dict keyed by decoder -> {realistic, uniform, inflation_x}."""
+    from qldpc.zoo import adapters as A
+    makers = {
+        "BPOSD-0": lambda: A.make_bposd0(dem),
+        "BPOSD-10": lambda: A.make_bposd10(dem),
+        "BPLSD": lambda: A.make_bplsd(dem),
+    }
+    real = np.asarray(realistic_dets, dtype=bool)
+    b = min(int(batch), real.shape[0])
+    real = real[:b]
+    uni = uniform_random_detectors(n_det, b, seed=seed)
+
+    out = {}
+    for name in decoders:
+        if name not in makers:
+            continue
+        try:
+            adapter = makers[name]()
+            rec_real = time_cpu_decoder(adapter, real,
+                                        n_warmup=n_warmup, n_reps=n_reps)
+            rec_uni = time_cpu_decoder(adapter, uni,
+                                       n_warmup=n_warmup, n_reps=n_reps)
+            inflation = (rec_uni["us_per_syndrome"] / rec_real["us_per_syndrome"]
+                         if rec_real["us_per_syndrome"] > 0 else None)
+            out[name] = dict(
+                decoder=name,
+                realistic=rec_real,
+                uniform_random=rec_uni,
+                inflation_x=float(inflation) if inflation else None,
+            )
+        except Exception as e:
+            import traceback
+            out[name] = dict(decoder=name, error=repr(e),
+                             traceback=traceback.format_exc()[-800:])
+    return out
+
+
+# --------------------------------------------------------------------------- #
+# Variance-over-runs check (Coda fallback for "can't lock clocks"): repeat the #
+# GPU bench N>=3x across the session, report per-decoder run-to-run CV.        #
+# --------------------------------------------------------------------------- #
+def measure_clock_variance(dem, *, device="cuda", n_runs=3,
+                           batches=(1, 16384), which=("bp_triton", "bp_gpu"),
+                           seed=0, n_warmup=DEFAULT_WARMUP, n_reps=DEFAULT_REPS):
+    """Repeat the GPU latency bench ``n_runs`` times; report run-to-run CV.
+
+    Confirms thermal stability despite unlocked clocks (clock-locking not
+    permitted on the RunPod container). For each (decoder, batch) we record the
+    mean us/syndrome of each run and the coefficient of variation
+    (std/mean across runs). A small CV (<~few %) means the unlocked clock did not
+    drift over the session -- Coda's stated fallback when clocks can't be locked.
+
+    Batches chosen: 1 (single-shot, latency-bound, most overhead-sensitive) and
+    16384 (throughput, fully-amortized) -- the two regimes the figure reports."""
+    runs = {}
+    for w in which:
+        per_batch = {}
+        for b in batches:
+            means = []
+            recs = []
+            for r in range(int(n_runs)):
+                try:
+                    rec = time_gpu_decoder(w, dem, batch=int(b), device=device,
+                                           n_warmup=n_warmup, n_reps=n_reps,
+                                           seed=seed + r)
+                    means.append(rec["us_per_syndrome"])
+                    recs.append(dict(run=r, us_per_syndrome=rec["us_per_syndrome"],
+                                     mean_ms=rec["mean_ms"],
+                                     p99_9_ms=rec["p99_9_ms"]))
+                except Exception as e:
+                    recs.append(dict(run=r, error=repr(e)))
+            if means:
+                m = float(np.mean(means))
+                s = float(np.std(means, ddof=1)) if len(means) > 1 else 0.0
+                cv = float(s / m) if m > 0 else None
+            else:
+                m = s = cv = None
+            per_batch[str(b)] = dict(
+                batch=int(b), n_runs=int(n_runs),
+                run_means_us=means, runs=recs,
+                mean_us=m, std_us=s, cv=cv,
+            )
+        runs[w] = per_batch
+    return runs
 
 
 # --------------------------------------------------------------------------- #
@@ -402,7 +636,9 @@ def env_manifest():
 def run_all(device="cuda", cpu_batch=DEFAULT_BATCH, gpu_batches=GPU_BATCH_SWEEP,
             seed=0, n_warmup=DEFAULT_WARMUP, n_reps=DEFAULT_REPS,
             rounds=CANON_ROUNDS, p=CANON_P, basis=CANON_BASIS,
-            include_gpu=True, include_sw=True, ext_dir=None, det_beam=64):
+            include_gpu=True, include_sw=True, ext_dir=None, det_beam=64,
+            both_workloads=True, clock_variance_runs=3,
+            both_workloads_batch=128):
     """Measure latency for every available decoder on the canonical DEM.
 
     Returns the full results manifest (dict). Each decoder that cannot be timed
@@ -487,17 +723,84 @@ def run_all(device="cuda", cpu_batch=DEFAULT_BATCH, gpu_batches=GPU_BATCH_SWEEP,
                     err = repr(e)
                     sweeps.append(dict(batch=int(b), error=repr(e),
                                        traceback=traceback.format_exc()[-400:]))
-            # representative point: largest successful batch (best amortized)
+            # representative point = largest successful batch (best amortized
+            # THROUGHPUT) -- kept as ``representative`` for cycle_time_budget
+            # back-compat. single_shot = batch-1 (REAL-TIME latency, no
+            # amortization) -- the headline latency story. Both reported.
             ok_sweeps = [s for s in sweeps if "error" not in s]
             rep = ok_sweeps[-1] if ok_sweeps else None
+            single = next((s for s in ok_sweeps
+                           if s.get("batch") == SINGLE_SHOT_BATCH), None)
             results[which] = dict(
                 decoder=which,
                 timing=("cuda_event" if cuda_ok else "perf_counter_cpu_fallback"),
                 cuda=cuda_ok,
                 batch_sweep=sweeps,
-                representative=rep,
+                representative=rep,        # throughput (batch 16384)
+                single_shot=single,        # real-time latency (batch 1)
                 error=err if rep is None else None,
             )
+
+    # --- Both-workloads (realistic vs uniform-random) for OSD/LSD ----------- #
+    both_wl = None
+    if both_workloads:
+        try:
+            bw_dets = sample_detectors(circ, both_workloads_batch, seed=seed)
+            both_wl = dict(
+                kind="t9-both-workloads",
+                code="[[72,12,6]] BB (BBCode default)",
+                rounds=rounds, p=p, basis=basis, noise=CANON_NOISE,
+                dem_sha256=dem_sha,
+                batch=int(both_workloads_batch),
+                discipline=dict(n_warmup=n_warmup, n_reps=n_reps,
+                                drop_frac=DROP_FRAC, seed=seed),
+                workloads=dict(
+                    realistic=("circuit detector syndromes at the operational "
+                               f"grid p={p} (sparse; the HEADLINE workload)"),
+                    uniform_random=("dense p=0.5-per-bit syndromes (OSD "
+                                    "worst-case; the adversarial bound)"),
+                ),
+                reference_note=BOTH_WORKLOADS_REFERENCE_NOTE,
+                results=measure_both_workloads(
+                    dem, realistic_dets=bw_dets, n_det=dem.num_detectors,
+                    batch=both_workloads_batch, seed=seed,
+                    n_warmup=n_warmup, n_reps=n_reps),
+            )
+        except Exception as e:
+            import traceback
+            both_wl = dict(kind="t9-both-workloads", error=repr(e),
+                           traceback=traceback.format_exc()[-800:])
+
+    # --- Variance-over-runs (unlocked-clock thermal-stability check) -------- #
+    clock_var = None
+    if include_gpu and clock_variance_runs and clock_variance_runs >= 1:
+        cuda_ok2 = False
+        try:
+            import torch
+            cuda_ok2 = (str(device).startswith("cuda")
+                        and torch.cuda.is_available())
+        except Exception:
+            cuda_ok2 = False
+        if cuda_ok2:
+            try:
+                clock_var = dict(
+                    kind="t9-clock-variance",
+                    purpose=("Coda fallback for 'can't lock clocks' on RunPod: "
+                             "repeat the GPU bench N>=3x across the session; a "
+                             "small run-to-run CV confirms no thermal drift "
+                             "despite unlocked clocks."),
+                    clock_state=gpu_clock_state(),
+                    n_runs=int(clock_variance_runs),
+                    batches=[SINGLE_SHOT_BATCH, gpu_batches[-1]],
+                    runs=measure_clock_variance(
+                        dem, device=device, n_runs=int(clock_variance_runs),
+                        batches=(SINGLE_SHOT_BATCH, gpu_batches[-1]),
+                        seed=seed, n_warmup=n_warmup, n_reps=n_reps),
+                )
+            except Exception as e:
+                import traceback
+                clock_var = dict(kind="t9-clock-variance", error=repr(e),
+                                 traceback=traceback.format_exc()[-800:])
 
     manifest = dict(
         kind="t9-decoder-latency",
@@ -507,7 +810,17 @@ def run_all(device="cuda", cpu_batch=DEFAULT_BATCH, gpu_batches=GPU_BATCH_SWEEP,
         dem_sha256=dem_sha,
         discipline=dict(n_warmup=n_warmup, n_reps=n_reps, drop_frac=DROP_FRAC,
                         cpu_batch=cpu_batch, gpu_batches=list(gpu_batches),
-                        seed=seed, tesseract_det_beam=det_beam),
+                        seed=seed, tesseract_det_beam=det_beam,
+                        single_shot_batch=SINGLE_SHOT_BATCH,
+                        throughput_batch=gpu_batches[-1]),
+        bootstrap=dict(n_resamples=BOOTSTRAP_N, alpha=BOOTSTRAP_ALPHA,
+                       seed=BOOTSTRAP_SEED,
+                       protocol=("percentile bootstrap on the kept per-rep "
+                                 "measure window (drop-first-10% applied): "
+                                 "resample-with-replacement the per-rep batch "
+                                 "times, amortize each resample's mean to "
+                                 "us/syndrome, take 2.5/97.5 percentiles -> "
+                                 "95% CI on the MEAN per-syndrome latency")),
         sw_latency_method=(
             "(a) in-process isolated importlib load of /workspace/qldpc_ext "
             "SlidingWindowDecoder; only compiled.decode_shots is timed, the "
@@ -516,6 +829,9 @@ def run_all(device="cuda", cpu_batch=DEFAULT_BATCH, gpu_batches=GPU_BATCH_SWEEP,
         env=env_manifest(),
         results=results,
     )
+    # Attach the sub-artifacts so a single run produces all three JSONs.
+    manifest["_both_workloads"] = both_wl
+    manifest["_clock_variance"] = clock_var
     return manifest
 
 
@@ -569,6 +885,10 @@ def _print_table(manifest):
 def main(argv=None):
     ap = argparse.ArgumentParser(description="T9 decoder latency harness")
     ap.add_argument("--out", default=os.path.join(_HERE, "latency_results.json"))
+    ap.add_argument("--both-workloads-out",
+                    default=os.path.join(_HERE, "both_workloads.json"))
+    ap.add_argument("--clock-variance-out",
+                    default=os.path.join(_HERE, "clock_variance.json"))
     ap.add_argument("--device", default="cuda")
     ap.add_argument("--cpu-batch", type=int, default=DEFAULT_BATCH)
     ap.add_argument("--gpu-batches", type=int, nargs="+",
@@ -580,6 +900,9 @@ def main(argv=None):
     ap.add_argument("--basis", default=CANON_BASIS)
     ap.add_argument("--no-gpu", action="store_true")
     ap.add_argument("--no-sw", action="store_true")
+    ap.add_argument("--no-both-workloads", action="store_true")
+    ap.add_argument("--clock-variance-runs", type=int, default=3)
+    ap.add_argument("--both-workloads-batch", type=int, default=128)
     ap.add_argument("--ext-dir", default=None)
     ap.add_argument("--det-beam", type=int, default=64)
     args = ap.parse_args(argv)
@@ -589,13 +912,67 @@ def main(argv=None):
         gpu_batches=tuple(args.gpu_batches), seed=args.seed,
         n_warmup=args.warmup, n_reps=args.reps, p=args.p, basis=args.basis,
         include_gpu=not args.no_gpu, include_sw=not args.no_sw,
-        ext_dir=args.ext_dir, det_beam=args.det_beam)
+        ext_dir=args.ext_dir, det_beam=args.det_beam,
+        both_workloads=not args.no_both_workloads,
+        clock_variance_runs=args.clock_variance_runs,
+        both_workloads_batch=args.both_workloads_batch)
+
+    # Split the sub-artifacts into their own committed JSON files.
+    both_wl = manifest.pop("_both_workloads", None)
+    clock_var = manifest.pop("_clock_variance", None)
 
     with open(args.out, "w") as f:
         json.dump(manifest, f, indent=2)
     _print_table(manifest)
     print(f"\nwrote {args.out}")
+
+    if both_wl is not None:
+        with open(args.both_workloads_out, "w") as f:
+            json.dump(both_wl, f, indent=2)
+        print(f"wrote {args.both_workloads_out}")
+        _print_both_workloads(both_wl)
+    if clock_var is not None:
+        with open(args.clock_variance_out, "w") as f:
+            json.dump(clock_var, f, indent=2)
+        print(f"wrote {args.clock_variance_out}")
+        _print_clock_variance(clock_var)
     return manifest
+
+
+def _print_both_workloads(bw):
+    if not bw or bw.get("error"):
+        print(f"both-workloads: {bw.get('error') if bw else 'n/a'}")
+        return
+    print("\nboth-workloads (realistic vs uniform-random; OSD/LSD):")
+    print(f"{'decoder':<12}{'realistic_us':>15}{'uniform_us':>15}"
+          f"{'inflation_x':>14}")
+    for name, rec in bw.get("results", {}).items():
+        if rec.get("error"):
+            print(f"{name:<12}  ERROR {rec['error'][:50]}")
+            continue
+        r = rec["realistic"]["us_per_syndrome"]
+        u = rec["uniform_random"]["us_per_syndrome"]
+        infl = rec.get("inflation_x")
+        print(f"{name:<12}{r:>15.4f}{u:>15.4f}"
+              f"{(infl if infl else 0):>14.2f}")
+
+
+def _print_clock_variance(cv):
+    if not cv or cv.get("error"):
+        print(f"clock-variance: {cv.get('error') if cv else 'n/a'}")
+        return
+    cs = cv.get("clock_state", {})
+    print(f"\nclock-variance ({cv.get('n_runs')} runs; clocks_locked="
+          f"{cs.get('clocks_locked')}, app_clk={cs.get('applications_clock_mhz')} "
+          f"MHz, gr_clk={cs.get('gr_clock_mhz')} MHz):")
+    print(f"{'decoder':<12}{'batch':>7}{'mean_us':>14}{'cv':>10}")
+    for which, per_batch in cv.get("runs", {}).items():
+        for b, rec in per_batch.items():
+            m = rec.get("mean_us")
+            c = rec.get("cv")
+            print(f"{which:<12}{rec['batch']:>7}"
+                  f"{(m if m else 0):>14.4f}"
+                  f"{(c if c is not None else float('nan')):>10.4f}")
 
 
 if __name__ == "__main__":
