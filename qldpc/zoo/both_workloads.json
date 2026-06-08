@@ -1,0 +1,281 @@
+{
+  "kind": "t9-both-workloads",
+  "code": "[[72,12,6]] BB (BBCode default)",
+  "rounds": 6,
+  "p": 0.003,
+  "basis": "Z",
+  "noise": "si1000",
+  "dem_sha256": "444e5cb66d56dc6ba39825931cbee148c0f5e6e0cf50d7058f7790b338624eaf",
+  "batch": 64,
+  "discipline": {
+    "realistic": {
+      "n_warmup": 3,
+      "n_reps": 30
+    },
+    "uniform_random": {
+      "osd_shots": 8,
+      "osd_warmup": 1,
+      "osd_reps": 3,
+      "lsd_shots": 1,
+      "lsd_reps": 1
+    },
+    "drop_frac": 0.1,
+    "seed": 0,
+    "note": "realistic at full batch/discipline; uniform-random (dense p=0.5) on a small shot count -- per-shot cost is ms-to-seconds, the RATIO is the reported quantity (per-syndrome latency is batch-invariant)"
+  },
+  "workloads": {
+    "realistic": "circuit detector syndromes at the operational grid p=0.003 (sparse; the HEADLINE workload)",
+    "uniform_random": "dense p=0.5-per-bit syndromes (OSD worst-case; the adversarial bound)"
+  },
+  "reference_note": "Pure-BP and Tesseract are workload-insensitive (BP flooding min-sum is data-independent in latency; Tesseract's cost is beam-dominated) -- not measured here. The OSD/LSD combination sweep is the workload-sensitive family: its residual support (and thus GE work) grows with syndrome density.",
+  "results": {
+    "BPOSD-0": {
+      "decoder": "BPOSD-0",
+      "realistic": {
+        "batch": 64,
+        "n_kept": 27,
+        "mean_ms": 16.873862318418645,
+        "median_ms": 16.847352497279644,
+        "p99_9_ms": 17.607059031724933,
+        "throughput_shots_per_s": 3792.848299475626,
+        "us_per_syndrome": 263.6540987252913,
+        "us_per_syndrome_p99_9": 275.1102973707021,
+        "us_per_syndrome_ci95": [
+          263.0539176068312,
+          264.6091354378128
+        ],
+        "bootstrap_n": 2000,
+        "per_rep_ms": [
+          16.866506077349186,
+          16.839999705553055,
+          16.798004508018494,
+          16.86607114970684,
+          16.83605369180441,
+          16.779934987425804,
+          16.814230009913445,
+          16.849175095558167,
+          16.830358654260635,
+          16.90375991165638,
+          16.866144724190235,
+          16.847352497279644,
+          16.843666322529316,
+          16.830703243613243,
+          16.85941591858864,
+          16.87927171587944,
+          16.801688820123672,
+          16.887350007891655,
+          16.80477987974882,
+          16.87437668442726,
+          16.90309215337038,
+          16.849510371685028,
+          16.833089292049408,
+          16.800121404230595,
+          16.843730583786964,
+          16.86006225645542,
+          17.625832930207253
+        ],
+        "decoder": "BPOSD-0",
+        "timing": "perf_counter_batch",
+        "tie_break": "osd0_reliability_order",
+        "config": {
+          "decoder": "BpOsdDecoder",
+          "bp_method": "minimum_sum",
+          "ms_scaling_factor": 0.625,
+          "max_iter": 30,
+          "schedule": "parallel",
+          "osd_method": "osd_0",
+          "osd_order": 0
+        }
+      },
+      "uniform_random": {
+        "batch": 8,
+        "n_kept": 2,
+        "mean_ms": 45.78715655952692,
+        "median_ms": 45.78715655952692,
+        "p99_9_ms": 45.81025363877416,
+        "throughput_shots_per_s": 174.72148526190676,
+        "us_per_syndrome": 5723.394569940865,
+        "us_per_syndrome_p99_9": 5726.28170484677,
+        "us_per_syndrome_ci95": [
+          5720.501649193466,
+          5726.287490688264
+        ],
+        "bootstrap_n": 2000,
+        "per_rep_ms": [
+          45.810299925506115,
+          45.764013193547726
+        ],
+        "decoder": "BPOSD-0",
+        "timing": "perf_counter_batch",
+        "tie_break": "osd0_reliability_order",
+        "config": {
+          "decoder": "BpOsdDecoder",
+          "bp_method": "minimum_sum",
+          "ms_scaling_factor": 0.625,
+          "max_iter": 30,
+          "schedule": "parallel",
+          "osd_method": "osd_0",
+          "osd_order": 0
+        },
+        "note": "uniform-random timed on 8 shots (warmup=1, reps=3); per-shot cost is ms on dense syndromes, the RATIO is the reported quantity (per-syndrome latency is batch-invariant)"
+      },
+      "inflation_x": 21.707967361828242
+    },
+    "BPOSD-10": {
+      "decoder": "BPOSD-10",
+      "realistic": {
+        "batch": 64,
+        "n_kept": 27,
+        "mean_ms": 67.45556152115266,
+        "median_ms": 67.38889496773481,
+        "p99_9_ms": 68.53981405124068,
+        "throughput_shots_per_s": 948.7727706473977,
+        "us_per_syndrome": 1053.9931487680103,
+        "us_per_syndrome_p99_9": 1070.9345945506357,
+        "us_per_syndrome_ci95": [
+          1052.340129859254,
+          1055.9828260199909
+        ],
+        "bootstrap_n": 2000,
+        "per_rep_ms": [
+          67.54565518349409,
+          67.78400857001543,
+          68.01038607954979,
+          67.3078652471304,
+          67.34388321638107,
+          68.549201823771,
+          67.29680951684713,
+          67.4104681238532,
+          67.57828406989574,
+          67.08996556699276,
+          67.36013758927584,
+          67.20585748553276,
+          67.24498700350523,
+          67.50748958438635,
+          67.28720106184483,
+          67.23528634756804,
+          67.24388152360916,
+          67.39447265863419,
+          67.41089466959238,
+          67.41525884717703,
+          67.4034133553505,
+          67.39160977303982,
+          67.26046558469534,
+          68.18813364952803,
+          67.2058304771781,
+          67.23981909453869,
+          67.38889496773481
+        ],
+        "decoder": "BPOSD-10",
+        "timing": "perf_counter_batch",
+        "tie_break": "osd_cs_order10",
+        "config": {
+          "decoder": "BpOsdDecoder",
+          "bp_method": "minimum_sum",
+          "ms_scaling_factor": 0.625,
+          "max_iter": 30,
+          "schedule": "parallel",
+          "osd_method": "osd_cs",
+          "osd_order": 10
+        }
+      },
+      "uniform_random": {
+        "batch": 8,
+        "n_kept": 2,
+        "mean_ms": 106.79705115035176,
+        "median_ms": 106.79705115035176,
+        "p99_9_ms": 106.99846558179706,
+        "throughput_shots_per_s": 74.90843533439313,
+        "us_per_syndrome": 13349.63139379397,
+        "us_per_syndrome_p99_9": 13374.808197724633,
+        "us_per_syndrome_ci95": [
+          13324.404135346413,
+          13374.858652241528
+        ],
+        "bootstrap_n": 2000,
+        "per_rep_ms": [
+          106.5952330827713,
+          106.99886921793222
+        ],
+        "decoder": "BPOSD-10",
+        "timing": "perf_counter_batch",
+        "tie_break": "osd_cs_order10",
+        "config": {
+          "decoder": "BpOsdDecoder",
+          "bp_method": "minimum_sum",
+          "ms_scaling_factor": 0.625,
+          "max_iter": 30,
+          "schedule": "parallel",
+          "osd_method": "osd_cs",
+          "osd_order": 10
+        },
+        "note": "uniform-random timed on 8 shots (warmup=1, reps=3); per-shot cost is ms on dense syndromes, the RATIO is the reported quantity (per-syndrome latency is batch-invariant)"
+      },
+      "inflation_x": 12.665766764611387
+    },
+    "BPLSD": {
+      "decoder": "BPLSD",
+      "realistic": {
+        "batch": 64,
+        "n_kept": 27,
+        "mean_ms": 18.843610598533242,
+        "median_ms": 18.830480985343456,
+        "p99_9_ms": 19.009256342425942,
+        "throughput_shots_per_s": 3396.3767010225556,
+        "us_per_syndrome": 294.4314156020819,
+        "us_per_syndrome_p99_9": 297.01963035040535,
+        "us_per_syndrome_ci95": [
+          294.1992007065521,
+          294.70606044654875
+        ],
+        "bootstrap_n": 2000,
+        "per_rep_ms": [
+          18.873726949095726,
+          19.012010656297207,
+          18.882467411458492,
+          18.90607550740242,
+          18.843410536646843,
+          18.816888332366943,
+          18.835674040019512,
+          18.81136279553175,
+          18.891872838139534,
+          18.823016434907913,
+          18.81260797381401,
+          18.84348038583994,
+          18.796768970787525,
+          18.833969719707966,
+          18.824242055416107,
+          18.88830866664648,
+          18.824825063347816,
+          18.84875912219286,
+          18.80236528813839,
+          18.80497206002474,
+          18.84235255420208,
+          18.857494927942753,
+          18.830480985343456,
+          18.817685544490814,
+          18.822508864104748,
+          18.825877457857132,
+          18.804281018674374
+        ],
+        "decoder": "BPLSD",
+        "timing": "perf_counter_batch",
+        "tie_break": "lsd_cs_order10",
+        "config": {
+          "decoder": "BpLsdDecoder",
+          "bp_method": "minimum_sum",
+          "ms_scaling_factor": 0.625,
+          "max_iter": 30,
+          "schedule": "parallel",
+          "lsd_method": "lsd_cs",
+          "lsd_order": 10
+        }
+      },
+      "uniform_random": {
+        "skipped": "pathological",
+        "note": "BP+LSD on FULLY-DENSE (p=0.5) syndromes did not complete a single shot in >11 min on H200 (localized-statistics clustering explodes over a near-full-lattice residual support) -- a regime that never occurs operationally (real syndromes are sparse at p=0.003). Skipped: an unbounded, non-operational bound, not a representative number. The OSD family carries the inflation finding."
+      },
+      "inflation_x": null
+    }
+  }
+}

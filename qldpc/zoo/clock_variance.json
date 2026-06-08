@@ -1,0 +1,153 @@
+{
+  "kind": "t9-clock-variance",
+  "purpose": "Coda fallback for 'can't lock clocks' on RunPod: repeat the GPU bench N>=3x across the session; a small run-to-run CV confirms no thermal drift despite unlocked clocks.",
+  "clock_state": {
+    "clocks_locked": false,
+    "lock_note": "clock-locking not permitted on RunPod container (user does not have permission); clocks left at default",
+    "applications_clock_mhz": 1980,
+    "gr_clock_mhz": 1980,
+    "max_gr_clock_mhz": 1980,
+    "idle_gr_clock_mhz": 345,
+    "boost_clock_mhz": 1980,
+    "runtime_conditions": "single-tenant pod, sustained-load bench"
+  },
+  "n_runs": 3,
+  "batches": [
+    1,
+    16384
+  ],
+  "runs": {
+    "bp_triton": {
+      "1": {
+        "batch": 1,
+        "n_runs": 3,
+        "run_means_us": [
+          1038.8522730933296,
+          1059.2174159155952,
+          1054.8704028129578
+        ],
+        "runs": [
+          {
+            "run": 0,
+            "us_per_syndrome": 1038.8522730933296,
+            "mean_ms": 1.0388522730933296,
+            "p99_9_ms": 1.0612263838052751
+          },
+          {
+            "run": 1,
+            "us_per_syndrome": 1059.2174159155952,
+            "mean_ms": 1.0592174159155952,
+            "p99_9_ms": 1.2538527683019662
+          },
+          {
+            "run": 2,
+            "us_per_syndrome": 1054.8704028129578,
+            "mean_ms": 1.0548704028129579,
+            "p99_9_ms": 1.4333273297548352
+          }
+        ],
+        "mean_us": 1050.980030607294,
+        "std_us": 10.725484020162869,
+        "cv": 0.010205221514975216
+      },
+      "16384": {
+        "batch": 16384,
+        "n_runs": 3,
+        "run_means_us": [
+          0.7920258413327651,
+          0.7921265438199043,
+          0.7920311408169153
+        ],
+        "runs": [
+          {
+            "run": 0,
+            "us_per_syndrome": 0.7920258413327651,
+            "mean_ms": 12.976551384396023,
+            "p99_9_ms": 13.0245829372406
+          },
+          {
+            "run": 1,
+            "us_per_syndrome": 0.7921265438199043,
+            "mean_ms": 12.978201293945313,
+            "p99_9_ms": 13.248587626457219
+          },
+          {
+            "run": 2,
+            "us_per_syndrome": 0.7920311408169153,
+            "mean_ms": 12.97663821114434,
+            "p99_9_ms": 13.038352244377137
+          }
+        ],
+        "mean_us": 0.7920611753231949,
+        "std_us": 5.667275716428505e-05,
+        "cv": 7.155098486068343e-05
+      }
+    },
+    "bp_gpu": {
+      "1": {
+        "batch": 1,
+        "n_runs": 3,
+        "run_means_us": [
+          7870.603370666504,
+          7859.593958324856,
+          7867.073064380222
+        ],
+        "runs": [
+          {
+            "run": 0,
+            "us_per_syndrome": 7870.603370666504,
+            "mean_ms": 7.870603370666504,
+            "p99_9_ms": 8.797686240196239
+          },
+          {
+            "run": 1,
+            "us_per_syndrome": 7859.593958324856,
+            "mean_ms": 7.859593958324856,
+            "p99_9_ms": 8.171613379955296
+          },
+          {
+            "run": 2,
+            "us_per_syndrome": 7867.073064380222,
+            "mean_ms": 7.867073064380222,
+            "p99_9_ms": 8.567213881492622
+          }
+        ],
+        "mean_us": 7865.756797790527,
+        "std_us": 5.62149520398836,
+        "cv": 0.0007146795087241224
+      },
+      "16384": {
+        "batch": 16384,
+        "n_runs": 3,
+        "run_means_us": [
+          43.35730796058972,
+          43.23346681065029,
+          43.44038810167047
+        ],
+        "runs": [
+          {
+            "run": 0,
+            "us_per_syndrome": 43.35730796058972,
+            "mean_ms": 710.366133626302,
+            "p99_9_ms": 718.6290292358399
+          },
+          {
+            "run": 1,
+            "us_per_syndrome": 43.23346681065029,
+            "mean_ms": 708.3371202256944,
+            "p99_9_ms": 716.6843177490234
+          },
+          {
+            "run": 2,
+            "us_per_syndrome": 43.44038810167047,
+            "mean_ms": 711.727318657769,
+            "p99_9_ms": 729.5590097045898
+          }
+        ],
+        "mean_us": 43.343720957636826,
+        "std_us": 0.10412761476330833,
+        "cv": 0.0024023690735984642
+      }
+    }
+  }
+}
