@@ -365,16 +365,23 @@ def make_figure(grid, lat, p, out_path, gpu_regime="throughput"):
         rep = trec.get("representative") or {}
         tail_us = float(rep.get("p99_9_ms", 0.0)) * 1e3   # ms -> us (per batch)
         if tail_us > sc_us:
+            tail_x = min(tail_us, ax.get_xlim()[1] * 0.95)
+            # draw the per-batch tail as a dashed whisker at a mid-plot y so it
+            # does not collide with the cluster or the title.
+            tail_y = (ymin * ymax) ** 0.5     # geometric mid of the y-range
             ax.annotate(
-                "", xy=(min(tail_us, ax.get_xlim()[1] * 0.98), tri["gap"]),
-                xytext=(tri["latency_us"], tri["gap"]),
+                "", xy=(tail_x, tail_y), xytext=(tri["latency_us"], tail_y),
                 arrowprops=dict(arrowstyle="-", color=kernel_color, lw=1.4,
-                                ls=(0, (4, 2)), alpha=0.65), zorder=3)
+                                ls=(0, (4, 2)), alpha=0.6), zorder=3)
+            # tie the tail line to the Triton point with a faint connector
+            ax.plot([tri["latency_us"], tri["latency_us"]],
+                    [tri["gap"], tail_y], color=kernel_color, lw=0.8,
+                    ls=":", alpha=0.5, zorder=2)
             ax.annotate(
-                f"per-batch tail {tail_us/1e3:.0f} ms (batch-16k)\n"
-                "mean fits SC budget, tail does NOT",
-                xy=(min(tail_us, ax.get_xlim()[1] * 0.98), tri["gap"]),
-                xytext=(sc_us * 2.2, tri["gap"] * 1.45),
+                f"per-batch p99.9 tail {tail_us/1e3:.0f} ms (batch-{rep.get('batch')}):\n"
+                "per-syndrome mean fits SC budget, the TAIL does NOT",
+                xy=(tail_x, tail_y),
+                xytext=(sc_us * 1.3, tail_y * 1.18),
                 fontsize=8.2, color=kernel_color, fontweight="bold",
                 ha="left", va="bottom",
                 arrowprops=dict(arrowstyle="->", color=kernel_color, lw=1.2,
@@ -412,8 +419,10 @@ def make_figure(grid, lat, p, out_path, gpu_regime="throughput"):
                   fontsize=10.5)
     ax.set_ylabel(f"LER gap to exact-MLE  (decoder LER / Tesseract-MLE; p={p}, X+Z mean)",
                   fontsize=11)
+    regime_word = ("throughput batch" if gpu_regime == "throughput"
+                   else "single-shot batch-1")
     ax.set_title("qLDPC circuit-level decoder Pareto frontier  --  [[72,12,6]] BB, "
-                 f"SI1000, d=6 R=6\nlatency (single-shot batch-1 GPU) x accuracy; "
+                 f"SI1000, d=6 R=6\nlatency ({regime_word} GPU) x accuracy; "
                  "the fused Triton min-sum kernel pulls BP left along the latency axis",
                  fontsize=12.5)
     ax.grid(True, which="both", ls=":", alpha=0.3)
