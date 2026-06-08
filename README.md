@@ -14,7 +14,7 @@ PFWL3S as an *individual* decoder also strictly beats Lange at 4 (d, p) points (
 
 [**Lange et al.** (Phys. Rev. Research 7, 023181, 2025)](https://github.com/LangeMoritz/GNN_decoder) previously released the first open-source neural decoder to outperform PyMatching on rotated surface codes under circuit-level noise. **Pathfinder is not the first open-source decoder to beat PyMatching on this task** — Lange et al. holds that priority. At matched-noise head-to-head, Lange's GNN has lower individual LER than canonical Pathfinder (paper §5.11).
 
-**Important fairness caveat.** Lange's published weights were trained at p ∈ {0.001, …, 0.005}; PFWL3S's strict-CI wins at p ∈ {0.007, 0.010, 0.015} therefore evaluate Lange out-of-distribution against in-distribution PFWL3S. The paper §5.11 reports a controlled experiment fine-tuning Lange at p=0.007 and discusses the OOD comparison as a §6.3 limitation. Reviewers and reproducers should treat the strict-CI claims with this caveat in mind.
+**Fairness check (controlled, resolved — paper §5.11 Table 9b).** Lange's published weights were trained at p ∈ {0.001, …, 0.005}, so the strict-CI wins at p ∈ {0.007, 0.010, 0.015} initially compared in-distribution PFWL3S against *out-of-distribution* Lange. To control for this I fine-tuned Lange's GNN at p=0.007 using its own training infrastructure: that closed most of the OOD gap (d=7 p=0.007: 2.956% → 2.739%), but **PFWL3S still strictly beats fine-tuned Lange** at all three operational rates — the non-overlapping-CI gaps shrink to 49 / 55 / 27 bp (from 262 / 1219 / 287 bp) but never invert. The strict-CI win is therefore a *controlled* result, not an out-of-distribution artifact. Honest residual caveat: after controlling, the margins are small (tens of basis points).
 
 ## Distinct contributions of this work
 
@@ -220,12 +220,25 @@ Six weeks calendar time; single engineer working part-time across multiple short
 
 Full write-up: [`paper/pathfinder.md`](paper/pathfinder.md). Reviewer-style audit at [`paper/AUDIT_2026-05-13.md`](paper/AUDIT_2026-05-13.md).
 
-## qLDPC follow-on (negative result)
+## qLDPC: kernel-grounded latency–LER benchmark (in progress)
 
-[`qldpc/`](qldpc/) contains a self-contained, controlled study of group-equivariant neural decoding
-for the [[72,12,6]] bivariate-bicycle code. The honest conclusion is a **negative result**: under a
-parameter-matched control, the Z₆×Z₆ symmetry prior gives no decoding advantage over a
-non-equivariant baseline, consistent with the AED-QC-LDPC theorem. See [`qldpc/README.md`](qldpc/README.md).
+A kernel-grounded, exact-MLE-anchored, multiplicity-corrected **latency–LER Pareto benchmark** of
+circuit-level decoders for the [[72,12,6]] bivariate-bicycle code under the SI1000 noise model. A
+matched-protocol decoder zoo (BP, BP-OSD-0/10, BP+LSD, Relay-BP, sliding-window) is measured against an
+exact maximum-likelihood **anchor** (Tesseract), with pre-registration, Wilson/TOST intervals,
+paired-bootstrap gap-to-MLE, and Holm/BH multiplicity control.
+
+- **Cross-vendor Triton kernels** — fused min-sum **BP** and **Relay-BP** decoders, LER-faithful to the
+  reference implementations, run *unmodified* on both **NVIDIA (H200)** and **AMD (MI300X)** GPUs.
+- **Amenability taxonomy** — per-decoder OSD/LSD fallthrough-rate vs p, Amdahl serial-fraction (kernel
+  ceiling), roofline, and memory footprint.
+- **Negative result** — under a parameter-matched control the Z₆×Z₆ equivariance prior gives no decoding
+  advantage (consistent with the AED-QC-LDPC theorem); the residual practical-decoder gap to MLE is a
+  high-syndrome-weight tail orthogonal to symmetry-averaging.
+
+The current code lives on the
+[`qldpc-mle-foundation`](https://github.com/bledden/pathfinder/tree/qldpc-mle-foundation) branch. Paper
+in preparation.
 
 ## Acknowledgements
 
