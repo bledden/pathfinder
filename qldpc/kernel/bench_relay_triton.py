@@ -115,23 +115,56 @@ def main():
     print("LER_IDENTITY", out["ler_identity"])
 
     # ---- THROUGHPUT: RelayBpTriton (CUDA-event) vs CPU relay_bp ----
-    # Triton batched throughput at several shot counts.
-    bench = []
-    for shots in [256, 1024, 4096]:
-        n_iter = 30 if shots <= 1024 else 10
-        rt = RelayBpTriton.bench_latency(dem, shots=shots, device="cuda",
-                                         n_warmup=10, n_iter=n_iter,
-                                         block_s=BLOCK_S, **RELAY_CFG)
-        row = dict(shots=shots,
-                   triton_mean_ms=round(rt["mean_ms"], 3),
-                   triton_per_syndrome_us=round(rt["per_syndrome_us"], 3),
-                   triton_throughput_shots_per_s=round(
-                       rt["throughput_shots_per_s"], 1))
-        bench.append(row)
-        print("BENCH(relay_triton)", row)
-    out["bench_triton"] = bench
+    # Two regimes, BOTH on REAL data syndromes (so the relay nconv early-stop is
+    # exercised identically to the CPU oracle -- apples-to-apples):
+    #   (A) FULL relay schedule end-to-end (decode_batch): the real workload.
+    #   fp64 (oracle-precision, LER-tightest) AND fp32 (~2x, a few extra flips).
+    def _bench_real(dec, dets_real, n_warmup=10, n_iter=10):
+        for _ in range(n_warmup):
+            dec.decode_batch(dets_real, device="cuda")
+        torch.cuda.synchronize()
+        ev0 = torch.cuda.Event(enable_timing=True)
+        ev1 = torch.cuda.Event(enable_timing=True)
+        ts = []
+        for _ in range(n_iter):
+            ev0.record()
+            dec.decode_batch(dets_real, device="cuda")
+            ev1.record(); torch.cuda.synchronize()
+            ts.append(ev0.elapsed_time(ev1))
+        ms = float(np.mean(ts))
+        return ms
 
-    # CPU relay_bp reference: time the oracle runner over a representative batch.
+    bench = []
+    for shots in [512, 2000]:
+        dets_real = dets[:shots]
+        for dt in ("float64", "float32"):
+            dec = RelayBpTriton.from_dem(dem, block_s=BLOCK_S, dtype=dt,
+                                         **RELAY_CFG)
+            ms = _bench_real(dec, dets_real, n_warmup=5, n_iter=10)
+            row = dict(shots=shots, dtype=dt, mean_ms=round(ms, 3),
+                       per_syndrome_us=round(ms / shots * 1e3, 3),
+                       throughput_shots_per_s=round(shots / (ms / 1e3), 1))
+            bench.append(row)
+            print("BENCH(relay_triton, real syndromes)", row)
+    out["bench_triton_real"] = bench
+
+    # Worst-case random-syndrome batched throughput (full schedule, never
+    # converges -- the pure per-iteration kernel-throughput regime).
+    bench_rand = []
+    for shots in [1024, 4096]:
+        rt = RelayBpTriton.bench_latency(dem, shots=shots, device="cuda",
+                                         n_warmup=5, n_iter=5, block_s=BLOCK_S,
+                                         dtype="float32", **RELAY_CFG)
+        row = dict(shots=shots, dtype="float32",
+                   mean_ms=round(rt["mean_ms"], 3),
+                   per_syndrome_us=round(rt["per_syndrome_us"], 3),
+                   throughput_shots_per_s=round(
+                       rt["throughput_shots_per_s"], 1))
+        bench_rand.append(row)
+        print("BENCH(relay_triton, random worst-case)", row)
+    out["bench_triton_random_worstcase"] = bench_rand
+
+    # CPU relay_bp reference: time the oracle runner over the SAME real syndromes.
     cpu_shots = 512
     _, _, runner_b = _relay_oracle(dem)
     syn_b = syn[:cpu_shots]
@@ -151,12 +184,13 @@ def main():
         throughput_shots_per_s=round(cpu_throughput, 1))
     print("CPU_RELAY_BP", out["cpu_relay_bp"])
 
-    # Speedup at the largest triton shot count vs CPU per-syndrome rate.
-    best = max(bench, key=lambda r: r["triton_throughput_shots_per_s"])
-    speedup = best["triton_throughput_shots_per_s"] / cpu_throughput
+    # Speedup: best real-syndrome Triton throughput vs CPU relay_bp.
+    best = max(bench, key=lambda r: r["throughput_shots_per_s"])
+    speedup = best["throughput_shots_per_s"] / cpu_throughput
     out["verdict"] = dict(
-        best_triton_throughput=best["triton_throughput_shots_per_s"],
-        best_triton_per_syndrome_us=best["triton_per_syndrome_us"],
+        best_triton_real=best,
+        best_triton_throughput=best["throughput_shots_per_s"],
+        best_triton_per_syndrome_us=best["per_syndrome_us"],
         cpu_relay_bp_per_syndrome_us=out["cpu_relay_bp"]["per_syndrome_us"],
         throughput_speedup_vs_cpu_relay_bp=round(speedup, 1),
         ler_identity_match=bool(out["ler_identity"]["ler_abs_diff"]
