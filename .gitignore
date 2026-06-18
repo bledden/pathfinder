@@ -77,3 +77,10 @@ paper/pathfinder.html
 
 # Internal research strategy/specs (private, like CODA_*/PAPER_SPEC_*; the paper is what ships, not the strategy)
 docs/superpowers/
+
+# audit re-run receipts + scripts (back paper §5.10/§5.15.1 corrections, 2026-06)
+!coda_experiments/ibm_d5r5_calibrated_100k_eval.json
+!coda_experiments/u3_table7_8_ler.json
+!coda_experiments/u3_p007_100k.json
+!coda_experiments/u1_d5r5_calibrated_100k.py
+!coda_experiments/u3_table7_8_ler.py

@@ -1,0 +1,68 @@
+{
+  "gpu": "NVIDIA H200",
+  "torch": "2.4.1+cu124",
+  "shots": 100000,
+  "noise": "3-parameter circuit-level (canonical, == run_final_eval.py)",
+  "configs": {
+    "full_H256": {
+      "params": 500225,
+      "path": "train/checkpoints/d7_final/best_model.pt",
+      "rates": {
+        "p0.007": {
+          "ler": 0.01689,
+          "errors": 1689,
+          "n": 100000,
+          "ci": [
+            0.016109679765050414,
+            0.01770743711658746
+          ]
+        }
+      }
+    },
+    "narrow_H128": {
+      "params": 126209,
+      "path": "train/checkpoints/d7_narrow/best_model.pt",
+      "rates": {
+        "p0.007": {
+          "ler": 0.02904,
+          "errors": 2904,
+          "n": 100000,
+          "ci": [
+            0.028017183785064306,
+            0.030098999623633868
+          ]
+        }
+      }
+    },
+    "narrow_distill": {
+      "params": 126209,
+      "path": "train/checkpoints/d7_distill/best_model.pt",
+      "rates": {
+        "p0.007": {
+          "ler": 0.02594,
+          "errors": 2594,
+          "n": 100000,
+          "ci": [
+            0.024972839849590416,
+            0.02694358172915822
+          ]
+        }
+      }
+    },
+    "h192_distill": {
+      "params": 282241,
+      "path": "train/checkpoints/d7_h192_distill/best_model.pt",
+      "rates": {
+        "p0.007": {
+          "ler": 0.02176,
+          "errors": 2176,
+          "n": 100000,
+          "ci": [
+            0.020873911097639176,
+            0.022682831626532333
+          ]
+        }
+      }
+    }
+  }
+}

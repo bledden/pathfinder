@@ -1,0 +1,78 @@
+{
+  "distance": 5,
+  "rounds": 5,
+  "n_shots": 100000,
+  "detector_flip_rate": 0.35350825,
+  "observable_flip_rate": 0.49617,
+  "pymatching_sweep": {
+    "p0.005": {
+      "ler": 0.47248,
+      "ci": [
+        0.4693867819813043,
+        0.47557533235411137
+      ],
+      "errors": 47248
+    },
+    "p0.01": {
+      "ler": 0.47339,
+      "ci": [
+        0.47029644128722115,
+        0.4764856031337603
+      ],
+      "errors": 47339
+    },
+    "p0.015": {
+      "ler": 0.47416,
+      "ci": [
+        0.47106616105927435,
+        0.4772558242033399
+      ],
+      "errors": 47416
+    },
+    "p0.02": {
+      "ler": 0.47478,
+      "ci": [
+        0.471685940783926,
+        0.47787599684467796
+      ],
+      "errors": 47478
+    },
+    "p0.025": {
+      "ler": 0.47542,
+      "ci": [
+        0.4723257184198776,
+        0.4785161700381354
+      ],
+      "errors": 47542
+    }
+  },
+  "pymatching_best": {
+    "p_dem": "p0.005",
+    "ler": 0.47248,
+    "ci": [
+      0.4693867819813043,
+      0.47557533235411137
+    ],
+    "errors": 47248
+  },
+  "pfwl3s_calibrated_3seed": {
+    "ler": 0.47635,
+    "ci": [
+      0.4732554043790407,
+      0.4794464126279572
+    ],
+    "errors": 47635,
+    "per_seed_errors": [
+      47774,
+      47755,
+      47544
+    ],
+    "ckpts": [
+      "/workspace/pf/bench/results/h200_main/calibrated/seed0/best_model.pt",
+      "/workspace/pf/bench/results/h200_main/calibrated/seed1/best_model.pt",
+      "/workspace/pf/bench/results/h200_main/calibrated/seed2/best_model.pt"
+    ],
+    "ensemble_method": "logit_mean"
+  },
+  "verdict": "tie (CIs overlap)"
+}
