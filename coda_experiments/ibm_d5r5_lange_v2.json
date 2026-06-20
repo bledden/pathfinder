@@ -1,0 +1,17 @@
+{
+  "distance": 5,
+  "rounds": 5,
+  "n_shots": 10000,
+  "det_flip_rate": 0.35299833333333336,
+  "obs_flip_rate": 0.491,
+  "lange": {
+    "ler": 0.4968,
+    "ci": [
+      0.48700331127220503,
+      0.5065991464076526
+    ],
+    "errors": 4968,
+    "ckpt": "/Users/bledden/Documents/pathfinder/coda_experiments/GNN_decoder/models/circuit_level_noise/d5/d5_d_t_5.pt",
+    "d_t": 5
+  }
+}

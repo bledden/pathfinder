@@ -84,3 +84,17 @@ docs/superpowers/
 !coda_experiments/u3_p007_100k.json
 !coda_experiments/u1_d5r5_calibrated_100k.py
 !coda_experiments/u3_table7_8_ler.py
+
+# soft-readout (§5.15.2) + IBM/Lange real-hardware (§5.15.1, §5.11 audit C3) artifacts the paper cites
+!coda_experiments/soft_info.py
+!coda_experiments/soft_info_v2.py
+!coda_experiments/soft_detmap.py
+!coda_experiments/soft_gate.py
+!coda_experiments/decode_soft_v2.py
+!coda_experiments/lange_decode_ibm.py
+!coda_experiments/eval_lange_3seed.py
+!coda_experiments/ibm_soft_v2_d3r3_eval.json
+!coda_experiments/ibm_soft_v2_d5r5_eval.json
+!coda_experiments/ibm_d3r3_lange_v2.json
+!coda_experiments/ibm_d5r5_lange_v2.json
+!coda_experiments/lange_3seed_eval.json
