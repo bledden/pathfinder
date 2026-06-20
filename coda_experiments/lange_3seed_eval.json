@@ -1,5 +1,5 @@
 {
-  "note": "matched 3-seed: PFWL3S-3seed vs Lange-3seed-FT-ensemble vs Lange-pub vs PM, 100K shots",
+  "note": "FULL-RECIPE matched 3-seed: PFWL3S-3seed vs Lange-3seed-FT-ensemble (2M x30 each) vs Lange-pub vs PM, 100K shots; with McNemar paired test",
   "rates": {
     "p0.007": {
       "n": 100000,
@@ -16,10 +16,10 @@
         0.0313500873276142
       ],
       "Lange_FT_3seed": [
-        0.02838,
-        0.02838,
-        0.02736875199570296,
-        0.029427482120167242
+        0.02652,
+        0.02652,
+        0.025542163072022523,
+        0.027534213945877958
       ],
       "PM": [
         0.0338,
@@ -27,7 +27,14 @@
         0.03269771004828011,
         0.034938107654147024
       ],
-      "PFWL3S_vs_LangeFT3seed": "PFWL3S_strict"
+      "mcnemar_PFWL3S_vs_LangeFT": {
+        "b_pf_wrong_lange_right": 701,
+        "c_pf_right_lange_wrong": 820,
+        "both_wrong": 1832,
+        "chi2": 9.154503616042078,
+        "p": 0.0024810667208113764
+      },
+      "PFWL3S_vs_LangeFT3seed_marginalCI": "PFWL3S_strict"
     },
     "p0.01": {
       "n": 100000,
@@ -44,10 +51,10 @@
         0.10983805905907429
       ],
       "Lange_FT_3seed": [
-        0.10084,
-        0.10084,
-        0.09898896547582352,
-        0.10272170160718984
+        0.09538,
+        0.09538,
+        0.09357489813510952,
+        0.09721618843450885
       ],
       "PM": [
         0.10333,
@@ -55,7 +62,14 @@
         0.10145858749904908,
         0.10523188827963344
       ],
-      "PFWL3S_vs_LangeFT3seed": "PFWL3S_strict"
+      "mcnemar_PFWL3S_vs_LangeFT": {
+        "b_pf_wrong_lange_right": 2653,
+        "c_pf_right_lange_wrong": 3051,
+        "both_wrong": 6487,
+        "chi2": 27.63131136044881,
+        "p": 1.46783379575656e-07
+      },
+      "PFWL3S_vs_LangeFT3seed_marginalCI": "PFWL3S_strict"
     },
     "p0.015": {
       "n": 100000,
@@ -72,10 +86,10 @@
         0.3054448008885283
       ],
       "Lange_FT_3seed": [
-        0.28866,
-        0.28866,
-        0.2858595730326415,
-        0.291476664018476
+        0.27542,
+        0.27542,
+        0.27265983249140946,
+        0.27819742177631057
       ],
       "PM": [
         0.27269,
@@ -83,7 +97,14 @@
         0.269938508256961,
         0.27545895575406154
       ],
-      "PFWL3S_vs_LangeFT3seed": "PFWL3S_strict"
+      "mcnemar_PFWL3S_vs_LangeFT": {
+        "b_pf_wrong_lange_right": 9758,
+        "c_pf_right_lange_wrong": 9996,
+        "both_wrong": 17546,
+        "chi2": 2.8434241166346057,
+        "p": 0.09174851030904019
+      },
+      "PFWL3S_vs_LangeFT3seed_marginalCI": "PFWL3S_strict"
     }
   }
 }

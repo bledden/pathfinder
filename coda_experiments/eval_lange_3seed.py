@@ -2,7 +2,7 @@
 d=7, 100K shots, p in {0.007,0.010,0.015}. Addresses the ensemble-vs-single-model fairness
 gap: PFWL3S (3-seed) was previously compared only to a single Lange GNN. Here Lange is also
 a 3-seed logit-mean ensemble of fine-tuned (30-epoch @ p=0.007) seeds, matched to PFWL3S."""
-import sys, os, glob, json
+import sys, os, glob, json, math
 sys.path.insert(0, '/workspace')
 sys.path.insert(0, '/workspace/pf/train')
 sys.path.insert(0, '/workspace/GNN_decoder')
@@ -55,18 +55,28 @@ def pf_logits(models, syn):
     return avg/len(models)
 
 d=7; NOISE=[0.007,0.010,0.015]; SEEDS=[3000,3001,3002,3003,3004]; NPS=20000
+def mcnemar(b,c):
+    # discordant b,c; continuity-corrected chi2(1) + survival p
+    chi=(abs(b-c)-1)**2/(b+c) if (b+c)>0 else 0.0
+    p=math.erfc(math.sqrt(chi/2)) if chi>0 else 1.0
+    return chi,p
+
 def main():
     pf=load_pf(); print(f"loaded {len(pf)} PFWL3S")
-    ft_paths=[sorted(glob.glob(f'/workspace/ftcfg/seed{i}/saved_models/d_7/*model.pt'))[-1] for i in range(3)]
-    print("FT-Lange ckpts:", [os.path.basename(p) for p in ft_paths])
+    # FULL-RECIPE 3-seed FT-Lange ensemble: existing seed0 (2M x30, the C2 2.739% ckpt) + 2 new seeds.
+    ft_paths=[os.environ.get('FT_SEED0','/workspace/lange_finetuned_d7_p007.pt')]
+    ft_paths+=[sorted(glob.glob(f'/workspace/ftcfg/seed{i}/saved_models/d_7/*model.pt'))[-1] for i in (1,2)]
+    print("FT-Lange ckpts (full recipe):", [os.path.basename(p) for p in ft_paths])
     lange_ft=[LangeLogits(d,d) for _ in range(3)]
-    out={'note':'matched 3-seed: PFWL3S-3seed vs Lange-3seed-FT-ensemble vs Lange-pub vs PM, 100K shots','rates':{}}
+    out={'note':'FULL-RECIPE matched 3-seed: PFWL3S-3seed vs Lange-3seed-FT-ensemble (2M x30 each) vs Lange-pub vs PM, 100K shots; with McNemar paired test','rates':{}}
     for p in NOISE:
         c=make_circuit(d,p); pfm=PathfinderMapper(c)
         lw_pub=LangeLogits(d,d); lw_pub.init_from_circuit(c)
         for lw in lange_ft: lw.init_from_circuit(c)
         for lw,fp in zip(lange_ft, ft_paths): lw.load_ft(fp)
         pf_e=lpub_e=lft_e=pm_e=tot=0
+        # McNemar contingency PFWL3S vs Lange-FT-ensemble: b=PF wrong&Lange right, cc=PF right&Lange wrong
+        b_pfw_lr=cc_pfr_lw=both_w=0
         for ss in SEEDS:
             det,obs=c.compile_detector_sampler(seed=ss).sample(shots=NPS,separate_observables=True)
             det=det.astype(np.uint8); obs=obs.astype(np.uint8).reshape(-1)
@@ -79,14 +89,18 @@ def main():
             lpub_pr=(lw_pub.logits_batch(det)>0).astype(np.uint8)
             lft_avg=np.mean([lw.logits_batch(det) for lw in lange_ft],axis=0)
             lft_pr=(lft_avg>0).astype(np.uint8)
-            pf_e+=int((pf_pr!=obs).sum()); lpub_e+=int((lpub_pr!=obs).sum())
-            lft_e+=int((lft_pr!=obs).sum()); pm_e+=int((pm_pr!=obs).sum()); tot+=NPS
+            pf_wrong=pf_pr!=obs; lft_wrong=lft_pr!=obs
+            b_pfw_lr+=int((pf_wrong & ~lft_wrong).sum()); cc_pfr_lw+=int((~pf_wrong & lft_wrong).sum()); both_w+=int((pf_wrong & lft_wrong).sum())
+            pf_e+=int(pf_wrong.sum()); lpub_e+=int((lpub_pr!=obs).sum())
+            lft_e+=int(lft_wrong.sum()); pm_e+=int((pm_pr!=obs).sum()); tot+=NPS
         def ci(e): return [e/tot]+list(wilson(e,tot))
-        r={'n':tot,'PFWL3S_3seed':ci(pf_e),'Lange_pub_1seed':ci(lpub_e),'Lange_FT_3seed':ci(lft_e),'PM':ci(pm_e)}
+        chi,mp=mcnemar(b_pfw_lr,cc_pfr_lw)
         pf_ci=ci(pf_e); lft_ci=ci(lft_e)
-        r['PFWL3S_vs_LangeFT3seed']=('PFWL3S_strict' if pf_ci[2]<lft_ci[1] else ('Lange_strict' if lft_ci[2]<pf_ci[1] else 'overlap'))
+        r={'n':tot,'PFWL3S_3seed':ci(pf_e),'Lange_pub_1seed':ci(lpub_e),'Lange_FT_3seed':ci(lft_e),'PM':ci(pm_e),
+           'mcnemar_PFWL3S_vs_LangeFT':{'b_pf_wrong_lange_right':b_pfw_lr,'c_pf_right_lange_wrong':cc_pfr_lw,'both_wrong':both_w,'chi2':chi,'p':mp},
+           'PFWL3S_vs_LangeFT3seed_marginalCI':('PFWL3S_strict' if pf_ci[2]<lft_ci[1] else ('Lange_strict' if lft_ci[2]<pf_ci[1] else 'overlap'))}
         out['rates'][f'p{p}']=r
-        print(f"p={p}: PFWL3S {pf_e/tot*100:.3f}%  Lange-FT-3seed {lft_e/tot*100:.3f}%  Lange-pub {lpub_e/tot*100:.3f}%  PM {pm_e/tot*100:.3f}%  -> PFWL3S_vs_LangeFT3seed={r['PFWL3S_vs_LangeFT3seed']}",flush=True)
+        print(f"p={p}: PFWL3S {pf_e/tot*100:.3f}%  Lange-FT-3seed {lft_e/tot*100:.3f}%  Lange-pub {lpub_e/tot*100:.3f}%  PM {pm_e/tot*100:.3f}%  | marginalCI={r['PFWL3S_vs_LangeFT3seed_marginalCI']}  McNemar chi2={chi:.2f} p={mp:.4f} (PF-wins={cc_pfr_lw} Lange-wins={b_pfw_lr})",flush=True)
     json.dump(out,open('/workspace/lange_3seed_eval.json','w'),indent=2)
     print("saved /workspace/lange_3seed_eval.json")
 if __name__=='__main__': main()
