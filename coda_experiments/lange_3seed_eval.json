@@ -1,5 +1,5 @@
 {
-  "note": "FULL-RECIPE matched 3-seed: PFWL3S-3seed vs Lange-3seed-FT-ensemble (2M x30 each) vs Lange-pub vs PM, 100K shots; with McNemar paired test",
+  "note": "FULL-RECIPE matched 3-seed: PFWL3S-3seed vs Lange-3seed-FT-ensemble (2M x30 each) vs Lange-pub vs PM, 100K shots; with McNemar paired test [marginalCI verdict field recomputed 2026-06-21 from stored Wilson CIs after fixing a verdict-indexing bug in eval_lange_3seed.py; LERs/CIs/McNemar unchanged.]",
   "rates": {
     "p0.007": {
       "n": 100000,
@@ -34,7 +34,7 @@
         "chi2": 9.154503616042078,
         "p": 0.0024810667208113764
       },
-      "PFWL3S_vs_LangeFT3seed_marginalCI": "PFWL3S_strict"
+      "PFWL3S_vs_LangeFT3seed_marginalCI": "overlap"
     },
     "p0.01": {
       "n": 100000,
@@ -104,7 +104,7 @@
         "chi2": 2.8434241166346057,
         "p": 0.09174851030904019
       },
-      "PFWL3S_vs_LangeFT3seed_marginalCI": "PFWL3S_strict"
+      "PFWL3S_vs_LangeFT3seed_marginalCI": "overlap"
     }
   }
 }

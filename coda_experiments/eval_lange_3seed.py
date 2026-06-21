@@ -96,9 +96,12 @@ def main():
         def ci(e): return [e/tot]+list(wilson(e,tot))
         chi,mp=mcnemar(b_pfw_lr,cc_pfr_lw)
         pf_ci=ci(pf_e); lft_ci=ci(lft_e)
+        # ci() = [rate, rate, lo, hi] (wilson returns rate,lo,hi). strict win = PF_hi < Lange_lo.
+        pf_lo,pf_hi=pf_ci[2],pf_ci[3]; lf_lo,lf_hi=lft_ci[2],lft_ci[3]
+        marg='PFWL3S_strict' if pf_hi<lf_lo else ('Lange_strict' if lf_hi<pf_lo else 'overlap')
         r={'n':tot,'PFWL3S_3seed':ci(pf_e),'Lange_pub_1seed':ci(lpub_e),'Lange_FT_3seed':ci(lft_e),'PM':ci(pm_e),
            'mcnemar_PFWL3S_vs_LangeFT':{'b_pf_wrong_lange_right':b_pfw_lr,'c_pf_right_lange_wrong':cc_pfr_lw,'both_wrong':both_w,'chi2':chi,'p':mp},
-           'PFWL3S_vs_LangeFT3seed_marginalCI':('PFWL3S_strict' if pf_ci[2]<lft_ci[1] else ('Lange_strict' if lft_ci[2]<pf_ci[1] else 'overlap'))}
+           'PFWL3S_vs_LangeFT3seed_marginalCI':marg}
         out['rates'][f'p{p}']=r
         print(f"p={p}: PFWL3S {pf_e/tot*100:.3f}%  Lange-FT-3seed {lft_e/tot*100:.3f}%  Lange-pub {lpub_e/tot*100:.3f}%  PM {pm_e/tot*100:.3f}%  | marginalCI={r['PFWL3S_vs_LangeFT3seed_marginalCI']}  McNemar chi2={chi:.2f} p={mp:.4f} (PF-wins={cc_pfr_lw} Lange-wins={b_pfw_lr})",flush=True)
     json.dump(out,open('/workspace/lange_3seed_eval.json','w'),indent=2)
