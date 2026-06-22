@@ -98,3 +98,5 @@ docs/superpowers/
 !coda_experiments/ibm_d3r3_lange_v2.json
 !coda_experiments/ibm_d5r5_lange_v2.json
 !coda_experiments/lange_3seed_eval.json
+!coda_experiments/soft_positive_control.py
+!coda_experiments/soft_positive_control.json
