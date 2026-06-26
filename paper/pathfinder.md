@@ -1101,6 +1101,18 @@ At d=3 the architecture is shallow enough (L=3, 252K parameters) that AdamW reac
 - **Documents** that PFWL3S individually does not scale to d=9, a clean negative result for the wide-and-distill recipe at higher distance, despite the warm-init from the existing `distill_d9_p007_ft` ckpt.
 - **Strengthens** the case for the Triad as the recommended deployment of the §5.13 wide-and-distill recipe family, the value-add of the ensemble grows with code distance precisely because the individual gap to Lange grows with d, giving the majority-vote rescue more room to operate.
 
+**Voter-independence analysis (per-shot): the d=9 win is structural, not a two-endpoint artifact.** A skeptic could read "individual loses, ensemble wins at exactly two rates" as a multiplicity fluke. It is not. Decoding the same 40,000 shots with all three voters and tabulating the full three-way agreement (Table 12b; this run reproduces Table 12's individual and Triad LERs within shot noise) shows the voters fail on *different* shots. At d=9 p=0.007 the pairwise error correlations are φ = 0.49 (PFWL3S–Lange), 0.37 (PFWL3S–PM), 0.36 (Lange–PM) — positive (hard syndromes are hard for everyone) but far below 1, so failures are substantially independent. The majority therefore recovers **1,533 of 40,000 shots (3.8%) in which exactly one voter fails and the other two outvote it** (PM solo-fail 651, PFWL3S solo-fail 548, Lange solo-fail 334), yielding Triad LER 2.16% [2.02, 2.31] — strictly below *every* individual voter, including the strongest (Lange, 2.56%), with non-overlapping 95% Wilson CIs. PyMatching is independently correct on 263 shots where *both* neural voters fail, confirming the non-neural voter supplies genuine independent coverage rather than redundancy (had its errors been perfectly correlated with the neural voters', those 263 shots would join the 319 all-three-wrong, nearly doubling the irreducible floor). The same structure holds at p=0.010 (φ = 0.33–0.42; 5,994 single-voter failures recovered; Triad 11.32% [11.01, 11.63] strictly below the best individual, PM at 12.47%). The d=9 win is thus an ensemble-of-independent-errors effect visible at the per-shot level, not a coincidence of two endpoints.
+
+**Table 12b: d=9 three-voter per-shot agreement (40,000 shots per rate; X = wrong; PF = PFWL3S-H256-d9; per-shot data in `bench/results/h200_main/d9_disagreement_matrix.json`).**
+
+| outcome | p=0.007 | p=0.010 |
+|---|---|---|
+| all three voters correct | 94.01% | 73.70% |
+| exactly one voter wrong (majority recovers) | 3.83% | 14.98% |
+| ≥ 2 voters wrong = **Triad LER** | **2.16%** | **11.32%** |
+| — of which all three wrong (irreducible floor) | 0.80% | 3.71% |
+| pairwise error corr. φ (PF–La / PF–PM / La–PM) | 0.49 / 0.37 / 0.36 | 0.42 / 0.33 / 0.36 |
+
 At p=0.015 the Triad still beats Lange (Maj≪Lange) but PM dominates both; this is a "saturated" regime where the d=9 surface code cannot suppress errors enough at this noise rate, and PM's simpler combinatorial approach happens to be the least-bad choice. Future work could explore a richer voting scheme (e.g. confidence-weighted ensemble) or a dedicated d=9 Wide-Long recipe at H=384 to further close the individual gap.
 
 ![Pathfinder-Triad strict-CI win extends from d=7 to d=9 at operational rates](../figures/fig11_d9_triad.png){.fig}

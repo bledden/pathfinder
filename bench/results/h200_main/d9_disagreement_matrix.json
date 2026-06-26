@@ -1,0 +1,102 @@
+{
+  "d": 9,
+  "n_per_rate": 40000,
+  "rates": {
+    "p0.007": {
+      "n": 40000,
+      "cells": {
+        "pf._la._pm.": 37603,
+        "pf._la._pmX": 651,
+        "pf._laX_pm.": 334,
+        "pf._laX_pmX": 106,
+        "pfX_la._pm.": 548,
+        "pfX_la._pmX": 176,
+        "pfX_laX_pm.": 263,
+        "pfX_laX_pmX": 319
+      },
+      "pf_ler": [
+        0.03265,
+        0.030952741034198254,
+        0.03443701893325447
+      ],
+      "lange_ler": [
+        0.02555,
+        0.02404863804718928,
+        0.02714248555729974
+      ],
+      "pm_ler": [
+        0.0313,
+        0.029638050691751284,
+        0.033051968558799896
+      ],
+      "majority_ler": [
+        0.0216,
+        0.020220609143167586,
+        0.02307127310446135
+      ],
+      "all_three_wrong": [
+        0.007975,
+        0.007149340412670072,
+        0.008895158673637674
+      ],
+      "all_correct": 37603,
+      "pf_solo_fail_recovered": 548,
+      "lange_solo_fail_recovered": 334,
+      "pm_solo_fail_recovered": 651,
+      "both_neural_wrong_pm_right": 263,
+      "pf_pm_wrong_lange_right": 176,
+      "lange_pm_wrong_pf_right": 106,
+      "phi_pf_lange": 0.48911644318529074,
+      "phi_pf_pm": 0.3668702641051637,
+      "phi_lange_pm": 0.35760460759304596
+    },
+    "p0.01": {
+      "n": 40000,
+      "cells": {
+        "pf._la._pm.": 29480,
+        "pf._la._pmX": 1853,
+        "pf._laX_pm.": 1749,
+        "pf._laX_pmX": 816,
+        "pfX_la._pm.": 2392,
+        "pfX_la._pmX": 837,
+        "pfX_laX_pm.": 1390,
+        "pfX_laX_pmX": 1483
+      },
+      "pf_ler": [
+        0.15255,
+        0.1490597558308961,
+        0.15610697595618306
+      ],
+      "lange_ler": [
+        0.13595,
+        0.13262613180309762,
+        0.1393437882057847
+      ],
+      "pm_ler": [
+        0.124725,
+        0.12152300592715624,
+        0.1279990699726743
+      ],
+      "majority_ler": [
+        0.11315,
+        0.11008267081750871,
+        0.11629162819481413
+      ],
+      "all_three_wrong": [
+        0.037075,
+        0.03526734336863756,
+        0.03897156672643691
+      ],
+      "all_correct": 29480,
+      "pf_solo_fail_recovered": 2392,
+      "lange_solo_fail_recovered": 1749,
+      "pm_solo_fail_recovered": 1853,
+      "both_neural_wrong_pm_right": 1390,
+      "pf_pm_wrong_lange_right": 837,
+      "lange_pm_wrong_pf_right": 816,
+      "phi_pf_lange": 0.41455126176955276,
+      "phi_pf_pm": 0.328060478293953,
+      "phi_lange_pm": 0.3578052908186178
+    }
+  }
+}
