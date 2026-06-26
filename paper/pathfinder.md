@@ -1183,6 +1183,8 @@ This work owes a specific intellectual debt to several teams. Andi Gu and collea
 
 **Tools and AI assistance.** In the interest of transparency, this work was carried out by the author with substantial assistance from AI tools, which are disclosed here and are not authors. Anthropic's Claude (Claude Code, Opus 4-class models) served as a research-engineering assistant throughout: it developed and debugged code, ran statistical-verification scripts, produced figures and PDF/typesetting tooling, and drafted and edited substantial portions of the manuscript text, which the author then revised, fact-checked against primary sources, and rewrote where needed. Conductor Quantum's Coda (a model and agentic harness; conductorquantum.com/coda) was used for independent adversarial review and statistical auditing of the results, which strengthened the controls and significance testing reported here. The author directed all research decisions and interpretive claims, independently verified every quantitative result against the raw data and every citation against its source, and is solely responsible for the content of this paper and any errors that remain.
 
+**Compute and hardware.** Cloud compute for this work was supported in part by DigitalOcean credits, which funded the AMD MI300X training runs; the NVIDIA H200 latency benchmarks and additional GPU runs were self-funded. Real-hardware experiments were run on IBM Quantum systems, accessed through Qiskit and the `qiskit-ibm-runtime` SamplerV2 primitive [18]: I acknowledge the use of IBM Quantum services for this work (the `ibm_fez` and `ibm_kingston` Heron r2 processors; §5.15). The views expressed are those of the author and do not reflect the official policy or position of IBM or the IBM Quantum team.
+
 ---
 
 ## References
@@ -1220,6 +1222,8 @@ This work owes a specific intellectual debt to several teams. Andi Gu and collea
 [16] NVIDIA. "Ising-Decoding: a training framework for AI quantum error-correction decoders." GitHub repository, https://github.com/NVIDIA/Ising-Decoding (released April 2026).
 
 [17] Pattison, C.A., Beverland, M.E., da Silva, M.P. & Delfosse, N. "Improved quantum error correction using soft information." arXiv:2107.13589 (2021).
+
+[18] Javadi-Abhari, A., Treinish, M., Krsulich, K., Wood, C.J., Lishman, J., Gacon, J., Martiel, S., Nation, P.D., Bishop, L.S., Cross, A.W., Johnson, B.R. & Gambetta, J.M. "Quantum computing with Qiskit." arXiv:2405.08810 (2024). DOI: 10.48550/arXiv.2405.08810.
 
 ---
 
