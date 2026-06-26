@@ -27,6 +27,7 @@ PFWL3S as an *individual* decoder also strictly beats Lange at 4 (d, p) points (
    - **Triad-distillation arc** (paper §5.13, ~$110 GPU): 6 recipe variants showing the Triad's coverage advantage is *architectural*, not absorbable into a single PF student.
    - **Modern-primitives hybrid** (paper §5.14): CNN+attention+SwiGLU at 9× parameter count is *worse* than the simpler CNN at matched compute.
    - **d=9 PFWL3S-H256-d9** (paper §6.3): individually loses to Lange (the recipe-level reversal does *not* extend to d=9 at H=256). However, Pathfinder-Triad with this PFWL3S-H256-d9 voter still strictly beats Lange at d=9 p=0.007 and p=0.010 (extending the §5.12 result from d=7 to d=9).
+7. **Real-hardware validation (IBM Heron r2)** (paper §5.15): PFWL3S, trained only on simulated noise, statistically *ties* PyMatching at d=3 r=3 on `ibm_fez` — the first PFWL3S-class neural decoder shown to match PyMatching on real superconducting-chip noise. A soft (analog-IQ) readout follow-up (§5.15.2) does *not* break the tie on this clean, matching-saturated chip; a synthetic readout-SNR positive control confirms the soft pipeline is not inert (peak gain at SNR≈4, McNemar p=3×10⁻⁴, Holm/Bonferroni-robust).
 
 ## Results
 
