@@ -197,7 +197,7 @@ python -m pytest tests/ -v --ignore=tests/test_cpp_decoder.py
 
 | Generalization axis | Result |
 |---|---|
-| 4-parameter circuit-level noise (Lange's noise model) — canonical Pathfinder | Loses to Lange ~5% relative at d=7 (§5.11) |
+| 4-parameter circuit-level noise (Lange's noise model) — canonical Pathfinder | Loses to Lange ~14% relative at d=7, non-overlapping CIs (McNemar p=1.7×10⁻⁸; §5.11) |
 | 4-parameter noise — PFWL3S | **Strict-CI wins** at 4 (d, p) operational points (§5.13) |
 | Phenomenological noise (data errors only) | **PyMatching wins 15/15 — Pathfinder does not generalize cleanly** (§5.7, retraction of an earlier claim) |
 | Color code XYZ (d=3) | **Pathfinder beats PM 3.3×** (3.76% vs 12.51%, §5.7 Table 6) — direction-specific architecture is especially effective on richer stabilizer geometry |
@@ -259,4 +259,7 @@ through adversarial review by the **Coda** expert model, which is gratefully ack
 
 ## License
 
-MIT
+- **Code** (everything except the manuscript and figures): MIT — see [`LICENSE`](LICENSE).
+- **Manuscript** (`paper/`) **and figures**: Creative Commons Attribution 4.0 International (**CC BY 4.0**) — <https://creativecommons.org/licenses/by/4.0/>. Reuse freely with attribution.
+
+© 2026 Blake Ledden.

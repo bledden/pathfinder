@@ -6,8 +6,8 @@ strategies: all-three-wrong (oracle lower bound), 3-way majority vote,
 and confidence-thresholded gating where Pathfinder is used when confident
 and another decoder (Lange or PM) otherwise.
 
-Pathfinder checkpoint defaults to fixed_d{d} (the 4-parameter retrain) if
-present, otherwise falls back to the Table-1 model.
+Pathfinder checkpoint defaults to finetune_d{d} (canonical 4-param fine-tune) if present,
+then fixed_d{d}, otherwise the Table-1 model.
 
 Usage:
   python3 ensemble_pf_lange.py --pathfinder-dir /workspace/pathfinder/train/checkpoints
@@ -129,6 +129,7 @@ class PathfinderMapper:
 
 def load_pathfinder(d, ckpt_dir):
     candidates = [
+        f"{ckpt_dir}/finetune_d{d}/best_model.pt",   # canonical 4-param fine-tune (verified: d7 p0.007 = 3.34%)
         f"{ckpt_dir}/fixed_d{d}/best_model.pt",
         f"{ckpt_dir}/d{d}_final/best_model.pt" if d == 7 else f"{ckpt_dir}/d{d}_muon/best_model.pt",
     ]

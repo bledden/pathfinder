@@ -100,3 +100,9 @@ docs/superpowers/
 !coda_experiments/lange_3seed_eval.json
 !coda_experiments/soft_positive_control.py
 !coda_experiments/soft_positive_control.json
+
+# local PDF/LaTeX build (paper/build_pdf.py) — intermediates + draft outputs
+paper/_pathfinder_build.md
+paper/_header.tex
+paper/pathfinder_draft.pdf
+paper/pathfinder_draft.tex

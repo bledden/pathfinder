@@ -135,7 +135,7 @@ def fig01_hero():
                               edgecolor=PAL["triad"], linewidth=0.8, alpha=0.95))
 
     # Callout in the lower-LEFT area (well clear of the curves)
-    ax.annotate("Pathfinder-Triad strict-CI\nbeats Lange (262 bp gap)",
+    ax.annotate("Pathfinder-Triad strict-CI\nbeats Lange (0.372 pp gap)",
                 xy=(0.007, 2.39),
                 xytext=(0.00125, 0.32),
                 fontsize=11, weight="bold", color=PAL["triad"], ha="left", va="center",
@@ -145,10 +145,10 @@ def fig01_hero():
                                 connectionstyle="arc3,rad=0.18"))
 
     # Honesty callout: PM competitive at the saturated regime (p=0.015)
-    # At p=0.015 d=7: PM 27.16% vs PFWL3S 27.34% — PM wins by 18 bp
-    ax.annotate("Above-threshold regime:\nPM beats PFWL3S by 18 bp here\n(see §6.3 saturated-regime note)",
+    # At p=0.015 d=7: PM 27.16% vs PFWL3S 27.34% — PM wins by 0.18 pp
+    ax.annotate("Above-threshold regime:\nPM beats PFWL3S by 0.18 pp here\n(see §6.3 saturated-regime note)",
                 xy=(0.015, 27.16),
-                xytext=(0.0028, 75),
+                xytext=(0.0028, 46),
                 fontsize=10, weight="bold", color=PAL["pm"], ha="left", va="center",
                 bbox=dict(boxstyle="round,pad=0.4", facecolor="white",
                           edgecolor=PAL["pm"], linewidth=1.0, alpha=0.97),
@@ -176,7 +176,7 @@ def fig01_hero():
 # ============================================================================
 def fig02_3param_multid():
     ps = [0.0005, 0.001, 0.002, 0.003, 0.005, 0.007, 0.010, 0.015]
-    fig, axs = plt.subplots(1, 3, figsize=(15.0, 4.6), sharey=True)
+    fig, axs = plt.subplots(1, 3, figsize=(11.5, 6.0), sharey=True)
     win_count = {3: 0, 5: 0, 7: 0}
     tie_count = {3: 0, 5: 0, 7: 0}
     loss_count = {3: 0, 5: 0, 7: 0}
@@ -206,10 +206,10 @@ def fig02_3param_multid():
         ax.set_xscale("log"); ax.set_yscale("log")
         ax.set_xlabel("Physical error rate  p", fontsize=12)
         verdict = f"{win_count[d]}W / {tie_count[d]}T / {loss_count[d]}L vs PM"
-        ax.set_title(f"d = {d}   ({verdict})", fontsize=12.5, weight="bold", pad=10)
+        ax.set_title(f"d = {d}   ({verdict})", fontsize=13.5, weight="bold", pad=10)
         ax.grid(True, which="both", alpha=0.55)
         ax.set_xticks(ps); ax.set_xticklabels([f"{p:g}" for p in ps],
-                                              rotation=35, fontsize=9.5)
+                                              rotation=35, fontsize=10.5)
         thin_spine(ax)
         _pct_log_axis(ax, minor_subs=None)
         if d == 3:
@@ -224,14 +224,14 @@ def fig02_3param_multid():
                               edgecolor="#D1D5DB", linewidth=0.6, alpha=0.95))
     total_w = sum(win_count.values()); total_t = sum(tie_count.values()); total_l = sum(loss_count.values())
     fig.suptitle(
-        f"Pathfinder vs PyMatching at d ∈ {{3,5,7}}: {total_w} strict-CI wins / {total_t} statistical ties / "
+        f"Pathfinder vs PyMatching at d $\\in$ {{3,5,7}}: {total_w} strict-CI wins / {total_t} statistical ties / "
         f"{total_l} strict-CI loss (3-param noise, 100K shots/point)",
-        fontsize=13, weight="bold", y=1.04, x=0.04, ha="left")
+        fontsize=15, weight="bold", y=1.05, x=0.5, ha="center")
     fig.text(0.04, -0.04,
              f"Strict-CI test uses 95% Wilson intervals. Pathfinder's only strict-CI loss is at d=7, p=0.015 — "
              f"the above-threshold regime where the surface code can no longer suppress errors and PM's "
              f"combinatorial structure is provably near-optimal (same physics as the d=9 p=0.015 result of Fig 11).",
-             fontsize=9, style="italic", color="#6B7280")
+             fontsize=10.5, style="italic", color="#6B7280")
     fig.tight_layout()
     _save(fig, "fig02_3param_multid")
 
@@ -256,7 +256,7 @@ def fig03_pareto():
         (63.0,  2.14,  "AlphaQubit (TPU, Sycamore real-hw)",         PAL["alpha_qubit"],"p", 130),
         (40.0,  1.0,   "Gu et al. (Gross codes, not surface)",       PAL["gu_etal"],    "h", 130),
     ]
-    fig, (ax, ax2) = plt.subplots(1, 2, figsize=(14.5, 6.0),
+    fig, (ax, ax2) = plt.subplots(1, 2, figsize=(14.5, 7.2),
                                   gridspec_kw=dict(width_ratios=[3.4, 1.0]),
                                   sharey=True)
     P = P_main
@@ -280,8 +280,8 @@ def fig03_pareto():
     # Manual offset table to keep numbered labels from overlapping
     offset = {
         1: (1.18, 0.97), 2: (1.18, 0.97), 3: (1.20, 0.98), 4: (1.16, 0.97),
-        5: (1.16, 0.97), 6: (1.07, 0.94), 7: (1.07, 1.05), 8: (1.06, 0.94),
-        9: (1.06, 1.05),
+        5: (1.16, 0.97), 6: (1.14, 1.03), 7: (1.14, 0.90), 8: (0.78, 1.05),
+        9: (0.78, 0.90),
     }
     handles = []
     for i, (lat, ler, lbl, color, marker, size) in enumerate(P, 1):
@@ -295,12 +295,13 @@ def fig03_pareto():
     leg_labels = [f"({i}) {p[2]}" for i, p in enumerate(P, 1)]
     ax.legend(handles, leg_labels, loc="lower right",
               title="Open-source decoders (measured here)", title_fontsize=10.5,
-              frameon=True, fontsize=9.0, ncol=2,
-              labelspacing=0.3, columnspacing=0.8)
+              frameon=True, fontsize=9.5, ncol=2,
+              labelspacing=1.0, columnspacing=1.4, handletextpad=0.7, borderpad=0.9)
     ax.set_xscale("log"); ax.set_yscale("log")
     ax.set_xlabel("Latency  (μs / syndrome, throughput-optimal batch)", fontsize=12.5)
     ax.set_ylabel("Logical error rate at d=7, p=0.007", fontsize=12.5)
     ax.set_xlim(3, 200); ax.set_ylim(0.6, 5)
+    ax.set_xticks([3,5,10,20,50,100,200]); ax.set_xticklabels(['3','5','10','20','50','100','200'])
     _pct_log_axis(ax)
     ax.set_title("Open-source decoders on matched hardware (H200 SXM / Apple M4)",
                  fontsize=12.5, weight="bold", pad=10, loc="left")
@@ -310,6 +311,7 @@ def fig03_pareto():
     # Second panel: closed-source / non-matched comparators (indicative only)
     ax2.set_xscale("log"); ax2.set_yscale("log")
     ax2.set_xlim(20, 200); ax2.set_ylim(0.6, 5)
+    ax2.set_xticks([20,50,100,200]); ax2.set_xticklabels(['20','50','100','200'])
     ax2.set_xlabel("Latency  (μs / syn)", fontsize=12)
     ax2.grid(True, which="both", alpha=0.55)
     ax2.set_facecolor("#FAFAFA")
@@ -333,7 +335,7 @@ def fig03_pareto():
              "Dotted line = Pareto frontier (lowest LER for each latency). "
              "Right panel: AlphaQubit (TPU, real Sycamore noise) and Gu et al. (Gross codes, not surface) "
              "are reported on different hardware OR a different problem — shown for context, not strictly comparable.",
-             fontsize=9, style="italic", color="#6B7280", wrap=True)
+             fontsize=10.5, style="italic", color="#6B7280", wrap=True)
     fig.tight_layout()
     _save(fig, "fig03_pareto_d7")
 
@@ -369,12 +371,13 @@ def fig04_triton_vs_ref():
         winner = "Triton wins" if sp >= 1 else "ref wins"
         ratio = sp if sp >= 1 else 1/sp
         ymax = max(ref[i], tri[i])
-        ax.text(i, ymax * 1.9, f"{ratio:.2f}x\n({winner})",
+        ax.text(i, ymax * 1.4, f"{ratio:.2f}x\n({winner})",
                 ha="center", va="bottom", fontsize=11.5, color=color, weight="bold")
     # Cycle budget line
     ax.axhline(7.0, color="#15803D", ls=":", lw=1.4)
     ax.text(2.45, 8.0, "d=7 cycle budget  (7 μs)", color="#15803D",
-            ha="right", va="bottom", fontsize=10.5, style="italic", weight="bold")
+            ha="right", va="bottom", fontsize=10.5, style="italic", weight="bold",
+            bbox=dict(boxstyle="round,pad=0.3", facecolor="white", edgecolor="#15803D", linewidth=0.8, alpha=0.92))
     ax.set_ylim(0.5, 9000)
     ax.legend(loc="upper right", fontsize=11)
     ax.set_title("Triton kernel tuned for H=256 LOSES to PyTorch reference at H=384 B=1024 (M10 audit)",
@@ -398,8 +401,8 @@ def fig05_failure_overlap():
     neither = n - both - pf_only - la_only
 
     fig, ax = plt.subplots(figsize=(11.0, 6.2))
-    R = 1.05
-    cx_pf, cx_la, cy = -0.55, 0.55, 0.0
+    R = 1.3
+    cx_pf, cx_la, cy = -0.72, 0.72, 0.0
     ax.add_patch(plt.Circle((cx_pf, cy), R, color=PAL["pf"],    alpha=0.40,
                             linewidth=2.5, edgecolor=PAL["pf"]))
     ax.add_patch(plt.Circle((cx_la, cy), R, color=PAL["lange"], alpha=0.40,
@@ -410,28 +413,28 @@ def fig05_failure_overlap():
     both_pct    = both/n*100
 
     # Headers above each circle
-    ax.text(-1.15, cy + 0.65, "Pathfinder\nwrong", ha="center", va="center",
+    ax.text(-0.72, 1.55, "Pathfinder\nwrong", ha="center", va="center",
             fontsize=13.5, weight="bold", color=PAL["pf"])
-    ax.text( 1.15, cy + 0.65, "Lange GNN\nwrong", ha="center", va="center",
+    ax.text( 0.72, 1.55, "Lange GNN\nwrong", ha="center", va="center",
             fontsize=13.5, weight="bold", color=PAL["lange"])
     # Count + pct in each region
-    ax.text(-0.90, cy - 0.10, f"only-PF\n{pf_only:,} shots\n{pf_only_pct:.3f}%",
+    ax.text(-1.15, cy - 0.10, f"only-PF\n{pf_only:,} shots\n{pf_only_pct:.3f}%",
             ha="center", va="center", fontsize=11.5, color="#1F2937")
-    ax.text( 0.90, cy - 0.10, f"only-Lange\n{la_only:,} shots\n{la_only_pct:.3f}%",
+    ax.text( 1.15, cy - 0.10, f"only-Lange\n{la_only:,} shots\n{la_only_pct:.3f}%",
             ha="center", va="center", fontsize=11.5, color="#1F2937")
     ax.text(  0.0, cy - 0.10, f"BOTH wrong\n{both:,} shots\n{both_pct:.3f}%",
             ha="center", va="center", fontsize=11.5, color="white", weight="bold")
     # Background line
-    ax.text(0.0, -1.85, f"Both correct on {neither:,} of {n:,} shots ({neither/n*100:.2f}%)",
+    ax.text(0.0, -2.15, f"Both correct on {neither:,} of {n:,} shots ({neither/n*100:.2f}%)",
             ha="center", va="top", fontsize=11, color="#4B5563")
 
-    ax.set_xlim(-2.6, 2.6); ax.set_ylim(-2.4, 2.4)
+    ax.set_xlim(-3.1, 3.1); ax.set_ylim(-2.7, 2.7)
     ax.set_aspect("equal")
     ax.set_xticks([]); ax.set_yticks([])
     for s in ("top","right","left","bottom"): ax.spines[s].set_visible(False)
     ax.set_title(f"Pathfinder and Lange fail on largely disjoint syndromes "
                  f"(only {both_pct:.2f}% shot overlap)",
-                 fontsize=14.5, weight="bold", pad=14, loc="left")
+                 fontsize=14.5, weight="bold", pad=14, loc="center")
     ax.text(0.5, -0.02, "This near-disjoint failure mode is the structural reason "
             "the §5.12 three-way majority vote (Pathfinder-Triad) beats every individual decoder.",
             transform=ax.transAxes, ha="center", va="top",
@@ -471,10 +474,10 @@ def fig06_lange_ft():
                           edgecolor=PAL["lange_ft"], linewidth=0.8, alpha=0.97),
                 arrowprops=dict(arrowstyle="-", color=PAL["lange_ft"], lw=0.8))
 
-    # Honesty callout at p=0.015: PM beats PFWL3S by 18 bp here
+    # Honesty callout at p=0.015: PM beats PFWL3S by 0.18 pp here
     idx15 = ps.index(0.015)
     ax.annotate(
-        f"At p=0.015: PM {pm_[idx15]:.2f}% beats PFWL3S {pfw[idx15]:.2f}% by 18 bp\n(above-threshold saturated regime — see §6.3)",
+        f"At p=0.015: PM {pm_[idx15]:.2f}% beats PFWL3S {pfw[idx15]:.2f}% by 0.18 pp\n(above-threshold saturated regime — see §6.3)",
         xy=(0.015, pm_[idx15]),
         xytext=(0.0050, 60), textcoords="data",
         ha="left", va="center", fontsize=10, weight="bold", color=PAL["pm"],
@@ -485,8 +488,8 @@ def fig06_lange_ft():
 
     # Callout placed in the upper-left empty region (high above the curves)
     callout(ax, 0.007, 2.74,
-            "PFWL3S strict-CI beats\nfine-tuned Lange\n(49 bp gap at p=0.007)",
-            dx=-0.0042, dy=8.5, color=PAL["pfwl3s"])
+            "PFWL3S strict-CI beats\nfine-tuned Lange\n(0.049 pp gap at p=0.007)",
+            dx=0.0, dy=15.0, color=PAL["pfwl3s"])
 
     ax.set_xscale("log"); ax.set_yscale("log")
     ax.set_xlabel("Physical error rate  p", fontsize=12.5)
@@ -506,7 +509,7 @@ def fig06_lange_ft():
     _save(fig, "fig06_lange_ft")
 
 # ============================================================================
-# F7 — Strict-CI dominance heatmap with CI-gap magnitudes in basis points
+# F7 — Strict-CI dominance heatmap with CI-gap magnitudes in percentage points (pp)
 # ============================================================================
 def fig07_dominance_heatmap():
     rows = []
@@ -556,7 +559,7 @@ def fig07_dominance_heatmap():
                                       r["pm_ci"][0], r["pm_ci"][1]))
         cells.append(out)
 
-    fig, ax = plt.subplots(figsize=(10.5, 7.5))
+    fig, ax = plt.subplots(figsize=(9.0, 9.0))
     for i, row in enumerate(cells):
         y = len(cells)-1-i
         for j, (status, gap) in enumerate(row):
@@ -565,9 +568,9 @@ def fig07_dominance_heatmap():
                                         facecolor=color,
                                         edgecolor="white", linewidth=2.0))
             if status == "win":
-                lbl = f"WIN\n+{gap*10000:.0f} bp";  tc = "white"; weight = "bold"
+                lbl = f"WIN\n+{gap*100:.2f} pp";  tc = "white"; weight = "bold"
             elif status == "loss":
-                lbl = f"loss\n-{gap*10000:.0f} bp"; tc = "white"; weight = "bold"
+                lbl = f"loss\n-{gap*100:.2f} pp"; tc = "white"; weight = "bold"
             elif status == "tie":
                 lbl = "overlap"; tc = "#4B5563"; weight = "normal"
             else:
@@ -576,9 +579,9 @@ def fig07_dominance_heatmap():
                     fontsize=10.5, color=tc, weight=weight)
 
     ax.set_xlim(0, len(cols)); ax.set_ylim(0, len(rows))
-    ax.set_xticks(np.arange(len(cols))+0.5); ax.set_xticklabels(cols, fontsize=11, weight="bold")
+    ax.set_xticks(np.arange(len(cols))+0.5); ax.set_xticklabels(cols, fontsize=12, weight="bold")
     ax.set_yticks(np.arange(len(rows))+0.5)
-    ax.set_yticklabels([f"d={d}, p={p}" for (d, p) in reversed(rows)], fontsize=11)
+    ax.set_yticklabels([f"d={d}, p={p}" for (d, p) in reversed(rows)], fontsize=12)
     for s in ("top","right","left","bottom"): ax.spines[s].set_visible(False)
     ax.tick_params(length=0)
     handles = [
@@ -589,9 +592,9 @@ def fig07_dominance_heatmap():
     ax.legend(handles=handles, loc="upper left", bbox_to_anchor=(0.0, -0.06),
               ncol=3, frameon=False, fontsize=11)
     ax.set_title("Triad strict-CI beats Lange at 5 of 8 d ≥ 7 ops points;\nloses to PM at d=9 p=0.015 (above threshold)",
-                 fontsize=13.5, weight="bold", pad=14, loc="left")
+                 fontsize=15, weight="bold", pad=14, loc="left")
     footer(ax, "Wilson 95% CIs at 100K shots / point. WIN = row-decoder strictly beats column-decoder. "
-                "Numbers show CI-gap magnitude in basis points. The single 'loss' cell at d=9 p=0.015 in "
+                "Numbers show CI-gap magnitude in percentage points (pp). The single 'loss' cell at d=9 p=0.015 in "
                 "the right column reflects that the d=9 surface code is above its pseudo-threshold at p=0.015, "
                 "where PM's combinatorial structure is provably near-optimal.")
     fig.tight_layout()
@@ -649,8 +652,8 @@ def fig09_hybrid_vs_pfwl3s():
         d_ler = pa - pb
         var = pa*(1-pa)/n + pb*(1-pb)/n
         hw = 1.96 * np.sqrt(var)
-        diffs.append(d_ler * 10000)        # bp
-        cis.append(hw * 10000)             # bp
+        diffs.append(d_ler * 100)        # pp
+        cis.append(hw * 100)             # pp
 
     fig, ax = plt.subplots(figsize=(11.0, 5.6))
     x = np.arange(len(ps))
@@ -661,15 +664,15 @@ def fig09_hybrid_vs_pfwl3s():
                 ecolor="#1F2937", elinewidth=1.4, capsize=6, capthick=1.4,
                 markersize=11, markeredgecolor="white", markeredgewidth=1.6,
                 zorder=4)
-    # Value labels (ΔLER in bp) above each point
+    # Value labels (ΔLER in pp) above each point
     for xi, d, c in zip(x, diffs, cis):
-        ax.annotate(f"{d:+.1f}", (xi, d + c + 1.5),
+        ax.annotate(f"{d:+.2f}", (xi, d + c + 0.06),
                     ha="center", fontsize=10, weight="bold", color="#1F2937")
     ax.set_xticks(x); ax.set_xticklabels([f"{p:g}" for p in ps], fontsize=11.5)
     ax.set_xlabel("Physical error rate  p", fontsize=12.5)
-    ax.set_ylabel("Hybrid − PFWL3S  (LER difference, basis points)", fontsize=12.5)
+    ax.set_ylabel("Hybrid − PFWL3S  (LER difference, percentage points)", fontsize=12.5)
     ax.grid(True, axis="y", alpha=0.55)
-    ax.set_ylim(min(min(diffs)-max(cis), -25) * 1.4, max(max(diffs)+max(cis), 25) * 1.4)
+    ax.set_ylim(min(min(diffs)-max(cis), -0.25) * 1.4, max(max(diffs)+max(cis), 0.25) * 1.4)
     ax.set_title("Hybrid CNN+GNN statistically ties PFWL3S at all 8 noise rates",
                  fontsize=14.5, weight="bold", pad=14, loc="left")
     # Caption-style headline
@@ -744,7 +747,7 @@ def fig11_d9_triad():
     tri_hi = [pfw_d9[f"d9_p{p}"]["majority_ci"][1] *100 for p in ps]
     x = np.arange(len(ps))
     w = 0.20
-    fig, ax = plt.subplots(figsize=(12.0, 6.0))
+    fig, ax = plt.subplots(figsize=(12.0, 6.8))
     def bars(offset, vals, lo, hi, color, label, linewidth=1.0):
         err_lo = np.array(vals) - np.array(lo)
         err_hi = np.array(hi)   - np.array(vals)
@@ -760,32 +763,35 @@ def fig11_d9_triad():
     ax.set_ylabel("Logical error rate at d=9  (log scale)", fontsize=12.5)
     ax.yaxis.set_major_formatter(FuncFormatter(_pct))
     ax.grid(True, which="both", axis="y", alpha=0.55)
-    ax.legend(loc="upper left", ncol=2, fontsize=11)
-    # WIN annotations for Triad strict-CI wins (p=0.007, p=0.010)
+    # generous headroom so callouts sit ABOVE the bars in clear space, not over them
+    all_hi = pm_hi + la_hi + pfw_hi + tri_hi
+    cluster_max = [max(pm_[j], la[j], pfw[j], tri[j]) for j in range(len(ps))]
+    ax.set_ylim(top=max(all_hi) * 3.6)
+    ax.legend(loc="upper left", ncol=2, fontsize=10, framealpha=0.9)
+    # Triad strict-CI wins (p=0.007, p=0.010): callout ABOVE the cluster, short arrow down to the bar
     for j, p in enumerate(ps):
-        if tri_hi[j] < la_lo[j]:
-            ax.annotate("Triad STRICT-CI\nbeats Lange",
-                        xy=(x[j]+1.5*w, tri[j]),
-                        xytext=(x[j]+1.5*w, tri[j]*0.55),
-                        ha="center", fontsize=10.5, color="#16A34A", weight="bold",
-                        arrowprops=dict(arrowstyle="->", color="#16A34A", lw=1.4))
-
-    # Honesty: at p=0.015 PM strictly beats Triad (saturated/above-threshold regime)
+        if tri_hi[j] < la_lo[j] and not (pm_hi[j] < tri_lo[j]):  # skip where PM itself beats Triad (p=0.015)
+            ax.annotate("Triad strict-CI\nbeats Lange",
+                        xy=(x[j]+1.5*w, tri_hi[j]),
+                        xytext=(x[j]+1.5*w, cluster_max[j]*2.3),
+                        ha="center", va="bottom", fontsize=9.5, color="#16A34A", weight="bold",
+                        arrowprops=dict(arrowstyle="->", color="#16A34A", lw=1.3))
+    # Honesty: at p=0.015 PM strictly beats Triad (above-threshold regime) — callout above its cluster
     j15 = ps.index(0.015)
     if pm_hi[j15] < tri_lo[j15]:
         ax.annotate(
-            f"PM WINS HERE\n(PM {pm_[j15]:.1f}% vs Triad {tri[j15]:.1f}%)\nabove-threshold regime",
-            xy=(x[j15]-1.5*w, pm_[j15]),
-            xytext=(x[j15]-1.6*w, pm_[j15]*0.18),
-            ha="center", va="center", fontsize=10.5, color="#7C3AED", weight="bold",
-            bbox=dict(boxstyle="round,pad=0.35", facecolor="white",
-                      edgecolor="#7C3AED", linewidth=1.2, alpha=0.97),
-            arrowprops=dict(arrowstyle="-|>", color="#7C3AED", lw=1.4))
-    ax.set_title("Triad strict-CI win extends from d=7 to d=9 at operational rates — but PM wins at p=0.015 (above threshold)",
-                 fontsize=13, weight="bold", pad=14, loc="left")
+            f"PM wins here\n(PM {pm_[j15]:.1f}% vs Triad {tri[j15]:.1f}%)\nabove-threshold regime",
+            xy=(x[j15]-1.5*w, pm_hi[j15]),
+            xytext=(x[j15], cluster_max[j15]*2.0),
+            ha="center", va="bottom", fontsize=9.5, color="#7C3AED", weight="bold",
+            bbox=dict(boxstyle="round,pad=0.3", facecolor="white",
+                      edgecolor="#7C3AED", linewidth=1.1, alpha=0.97),
+            arrowprops=dict(arrowstyle="-|>", color="#7C3AED", lw=1.3))
+    ax.set_title("Triad strict-CI win extends from d=7 to d=9 at operational rates —\nbut PM wins at p=0.015 (above threshold)",
+                 fontsize=12.5, weight="bold", pad=12, loc="left")
     thin_spine(ax)
     footer(ax, "100K shots / point. PFWL3S-H256-d9 loses to Lange individually at every rate, "
-                "but the Triad strictly beats Lange at p=0.007 (25 bp) and p=0.010 (204 bp).")
+                "but the Triad strictly beats Lange at p=0.007 (0.154 pp) and p=0.010 (1.831 pp).")
     fig.tight_layout()
     _save(fig, "fig11_d9_triad")
 

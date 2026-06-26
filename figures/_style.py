@@ -159,9 +159,12 @@ def insight_title(ax, title, subtitle=None):
         ax.set_title(title, fontsize=14.5, weight="bold", pad=12)
 
 def footer(ax, text):
-    """Small italic provenance line below the chart."""
+    """Small italic provenance line below the chart. Wrap long footers so a single long line
+    doesn't force a wide savefig bbox (which left the figure small + left-justified)."""
+    import textwrap
+    text = "\n".join(textwrap.wrap(text, width=115))
     ax.text(0.0, -0.20, text, ha="left", va="top", transform=ax.transAxes,
-            fontsize=9.5, style="italic", color="#6B7280")
+            fontsize=11, style="italic", color="#6B7280")
 
 def callout(ax, x, y, text, dx=0, dy=0, color=None, fontsize=10.5):
     """Speech-bubble-style annotation with a thin arrow pointing to (x, y)."""

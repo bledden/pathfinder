@@ -94,9 +94,10 @@ class LangeDecoderWrapper:
 
 
 def load_pathfinder(d):
-    paths = {3: "/workspace/pathfinder/train/checkpoints/best_model.pt",
-             5: "/workspace/pathfinder/train/checkpoints/d5_muon/best_model.pt",
-             7: "/workspace/pathfinder/train/checkpoints/d7_final/best_model.pt"}
+    import os
+    _ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+    # canonical 4-parameter fine-tune checkpoints (verified): finetune_d{d}
+    paths = {d: os.path.join(_ROOT, f"bench/results/h200_main/tuned/finetune_d{d}/best_model.pt") for d in (3, 5, 7)}
     ck = torch.load(paths[d], weights_only=False, map_location=device)
     m = NeuralDecoder(ck["config"]).to(device)
     m.load_state_dict(ck["model_state_dict"])
