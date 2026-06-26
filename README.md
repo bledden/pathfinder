@@ -4,7 +4,7 @@ Two open-source decoder systems for quantum error correction on rotated surface 
 
 ## TL;DR
 
-- **System 1: real-time-budget decoder.** Canonical Pathfinder (H=256, 500K params) + a custom Triton kernel for DirectionalConv3d → **6.12 μs/syndrome at d=7 batch=1024 on NVIDIA H200 SXM**. The only open-source decoder tested that sustains the 7-μs superconducting cycle-time budget (paper §5.3, §A.3). Beats PyMatching at 22 of 24 operational points under 3-parameter circuit-level noise (paper §5.1, Table 1).
+- **System 1: real-time-budget decoder.** Canonical Pathfinder (H=256, 500K params) + a custom Triton kernel for DirectionalConv3d → **6.12 μs/syndrome at d=7 batch=1024 on NVIDIA H200 SXM**. The only open-source decoder tested whose batched GPU throughput sustains the 7-μs superconducting cycle-time budget (a cross-hardware comparison — PyMatching is CPU-timed; paper §5.3, §A.3). Beats PyMatching at 22 of 24 operational points under 3-parameter circuit-level noise (paper §5.1, Table 1).
 
 - **System 2: lowest-LER decoder (Pathfinder-Triad with PFWL3S voter).** A 3-way majority vote of (PFWL3S, Lange et al. 2025, PyMatching), where **PFWL3S** = three independent random-seed H=384 Pathfinders trained 160K steps each with Lange-teacher distillation, ensembled by averaging logits. Achieves **LER 2.384% at d=7 p=0.007 (100K shots)** vs Lange's 2.956% — **strict statistical win** with non-overlapping 95% Wilson CIs (**Triad vs Lange: 19.4% relative LER reduction**; the PFWL3S voter alone is 2.492%, 15.7% vs Lange). Strict-CI wins at 5 (d, p) operational points: **d=7 p ∈ {0.007, 0.010, 0.015} and d=9 p ∈ {0.007, 0.010}** (paper §5.12, §6.3). Latency is Lange-bounded at ≈72 μs/syn — for non-real-time deployment (offline verification, post-selection in repeat-until-success).
 
@@ -26,7 +26,7 @@ PFWL3S as an *individual* decoder also strictly beats Lange at 4 (d, p) points (
 6. **Documented negative results** strengthening the headline claims:
    - **Triad-distillation arc** (paper §5.13, ~$110 GPU): 6 recipe variants showing the Triad's coverage advantage is *architectural*, not absorbable into a single PF student.
    - **Modern-primitives hybrid** (paper §5.14): CNN+attention+SwiGLU at 9× parameter count is *worse* than the simpler CNN at matched compute.
-   - **d=9 PFWL3S-H256-d9** (paper §6.3): individually loses to Lange (architectural-reversal does *not* extend to d=9 at H=256). However, Pathfinder-Triad with this PFWL3S-H256-d9 voter still strictly beats Lange at d=9 p=0.007 and p=0.010 (extending the §5.12 result from d=7 to d=9).
+   - **d=9 PFWL3S-H256-d9** (paper §6.3): individually loses to Lange (the recipe-level reversal does *not* extend to d=9 at H=256). However, Pathfinder-Triad with this PFWL3S-H256-d9 voter still strictly beats Lange at d=9 p=0.007 and p=0.010 (extending the §5.12 result from d=7 to d=9).
 
 ## Results
 
