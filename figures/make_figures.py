@@ -176,7 +176,9 @@ def fig01_hero():
 # ============================================================================
 def fig02_3param_multid():
     ps = [0.0005, 0.001, 0.002, 0.003, 0.005, 0.007, 0.010, 0.015]
-    fig, axs = plt.subplots(1, 3, figsize=(11.5, 6.0), sharey=True)
+    # Vertical 3x1 stack: each d-panel spans the FULL column width (the side-by-side
+    # 1x3 layout forced each panel to ~1/3 width once scaled to 0.92\linewidth).
+    fig, axs = plt.subplots(3, 1, figsize=(9.0, 11.5), sharex=True)
     win_count = {3: 0, 5: 0, 7: 0}
     tie_count = {3: 0, 5: 0, 7: 0}
     loss_count = {3: 0, 5: 0, 7: 0}
@@ -186,10 +188,10 @@ def fig02_3param_multid():
         pm_    = np.array([comp[f"d{d}_p{p}"]["pm_ler"]    *100 for p in ps])
         pm_hw  = np.array([comp[f"d{d}_p{p}"]["pm_ci"]     *100 for p in ps])
         uf_    = np.array([comp[f"d{d}_p{p}"].get("uf_ler", np.nan)*100 for p in ps])
-        ax.plot(ps, pm_, "o-", color=PAL["pm"], linewidth=2.4, markersize=8, label="PyMatching")
-        ax.plot(ps, nl,  "s-", color=PAL["pf"], linewidth=2.8, markersize=9, label="Pathfinder")
-        ax.plot(ps, uf_, "^--", color=PAL["uf"], linewidth=1.8, alpha=0.85, label="Union-Find")
-        # Per-cell verdict markers (above each Pathfinder point)
+        ax.plot(ps, pm_, "o-", color=PAL["pm"], linewidth=2.6, markersize=9, label="PyMatching")
+        ax.plot(ps, nl,  "s-", color=PAL["pf"], linewidth=3.0, markersize=10, label="Pathfinder")
+        ax.plot(ps, uf_, "^--", color=PAL["uf"], linewidth=2.0, alpha=0.85, label="Union-Find")
+        # Per-cell verdict markers (below each Pathfinder point)
         for p, y, nhw, py, phw in zip(ps, nl, nl_hw, pm_, pm_hw):
             if y == 0 and py == 0:
                 sym, color = "≈", "#888"; tie_count[d] += 1
@@ -199,40 +201,40 @@ def fig02_3param_multid():
                 sym, color = "✗", "#7C3AED"; loss_count[d] += 1  # PF strict-loses
             else:
                 sym, color = "≈", "#888"; tie_count[d] += 1       # overlap
-            # Offset above the Pathfinder marker, in log-y display coords
             label_y = max(y, 1e-4) * 0.45 if y > 0 else 5e-5
             ax.text(p, label_y, sym, ha="center", va="top",
-                    fontsize=12, color=color, weight="bold")
+                    fontsize=15, color=color, weight="bold")
         ax.set_xscale("log"); ax.set_yscale("log")
-        ax.set_xlabel("Physical error rate  p", fontsize=12)
         verdict = f"{win_count[d]}W / {tie_count[d]}T / {loss_count[d]}L vs PM"
-        ax.set_title(f"d = {d}   ({verdict})", fontsize=13.5, weight="bold", pad=10)
+        ax.set_title(f"d = {d}   ({verdict})", fontsize=15.5, weight="bold", pad=8)
         ax.grid(True, which="both", alpha=0.55)
-        ax.set_xticks(ps); ax.set_xticklabels([f"{p:g}" for p in ps],
-                                              rotation=35, fontsize=10.5)
+        ax.set_xticks(ps)
+        ax.set_ylabel("Logical error rate", fontsize=13)
+        ax.tick_params(axis="y", labelsize=11.5)
         thin_spine(ax)
         _pct_log_axis(ax, minor_subs=None)
         if d == 3:
-            ax.legend(loc="lower right")
-            ax.set_ylabel("Logical error rate", fontsize=12)
+            ax.legend(loc="lower right", fontsize=12.5)
             # In-axes legend for the verdict markers
             ax.text(0.02, 0.98,
-                    "✓ Pathfinder strict-CI wins   ≈ overlap (tie)   ✗ PM strict-CI wins",
+                    "✓ Pathfinder strict-CI wins    ≈ overlap (tie)    ✗ PM strict-CI wins",
                     transform=ax.transAxes, ha="left", va="top",
-                    fontsize=8.5, color="#374151", style="italic",
-                    bbox=dict(boxstyle="round,pad=0.3", facecolor="white",
+                    fontsize=11.5, color="#374151", style="italic",
+                    bbox=dict(boxstyle="round,pad=0.35", facecolor="white",
                               edgecolor="#D1D5DB", linewidth=0.6, alpha=0.95))
+    axs[-1].set_xlabel("Physical error rate  p", fontsize=13)
+    axs[-1].set_xticklabels([f"{p:g}" for p in ps], rotation=35, fontsize=12)
     total_w = sum(win_count.values()); total_t = sum(tie_count.values()); total_l = sum(loss_count.values())
     fig.suptitle(
         f"Pathfinder vs PyMatching at d $\\in$ {{3,5,7}}: {total_w} strict-CI wins / {total_t} statistical ties / "
         f"{total_l} strict-CI loss (3-param noise, 100K shots/point)",
-        fontsize=15, weight="bold", y=1.05, x=0.5, ha="center")
-    fig.text(0.04, -0.04,
-             f"Strict-CI test uses 95% Wilson intervals. Pathfinder's only strict-CI loss is at d=7, p=0.015 — "
-             f"the above-threshold regime where the surface code can no longer suppress errors and PM's "
-             f"combinatorial structure is provably near-optimal (same physics as the d=9 p=0.015 result of Fig 11).",
-             fontsize=10.5, style="italic", color="#6B7280")
-    fig.tight_layout()
+        fontsize=16, weight="bold", y=0.997, x=0.5, ha="center")
+    fig.text(0.5, 0.012,
+             "Strict-CI test uses 95% Wilson intervals. Pathfinder's only strict-CI loss is at d=7, p=0.015 —\n"
+             "the above-threshold regime where the surface code can no longer suppress errors and PM's combinatorial\n"
+             "structure is provably near-optimal (same physics as the d=9 p=0.015 result of Fig 11).",
+             ha="center", va="bottom", fontsize=11, style="italic", color="#6B7280")
+    fig.tight_layout(rect=[0, 0.055, 1, 0.975])
     _save(fig, "fig02_3param_multid")
 
 # ============================================================================
