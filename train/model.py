@@ -57,6 +57,15 @@ class DirectionalConv3d(nn.Module):
         Returns:
             [B, C_out, T, R, Co]
         """
+        # Workaround for a PyTorch MPS-backend correctness bug: this layer's
+        # standard ops (permute / Linear / pad on a 5D tensor) silently return
+        # wrong values on Apple MPS above ~256 batch (e.g. d=5 LER reads 38%
+        # instead of 3%); chunking to <=256 is bit-exact vs CPU/CUDA. No effect
+        # on CPU/CUDA, which are correct at any batch.
+        if x.device.type == "mps" and x.shape[0] > 256:
+            return torch.cat([self.forward(x[i:i + 256])
+                              for i in range(0, x.shape[0], 256)], dim=0)
+
         # Permute to channel-last for nn.Linear: [B, T, R, Co, C]
         xp = x.permute(0, 2, 3, 4, 1)
 

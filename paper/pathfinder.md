@@ -1210,7 +1210,7 @@ Minimum versions (matches what was used for measurements reported in this paper)
 - Muon optimizer: `pip install git+https://github.com/KellerJordan/Muon` (use the `SingleDeviceMuon` variant for single-GPU training)
 - NumPy, pybind11, pytest
 
-**Paths and evaluation hardware.** All file paths in this paper are relative to the repository root (after `git clone https://github.com/bledden/pathfinder && cd pathfinder`). Evaluate Pathfinder on a CUDA GPU or CPU: the Apple MPS backend mis-evaluates the `DirectionalConv3d` kernel at large batch (d=5 returns ~38% instead of ~3% at batch 2000, though it is correct at batch ≤ 256), so MPS is not recommended for evaluation.
+**Paths and evaluation hardware.** All file paths in this paper are relative to the repository root (after `git clone https://github.com/bledden/pathfinder && cd pathfinder`). Evaluate Pathfinder on a CUDA GPU or CPU (both bit-exact at any batch, and the backends all reported results were produced on). Apple MPS has a backend correctness bug in `DirectionalConv3d`'s 5D ops above ~256 batch (d=5 reads ~38% instead of ~3% at batch 2000); `train/model.py` works around it by chunking the batch on MPS (verified bit-exact vs CPU), so MPS is also safe, though CUDA/CPU remain the validated backends.
 
 ### A.2 Reproducing the LER results (Table 1, 100K shots, MI300X or any CUDA GPU)
 
