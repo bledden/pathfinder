@@ -1,0 +1,127 @@
+{
+  "gpu": "NVIDIA H200",
+  "torch": "2.6.0+cu124",
+  "cuda": "12.4",
+  "rows": [
+    {
+      "label": "d3_full_H256",
+      "triton": false,
+      "distance": 3,
+      "params": 252417,
+      "B1_us_call": 106.02,
+      "B1_us_syn": 106.024,
+      "B64_us_call": 149.03,
+      "B64_us_syn": 2.329,
+      "B1024_us_call": 406.45,
+      "B1024_us_syn": 0.397
+    },
+    {
+      "label": "d3_full_H256",
+      "triton": true,
+      "distance": 3,
+      "params": 252417,
+      "B1_us_call": 75.76,
+      "B1_us_syn": 75.762,
+      "B64_us_call": 102.04,
+      "B64_us_syn": 1.594,
+      "B1024_us_call": 312.41,
+      "B1024_us_syn": 0.305
+    },
+    {
+      "label": "d5_full_H256",
+      "triton": false,
+      "distance": 5,
+      "params": 376321,
+      "B1_us_call": 183.67,
+      "B1_us_syn": 183.669,
+      "B64_us_call": 322.29,
+      "B64_us_syn": 5.036,
+      "B1024_us_call": 2147.66,
+      "B1024_us_syn": 2.097
+    },
+    {
+      "label": "d5_full_H256",
+      "triton": true,
+      "distance": 5,
+      "params": 376321,
+      "B1_us_call": 129.65,
+      "B1_us_syn": 129.646,
+      "B64_us_call": 224.61,
+      "B64_us_syn": 3.509,
+      "B1024_us_call": 1769.89,
+      "B1024_us_syn": 1.728
+    },
+    {
+      "label": "d7_full_H256",
+      "triton": false,
+      "distance": 7,
+      "params": 500225,
+      "B1_us_call": 267.42,
+      "B1_us_syn": 267.419,
+      "B64_us_call": 731.05,
+      "B64_us_syn": 11.423,
+      "B1024_us_call": 8112.18,
+      "B1024_us_syn": 7.922
+    },
+    {
+      "label": "d7_full_H256",
+      "triton": true,
+      "distance": 7,
+      "params": 500225,
+      "B1_us_call": 212.44,
+      "B1_us_syn": 212.442,
+      "B64_us_call": 545.48,
+      "B64_us_syn": 8.523,
+      "B1024_us_call": 6274.5,
+      "B1024_us_syn": 6.127
+    },
+    {
+      "label": "d7_narrow_H128",
+      "triton": false,
+      "distance": 7,
+      "params": 126209,
+      "B1_us_call": 222.61,
+      "B1_us_syn": 222.61,
+      "B64_us_call": 463.67,
+      "B64_us_syn": 7.245,
+      "B1024_us_call": 3641.63,
+      "B1024_us_syn": 3.556
+    },
+    {
+      "label": "d7_narrow_H128",
+      "triton": true,
+      "distance": 7,
+      "params": 126209,
+      "B1_us_call": 154.05,
+      "B1_us_syn": 154.046,
+      "B64_us_call": 286.62,
+      "B64_us_syn": 4.478,
+      "B1024_us_call": 2765.42,
+      "B1024_us_syn": 2.701
+    },
+    {
+      "label": "d7_H192",
+      "triton": false,
+      "distance": 7,
+      "params": 126209,
+      "B1_us_call": 223.34,
+      "B1_us_syn": 223.337,
+      "B64_us_call": 464.92,
+      "B64_us_syn": 7.264,
+      "B1024_us_call": 3637.47,
+      "B1024_us_syn": 3.552
+    },
+    {
+      "label": "d7_H192",
+      "triton": true,
+      "distance": 7,
+      "params": 126209,
+      "B1_us_call": 153.85,
+      "B1_us_syn": 153.853,
+      "B64_us_call": 288.58,
+      "B64_us_syn": 4.509,
+      "B1024_us_call": 2762.47,
+      "B1024_us_syn": 2.698
+    }
+  ]
+}
