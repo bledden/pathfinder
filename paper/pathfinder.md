@@ -849,7 +849,7 @@ To address the §6.3 limitation that all evaluations in §5.1–§5.14 are on si
 |---|---:|---|---|
 | **PyMatching v2 (algorithmic)** | **4.006%** | [3.838, 4.182] | Works on any noise model + circuit structure since PM builds its matching graph from Stim's detector error model. Real chip noise is roughly 6× harder than simulated 4-parameter noise at p=0.007 (4.0% vs 0.67% PM-on-simulated). |
 | PFWL3S (3-seed avg, T=8 truncation) | 46.336% | [45.899, 46.773] | **Effectively random predictions (4.0% true flip rate; PFWL3S close to random binary classification on the OOD input).** |
-| OR-oracle (both PF and PM wrong) | 2.080% | [1.959, 2.209] | Lower bound for any PM+PFWL3S ensemble. Shows the two decoders' failure modes are *not* purely correlated even in this OOD regime. |
+| OR-oracle (both PF and PM wrong) | 2.080% | [1.959, 2.209] | Lower bound for any PM+PFWL3S ensemble; it shows the two decoders' failure modes are *not* purely correlated even in this OOD regime. |
 
 **Interpretation.** PyMatching's 4.006% LER on real Willow d=7 hardware is the headline real-hardware result and a useful anchor for any future neural-decoder work on Willow data. The PFWL3S failure (46.3%, essentially random) **is not a failure of the PFWL3S recipe per se**; it's a failure of the *input-format adapter*. PFWL3S's trained weights expect a specific (R=d=7 standard-Stim 4-parameter-noise) detector tensor; the Willow data uses (R=13 SI1000-noise compound-detector) format. The minimal mapping used here (truncate to first T=8 timepoints, use first 3 coords of each detector as the (x, y, t) tensor index) produces a tensor that the trained PFWL3S weights do not recognize.
 
