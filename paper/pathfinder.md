@@ -678,6 +678,8 @@ Pathfinder and Lange agree on 96.97% of shots; the 3.03% they disagree on is whe
 
 ### 5.13 PFWL3S: making an individual CNN beat Lange — the winning recipe and its negative variants
 
+
+*Secondary and negative recipe variants — Pathfinder-XL, the 5-seed / d=3-rescue multi-seed details, the multi-noise single checkpoint, the rationale for shipping fine-tune over distillation, and the distill-as-fine-tune negative — are collected in **Appendix B** to keep this section on the winning PFWL3S path and the load-bearing Triad-distillation negative.*
 **Table 9c, canonical headline numbers (d=7, p=0.007, 100K shots unless noted).** Every prose figure and the repository README derive from this table. Gaps are given in three explicitly-distinct forms; *all* LER values are at the headline operating point (d=7, p=0.007).
 
 | Decoder / system | LER | 95% Wilson CI | point-est. gap vs Lange-pub (pp) | CI-edge sep. vs Lange-pub (pp) | rel. ↓ vs Lange-pub |
@@ -722,8 +724,6 @@ An obvious way to try to close the Pathfinder–Lange individual-LER gap in §5.
 
 **Pathfinder-Wide result (d=7 p=0.007, p=0.010).** Increasing Pathfinder's hidden dimension from H=256 (500K params) to H=384 (1.09M params), approaching Lange's 1.36M parameter count, and training with Lange-teacher distillation for 80,000 steps at `muon_lr=0.005` produces a **statistically-tied result with Lange at d=7 p=0.007** (Pathfinder-Wide 2.995% vs. Lange 2.940%, overlapping 95% Wilson CIs). At d=7 p=0.010 Pathfinder-Wide slightly out-performs Lange (10.688% vs. 10.822%, also overlapping CIs). Pathfinder-Wide is **the first Pathfinder variant tested whose 95% CI includes Lange's point estimate**, i.e., the first variant where the paper cannot reject the hypothesis that Pathfinder and Lange have equal individual LER at matched 4-parameter noise. Distillation trainer: `bench/results/h200_main/failed_runs/train_distill_lange.py` (run with the H=384 configuration at `muon_lr=0.005`); checkpoint: `bench/results/h200_main/tierC1/pathfinder_wide_d7/best_model.pt` (`hidden_dim=384`, distilled from Lange).
 
-**Pathfinder-XL, capacity ceiling.** Doubling parameters from Pathfinder-Wide to Pathfinder-XL (H=512, 1.99M params, 47% more parameters than Lange) and training with the same recipe yields LER 3.063% at d=7 p=0.007, *slightly worse* than Pathfinder-Wide's 2.995% (60K-shot evals). Both variants tie Lange within overlapping CIs but additional capacity past H=384 does not improve the individual decoder. Interpretation: the matched-noise distillation recipe is capacity-saturated around H=384 / 1.1 M parameters for d=7. Further individual-LER improvements require a different training regime (longer schedule, multi-noise-mixture distillation, or a better teacher loss) or a different inductive bias (the GNN representation that Lange uses; future work). Pathfinder-XL is preserved at `bench/results/h200_main/tierC1/pathfinder_xl_d7/best_model.pt`.
-
 **Pathfinder-Wide-Long, finally beats Lange.** Doubling the training schedule from 80K to 160K steps (H=384, distill from Lange, single-noise p=0.007) and re-evaluating at the headline d=7 noise rates with **100,000 shots per point** for tighter CIs:
 
 | d=7 (100K shots) | PF-Wide-Long | Lange | PM | Pathfinder-Triad | CI vs Lange |
@@ -765,32 +765,6 @@ The single-seed bottleneck identified by Pathfinder-Wide-XLong (240K-step single
 | d=5, p=0.015 | **17.205%** [16.972, 17.440] | 17.898% [17.662, 18.137] | **16.779%** | **NON-OVERLAP, 0.222 pp gap, 3.9% relative** |
 
 Multi-seed averaging closed the gap at d=5: the single-seed Wide-Long lost to Lange at p ≥ 0.005 with non-overlapping CIs (§5.11 Table 9), but the 3-seed-averaged ensemble ties Lange at every operational point and **strictly beats Lange at d=5 p=0.015** with non-overlapping 95% Wilson CIs. This adds a *fourth* strict-CI win to the headline claim; PFWL3S strictly beats Lange's individual GNN at **d=5 p=0.015 plus d=7 p ∈ {0.007, 0.010, 0.015}**, extending the recipe-level reversal result from one to two code distances. Pathfinder-Triad with the 3-seed-avg PF voter at d=5 reaches LER 16.779% at p=0.015 and 6.515% at p=0.010, also strictly beating Lange (Maj≪all category in `eval_pfwl3s_v2.log`).
-
-**5-seed averaging at d=5, diminishing returns.** I subsequently trained two additional independent random-seed Wide-Long ckpts at d=5 (seeds 3 and 4, same recipe as seeds 0–2) and re-ran the 8-noise sweep with **5-seed-avg ensembling** (instead of 3-seed). Data: `bench/results/h200_main/tierC1/ensemble_pfwl5s_d5.json`; new training logs `d5_seed{3,4}.log`. The 5-seed ensemble produces essentially the same per-noise-rate LER as the 3-seed ensemble (deltas of ±0.015 pp in either direction, all within statistical seed-noise):
-
-| (d=5, 100K shots) | 3-seed PF | 5-seed PF | Δ | Lange | 5-seed CI vs Lange |
-|---|---:|---:|---:|---:|---|
-| p=0.005 | 0.953% | 0.970% [0.911, 1.033] | +0.017 pp | 0.944% | overlap |
-| p=0.007 | 2.539% | **2.527%** [2.432, 2.626] | -0.012 pp | 2.544% | overlap (PF point estimate edges Lange) |
-| p=0.010 | 6.734% | 6.747% [6.593, 6.904] | +0.013 pp | 6.851% | overlap (PF still wins point est.) |
-| p=0.015 | 17.205% | **17.198%** [16.965, 17.433] | -0.007 pp | 17.898% | **STRICT WIN, 0.229 pp gap (3-seed had 0.222 pp gap)** |
-
-Going from 3 → 5 seeds at d=5 **does not materialize any new strict-CI wins** at p ∈ {0.005, 0.007, 0.010}; the strict-CI gap at p=0.015 is preserved (~0.222 pp, essentially unchanged), but the additional averaging provides no detectable improvement at the operational rates where the 3-seed result already overlapped Lange. The headline strict-CI claim of 4 (d, p) points (d=5 p=0.015 + d=7 p ∈ {0.007, 0.010, 0.015}) is therefore the operating point of this recipe at the H=384 / 160K-step / Lange-distillation budget. Breaking the remaining d=5 p ∈ {0.005, 0.007, 0.010} ties would require either (a) substantially more seeds (10+, with ensemble compute cost growing linearly), (b) longer training (the d=7 Wide-XLong study at 240K steps showed ~zero gain at single-seed, suggesting the ~160K-step budget is at or near saturation), or (c) a fundamentally different recipe (e.g., a richer teacher loss, a multi-noise mixture for the d=5 student, or replacing Lange's GNN with a stronger teacher). This is consistent with a "ceiling effect"; the recipe-level reversal CNN-vs-GNN result is real and strict at p=0.015, soft (overlapping CIs with PF favored) at p ∈ {0.007, 0.010}, and tied at p ∈ {0.005, ≤0.003} where Lange and Pathfinder are both very close to the per-shot oracle bound (oracle_lb ≈ PF_ler at low p; see `ensemble_pfwl5s_d5.json` `oracle_lb` field). The 3-seed PFWL3S of the headline tables is the cost-effective operating point.
-
-**d=3 PFWL3S, distillation-weight rescue and the conclusion that canonical fine-tune is the d=3 default.** Applying the same recipe at d=3 (H=384, 160K steps, distill from Lange at p=0.007, default α_bce=0.3 / α_kl=0.7) produces a model with **catastrophic individual LER**, 14.01% [13.79, 14.22] at d=3 p=0.007 vs. canonical fine-tune Pathfinder's 2.87% (§5.11 Table 9 d=3 row) and Lange's 2.78%. This is a 5× regression and is consistent with the existing finding (below) that Pathfinder-KD distillation with the same default loss weights also fails catastrophically at d=3 (13.4% LER in the 80K-step Pathfinder-KD ablation). I ran a follow-up "rescue" experiment swapping the loss weights (α_bce=0.7, α_kl=0.3, three-quarters BCE, one-quarter teacher KL) holding everything else fixed, three random seeds, 160K steps each. Data: `bench/results/h200_main/tierC1/ensemble_pfwl3s_d3_rescue.json`; training logs: `d3_rescue_seed{0,1,2}.log`.
-
-| (d=3) | PFWL3S rescue (α_kl=0.3, 3-seed avg) | Lange | Canonical fine-tune (§5.11) | PM | Verdict |
-|---|---:|---:|---:|---:|---|
-| p=0.0005 | **0.010%** [0.005, 0.018] | 0.014% | — | 0.013% | overlap |
-| p=0.001 | 0.073% [0.058, 0.092] | 0.065% | — | 0.078% | overlap |
-| p=0.002 | 0.250% [0.221, 0.283] | 0.215% | — | 0.288% | overlap |
-| p=0.003 | 0.640% [0.592, 0.691] | 0.517% | 0.572% | 0.659% | Lange strict-wins |
-| p=0.005 | 1.689% [1.611, 1.771] | 1.460% | 1.527% | 1.728% | Lange strict-wins |
-| p=0.007 | 3.181% [3.074, 3.292] | 2.782% | 2.817% | 3.228% | Lange strict-wins |
-| p=0.010 | 5.787% [5.644, 5.933] | 5.133% | 5.302% | 5.821% | Lange strict-wins |
-| p=0.015 | 11.558% [11.361, 11.758] | 10.527% | 10.799% | 11.523% | Lange strict-wins |
-
-The rescue lifts d=3 PFWL3S from a 14% LER recipe failure to a 3.18% LER converged result (78% relative reduction at p=0.007), confirming that the original 14% was a *loss-weight* issue, not an architectural one. But the rescued d=3 PFWL3S is **still strictly worse than Lange's GNN at p ≥ 0.003 with non-overlapping 95% Wilson CIs** and is also slightly worse than the simpler 252K-parameter canonical fine-tune Pathfinder at p=0.007 (3.18% vs 2.82%). The H=384 + 160K-step + distillation budget delivers no per-shot accuracy advantage over the simpler BCE-only fine-tune at d=3; the d=3 surface code is too shallow for the wider model and longer schedule to be useful, and the Lange-teacher signal at d=3 is already nearly saturated by Lange itself (whose d=3 LER is so close to the per-shot oracle bound that there is little room for KL-pull to help the student). **Canonical fine-tune Pathfinder remains the recommended d=3 deployment**; the §5.11 Table 9 d=3 row (overlapping CIs with Lange across all matched noise rates) stands. PFWL3S is therefore a d=5- and d=7-only construction. Pathfinder-Triad at d=3 with the canonical fine-tune voter is the correct deployment configuration; the rescue-PFWL3S Triad numbers in the rightmost block above (d=3 Maj column) overlap Lange at every point and are not better than the §5.12 Table 10 fine-tune-voter Triad at d=3.
 
 **PFWL3S inference latency at d=7 (measured at H=384).** The 3-seed-average inference cost was previously stated as "3× per-shot CNN forward pass". I measured this directly. Two separate latency benchmarks were run on the H=384 PFWL3S architecture (data: `bench/results/h200_main/tierC1/pfwl3s_latency.json` from the original 3-seed benchmark; `bench/results/h200_main/tierC1/triton_h384_stability.json` from the M10 audit follow-up that directly measures reference vs. Triton at H=384):
 
@@ -840,37 +814,6 @@ The rescue lifts d=3 PFWL3S from a 14% LER recipe failure to a 3.18% LER converg
 ![No distilled single PF student beats the Triad — coverage is architectural](../figures/fig08_triad_distill.png){.fig}
 
 **Figure 8.** *Triad-distillation arc, six recipes vs the Pathfinder-Triad baseline at d=7 p=0.007.* Each bar is the 3-seed-average single-decoder LER from one distillation recipe variant trained over ~$110 of follow-up compute. Recipes span both soft- and hard-label Triad targets, warm vs cold initialization, the wider H=512 capacity, and a Lange-free PF+PM-only KD. The dashed purple line is the Pathfinder-Triad ensemble baseline (2.384% LER, the same eval). No single-decoder variant gets within shot-noise of the ensemble; the Triad's three-way independent-failure-mode coverage is an architectural property that single-decoder distillation cannot replicate.
-
-**Pathfinder-Wide-Multi, single checkpoint covers all four operational noise rates.** A complementary recipe trains Pathfinder-Wide (H=384) with Lange-teacher distillation but samples the noise rate uniformly from p ∈ {0.003, 0.005, 0.007, 0.010} per training step (script: `bench/results/h200_main/tierC1/train_multi_noise.py`). The resulting single checkpoint produces matched-noise individual LERs essentially identical to single-noise specialization at every tested point:
-
-| d=7 (60K shots) | PF-Multi | Lange | PM | Pathfinder-Triad |
-|----|---:|---:|---:|---:|
-| p=0.003 | 0.100% | 0.087% | 0.148% | 0.085% |
-| p=0.005 | 0.833% | 0.752% | 0.985% | **0.668%** |
-| p=0.007 | 2.998% | 2.940% | 3.343% | **2.448%** |
-| p=0.010 | 10.855% | 10.822% | 10.300% | **9.017%** |
-
-Compare PF-Multi to PF-Wide single-noise at p=0.007 (2.998% vs. 2.995%): the multi-noise mixture loses essentially nothing per-rate. **One checkpoint can therefore replace the per-noise-rate specialization needed by §4.5 / §6.3 d=9**, simplifying deployment. Like Pathfinder-Wide and Pathfinder-XL, Pathfinder-Wide-Multi statistically ties Lange (overlapping CIs) at every tested p; none of the C1 attempts so far strictly beats Lange individually. The Pathfinder-Triad numbers in the rightmost column are essentially the best I have measured at any d=7 noise rate, marginally improving §5.12 Table 10's results: e.g., at p=0.007 the multi-noise Pathfinder voter gives Triad 2.448% vs. Table 10's 2.417% (with fine-tune voter), within ensemble seed-noise. Checkpoint: `bench/results/h200_main/tierC1/pathfinder_wide_multi_d7/best_model.pt`.
-
-**Why canonical Pathfinder uses fine-tune, not distill.** Three independent reasons:
-
-1. **Pathfinder-KD fails catastrophically at d=3.** The same distillation recipe applied at d=3 (80K steps, p=0.007, Lange teacher) converges to LER **13.4%**, four standard deviations worse than the d=3 fine-tune result (2.77%) or even the OOD Table-1 checkpoint (2.92%). The depth-independent KL-weighted training does not converge for the shallow d=3 architecture, paradoxically given that d=3 is the easiest decoding task. Canonical Pathfinder is defined by a single recipe that works at all three distances; Pathfinder-KD is not.
-
-2. **Pathfinder-KD gives a *looser* Pathfinder-Triad ensemble** at the headline stat-sig point (d=7 p=0.007): 2.495% vs. canonical Pathfinder's 2.417%, an 18% relative loss of the oracle-bound headroom. Shot-level agreement is the mechanism: Pathfinder-KD agrees with Lange on 96.7% of shots at d=7 p=0.007 vs. canonical Pathfinder's 95.9%, roughly 80 additional shots per 10K where Pathfinder-KD agrees with Lange (its teacher) but canonical Pathfinder diverges. When canonical diverges *and* PyMatching votes with it, the majority flips a Lange error into a correct prediction; Pathfinder-KD's over-agreement with Lange suppresses that signal. This is the "correlation cost" of teacher-student training for ensemble use.
-
-3. **Pathfinder-KD requires the Lange GNN at training time**, including PyG / torch-cluster and the `d{d}_d_t_{d_t}.pt` weights from the Lange repo. Canonical Pathfinder trains with just PyTorch + Stim + Muon, fewer dependencies, simpler reproduction.
-
-**When Pathfinder-KD is preferable.** Standalone neural decoding at d=5 or d=7, i.e., deployments that don't run the Triad ensemble, where the individual-LER improvement at d=7 (3.34% → 3.09%, 7.5% relative) is worth the extra training machinery and the d=3 gap (use the fine-tune d=3 checkpoint there anyway). Pathfinder-KD is released under `bench/results/h200_main/distill/distill_d{5,7}/` for these use cases.
-
-**Negative result, distill-as-fine-tune does not combine both benefits.** The natural next recipe is to initialize from the Table-1 checkpoint *and* add Lange as a soft-target teacher for the fine-tune phase, in principle combining the "good basin" of fine-tuning with the "stronger training signal" of distillation. I ran this at d=5 and d=7 (40,000 steps each, init from Table-1 ckpt, α_bce=0.3, α_kl=0.7, T=2.0; script: patched `train_distill_lange.py` with `--init` flag; checkpoints under `bench/results/h200_main/phase3/`):
-
-| Recipe | d=5 LER | d=7 LER |
-|--------|---------|---------|
-| Canonical Pathfinder (fine-tune: init + BCE labels only) | **2.55%** | 3.34% |
-| Pathfinder-KD (from scratch + teacher KL) | 3.07% | **3.09%** |
-| Distill-as-fine-tune (init + BCE + teacher KL) | 2.92% | 3.66% |
-
-Distill-as-fine-tune is *strictly dominated* at both distances, worse than fine-tune at d=5, worse than Pathfinder-KD at d=7. An α_kl ∈ {0.3, 0.5, 0.7} sweep at d=7 (`bench/results/h200_main/phase4/`) confirms this across the hyperparameter: α_kl=0.3 gives 3.27% (nearly tying canonical Pathfinder's 3.34%), α_kl=0.5 gives 3.83%, α_kl=0.7 gives 3.66%, and none of them beats Pathfinder-KD's 3.09%. My interpretation: a strong Table-1 init and a heavy Lange-teacher KL pull the student in two directions; 40,000 steps is not enough to reach either attractor. Longer training or a smaller α_kl might eventually close this; it is out of scope for this paper.
 
 ### 5.14 Modern-Architecture Ablation (Negative Result)
 
@@ -1427,8 +1370,8 @@ All checkpoints are distributed under `train/checkpoints/` and `bench/results/h2
 | `bench/results/h200_main/distill/distill_d7/best_model.pt` | d=7, H=256, L=7, 500K params | §5.13 distill_d7 |
 | `bench/results/h200_main/hybrid/hybrid_d7/best_model.pt` | d=7, H=192, L=7, 4.36M params | §5.14 hybrid (negative) |
 | `bench/results/h200_main/phase2/finetune_d3/best_model.pt` | d=3, H=256, L=3, 252K params | §5.11 fine-tune_d3 |
-| `bench/results/h200_main/phase3/distill_finetune_d5/best_model.pt` | d=5, H=256, L=5, 376K params | §5.13 distill-as-fine-tune (negative) |
-| `bench/results/h200_main/phase3/distill_finetune_d7/best_model.pt` | d=7, H=256, L=7, 500K params | §5.13 distill-as-fine-tune (negative) |
+| `bench/results/h200_main/phase3/distill_finetune_d5/best_model.pt` | d=5, H=256, L=5, 376K params | App B distill-as-fine-tune (negative) |
+| `bench/results/h200_main/phase3/distill_finetune_d7/best_model.pt` | d=7, H=256, L=7, 500K params | App B distill-as-fine-tune (negative) |
 
 Each checkpoint stores `model_state_dict`, a `DecoderConfig` instance, and (for most) training metadata. Loading example:
 
@@ -1440,3 +1383,67 @@ model = NeuralDecoder(ck["config"]).cuda()
 model.load_state_dict(ck["model_state_dict"])
 model.eval()  # set to inference mode
 ```
+
+
+## Appendix B: Recipe ablations and secondary variants (§5.13)
+
+This appendix collects the dead-end and secondary recipe variants referenced from §5.13, relocated here to keep the main text on the winning PFWL3S path and the load-bearing Triad-distillation negative. None of these change a headline result; they document what was tried and why it was not adopted.
+
+**Pathfinder-XL, capacity ceiling.** Doubling parameters from Pathfinder-Wide to Pathfinder-XL (H=512, 1.99M params, 47% more parameters than Lange) and training with the same recipe yields LER 3.063% at d=7 p=0.007, *slightly worse* than Pathfinder-Wide's 2.995% (60K-shot evals). Both variants tie Lange within overlapping CIs but additional capacity past H=384 does not improve the individual decoder. Interpretation: the matched-noise distillation recipe is capacity-saturated around H=384 / 1.1 M parameters for d=7. Further individual-LER improvements require a different training regime (longer schedule, multi-noise-mixture distillation, or a better teacher loss) or a different inductive bias (the GNN representation that Lange uses; future work). Pathfinder-XL is preserved at `bench/results/h200_main/tierC1/pathfinder_xl_d7/best_model.pt`.
+
+**5-seed averaging at d=5, diminishing returns.** I subsequently trained two additional independent random-seed Wide-Long ckpts at d=5 (seeds 3 and 4, same recipe as seeds 0–2) and re-ran the 8-noise sweep with **5-seed-avg ensembling** (instead of 3-seed). Data: `bench/results/h200_main/tierC1/ensemble_pfwl5s_d5.json`; new training logs `d5_seed{3,4}.log`. The 5-seed ensemble produces essentially the same per-noise-rate LER as the 3-seed ensemble (deltas of ±0.015 pp in either direction, all within statistical seed-noise):
+
+| (d=5, 100K shots) | 3-seed PF | 5-seed PF | Δ | Lange | 5-seed CI vs Lange |
+|---|---:|---:|---:|---:|---|
+| p=0.005 | 0.953% | 0.970% [0.911, 1.033] | +0.017 pp | 0.944% | overlap |
+| p=0.007 | 2.539% | **2.527%** [2.432, 2.626] | -0.012 pp | 2.544% | overlap (PF point estimate edges Lange) |
+| p=0.010 | 6.734% | 6.747% [6.593, 6.904] | +0.013 pp | 6.851% | overlap (PF still wins point est.) |
+| p=0.015 | 17.205% | **17.198%** [16.965, 17.433] | -0.007 pp | 17.898% | **STRICT WIN, 0.229 pp gap (3-seed had 0.222 pp gap)** |
+
+Going from 3 → 5 seeds at d=5 **does not materialize any new strict-CI wins** at p ∈ {0.005, 0.007, 0.010}; the strict-CI gap at p=0.015 is preserved (~0.222 pp, essentially unchanged), but the additional averaging provides no detectable improvement at the operational rates where the 3-seed result already overlapped Lange. The headline strict-CI claim of 4 (d, p) points (d=5 p=0.015 + d=7 p ∈ {0.007, 0.010, 0.015}) is therefore the operating point of this recipe at the H=384 / 160K-step / Lange-distillation budget. Breaking the remaining d=5 p ∈ {0.005, 0.007, 0.010} ties would require either (a) substantially more seeds (10+, with ensemble compute cost growing linearly), (b) longer training (the d=7 Wide-XLong study at 240K steps showed ~zero gain at single-seed, suggesting the ~160K-step budget is at or near saturation), or (c) a fundamentally different recipe (e.g., a richer teacher loss, a multi-noise mixture for the d=5 student, or replacing Lange's GNN with a stronger teacher). This is consistent with a "ceiling effect"; the recipe-level reversal CNN-vs-GNN result is real and strict at p=0.015, soft (overlapping CIs with PF favored) at p ∈ {0.007, 0.010}, and tied at p ∈ {0.005, ≤0.003} where Lange and Pathfinder are both very close to the per-shot oracle bound (oracle_lb ≈ PF_ler at low p; see `ensemble_pfwl5s_d5.json` `oracle_lb` field). The 3-seed PFWL3S of the headline tables is the cost-effective operating point.
+
+**d=3 PFWL3S, distillation-weight rescue and the conclusion that canonical fine-tune is the d=3 default.** Applying the same recipe at d=3 (H=384, 160K steps, distill from Lange at p=0.007, default α_bce=0.3 / α_kl=0.7) produces a model with **catastrophic individual LER**, 14.01% [13.79, 14.22] at d=3 p=0.007 vs. canonical fine-tune Pathfinder's 2.87% (§5.11 Table 9 d=3 row) and Lange's 2.78%. This is a 5× regression and is consistent with the existing finding (below) that Pathfinder-KD distillation with the same default loss weights also fails catastrophically at d=3 (13.4% LER in the 80K-step Pathfinder-KD ablation). I ran a follow-up "rescue" experiment swapping the loss weights (α_bce=0.7, α_kl=0.3, three-quarters BCE, one-quarter teacher KL) holding everything else fixed, three random seeds, 160K steps each. Data: `bench/results/h200_main/tierC1/ensemble_pfwl3s_d3_rescue.json`; training logs: `d3_rescue_seed{0,1,2}.log`.
+
+| (d=3) | PFWL3S rescue (α_kl=0.3, 3-seed avg) | Lange | Canonical fine-tune (§5.11) | PM | Verdict |
+|---|---:|---:|---:|---:|---|
+| p=0.0005 | **0.010%** [0.005, 0.018] | 0.014% | — | 0.013% | overlap |
+| p=0.001 | 0.073% [0.058, 0.092] | 0.065% | — | 0.078% | overlap |
+| p=0.002 | 0.250% [0.221, 0.283] | 0.215% | — | 0.288% | overlap |
+| p=0.003 | 0.640% [0.592, 0.691] | 0.517% | 0.572% | 0.659% | Lange strict-wins |
+| p=0.005 | 1.689% [1.611, 1.771] | 1.460% | 1.527% | 1.728% | Lange strict-wins |
+| p=0.007 | 3.181% [3.074, 3.292] | 2.782% | 2.817% | 3.228% | Lange strict-wins |
+| p=0.010 | 5.787% [5.644, 5.933] | 5.133% | 5.302% | 5.821% | Lange strict-wins |
+| p=0.015 | 11.558% [11.361, 11.758] | 10.527% | 10.799% | 11.523% | Lange strict-wins |
+
+The rescue lifts d=3 PFWL3S from a 14% LER recipe failure to a 3.18% LER converged result (78% relative reduction at p=0.007), confirming that the original 14% was a *loss-weight* issue, not an architectural one. But the rescued d=3 PFWL3S is **still strictly worse than Lange's GNN at p ≥ 0.003 with non-overlapping 95% Wilson CIs** and is also slightly worse than the simpler 252K-parameter canonical fine-tune Pathfinder at p=0.007 (3.18% vs 2.82%). The H=384 + 160K-step + distillation budget delivers no per-shot accuracy advantage over the simpler BCE-only fine-tune at d=3; the d=3 surface code is too shallow for the wider model and longer schedule to be useful, and the Lange-teacher signal at d=3 is already nearly saturated by Lange itself (whose d=3 LER is so close to the per-shot oracle bound that there is little room for KL-pull to help the student). **Canonical fine-tune Pathfinder remains the recommended d=3 deployment**; the §5.11 Table 9 d=3 row (overlapping CIs with Lange across all matched noise rates) stands. PFWL3S is therefore a d=5- and d=7-only construction. Pathfinder-Triad at d=3 with the canonical fine-tune voter is the correct deployment configuration; the rescue-PFWL3S Triad numbers in the rightmost block above (d=3 Maj column) overlap Lange at every point and are not better than the §5.12 Table 10 fine-tune-voter Triad at d=3.
+
+**Pathfinder-Wide-Multi, single checkpoint covers all four operational noise rates.** A complementary recipe trains Pathfinder-Wide (H=384) with Lange-teacher distillation but samples the noise rate uniformly from p ∈ {0.003, 0.005, 0.007, 0.010} per training step (script: `bench/results/h200_main/tierC1/train_multi_noise.py`). The resulting single checkpoint produces matched-noise individual LERs essentially identical to single-noise specialization at every tested point:
+
+| d=7 (60K shots) | PF-Multi | Lange | PM | Pathfinder-Triad |
+|----|---:|---:|---:|---:|
+| p=0.003 | 0.100% | 0.087% | 0.148% | 0.085% |
+| p=0.005 | 0.833% | 0.752% | 0.985% | **0.668%** |
+| p=0.007 | 2.998% | 2.940% | 3.343% | **2.448%** |
+| p=0.010 | 10.855% | 10.822% | 10.300% | **9.017%** |
+
+Compare PF-Multi to PF-Wide single-noise at p=0.007 (2.998% vs. 2.995%): the multi-noise mixture loses essentially nothing per-rate. **One checkpoint can therefore replace the per-noise-rate specialization needed by §4.5 / §6.3 d=9**, simplifying deployment. Like Pathfinder-Wide and Pathfinder-XL, Pathfinder-Wide-Multi statistically ties Lange (overlapping CIs) at every tested p; none of the C1 attempts so far strictly beats Lange individually. The Pathfinder-Triad numbers in the rightmost column are essentially the best I have measured at any d=7 noise rate, marginally improving §5.12 Table 10's results: e.g., at p=0.007 the multi-noise Pathfinder voter gives Triad 2.448% vs. Table 10's 2.417% (with fine-tune voter), within ensemble seed-noise. Checkpoint: `bench/results/h200_main/tierC1/pathfinder_wide_multi_d7/best_model.pt`.
+
+**Why canonical Pathfinder uses fine-tune, not distill.** Three independent reasons:
+
+1. **Pathfinder-KD fails catastrophically at d=3.** The same distillation recipe applied at d=3 (80K steps, p=0.007, Lange teacher) converges to LER **13.4%**, four standard deviations worse than the d=3 fine-tune result (2.77%) or even the OOD Table-1 checkpoint (2.92%). The depth-independent KL-weighted training does not converge for the shallow d=3 architecture, paradoxically given that d=3 is the easiest decoding task. Canonical Pathfinder is defined by a single recipe that works at all three distances; Pathfinder-KD is not.
+
+2. **Pathfinder-KD gives a *looser* Pathfinder-Triad ensemble** at the headline stat-sig point (d=7 p=0.007): 2.495% vs. canonical Pathfinder's 2.417%, an 18% relative loss of the oracle-bound headroom. Shot-level agreement is the mechanism: Pathfinder-KD agrees with Lange on 96.7% of shots at d=7 p=0.007 vs. canonical Pathfinder's 95.9%, roughly 80 additional shots per 10K where Pathfinder-KD agrees with Lange (its teacher) but canonical Pathfinder diverges. When canonical diverges *and* PyMatching votes with it, the majority flips a Lange error into a correct prediction; Pathfinder-KD's over-agreement with Lange suppresses that signal. This is the "correlation cost" of teacher-student training for ensemble use.
+
+3. **Pathfinder-KD requires the Lange GNN at training time**, including PyG / torch-cluster and the `d{d}_d_t_{d_t}.pt` weights from the Lange repo. Canonical Pathfinder trains with just PyTorch + Stim + Muon, fewer dependencies, simpler reproduction.
+
+**When Pathfinder-KD is preferable.** Standalone neural decoding at d=5 or d=7, i.e., deployments that don't run the Triad ensemble, where the individual-LER improvement at d=7 (3.34% → 3.09%, 7.5% relative) is worth the extra training machinery and the d=3 gap (use the fine-tune d=3 checkpoint there anyway). Pathfinder-KD is released under `bench/results/h200_main/distill/distill_d{5,7}/` for these use cases.
+
+**Negative result, distill-as-fine-tune does not combine both benefits.** The natural next recipe is to initialize from the Table-1 checkpoint *and* add Lange as a soft-target teacher for the fine-tune phase, in principle combining the "good basin" of fine-tuning with the "stronger training signal" of distillation. I ran this at d=5 and d=7 (40,000 steps each, init from Table-1 ckpt, α_bce=0.3, α_kl=0.7, T=2.0; script: patched `train_distill_lange.py` with `--init` flag; checkpoints under `bench/results/h200_main/phase3/`):
+
+| Recipe | d=5 LER | d=7 LER |
+|--------|---------|---------|
+| Canonical Pathfinder (fine-tune: init + BCE labels only) | **2.55%** | 3.34% |
+| Pathfinder-KD (from scratch + teacher KL) | 3.07% | **3.09%** |
+| Distill-as-fine-tune (init + BCE + teacher KL) | 2.92% | 3.66% |
+
+Distill-as-fine-tune is *strictly dominated* at both distances, worse than fine-tune at d=5, worse than Pathfinder-KD at d=7. An α_kl ∈ {0.3, 0.5, 0.7} sweep at d=7 (`bench/results/h200_main/phase4/`) confirms this across the hyperparameter: α_kl=0.3 gives 3.27% (nearly tying canonical Pathfinder's 3.34%), α_kl=0.5 gives 3.83%, α_kl=0.7 gives 3.66%, and none of them beats Pathfinder-KD's 3.09%. My interpretation: a strong Table-1 init and a heavy Lange-teacher KL pull the student in two directions; 40,000 steps is not enough to reach either attractor. Longer training or a smaller α_kl might eventually close this; it is out of scope for this paper.
