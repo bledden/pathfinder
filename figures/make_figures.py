@@ -395,7 +395,7 @@ def fig04_triton_vs_ref():
 # F5 — Decoder failure overlap (Venn diagram for set overlap)
 # ============================================================================
 def fig05_failure_overlap():
-    r = phase2["d7_p0.007"]
+    r = tuned["d7_p0.007"]  # canonical fine-tune (A2 fix: was phase2/KD-era)
     n = r["n"]
     both    = r["both_wrong_pf_lange"]
     pf_only = r["pf_wrong_lange_right"]
