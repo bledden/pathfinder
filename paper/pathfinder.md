@@ -424,7 +424,7 @@ A simple confidence-thresholded ensemble (use Pathfinder's prediction when |logi
 
 ### 5.7 Generalization
 
-**Noise models, phenomenological (no measurement errors).** A rigorous 60K-shot evaluation of Pathfinder on phenomenological noise (data-qubit `before_round_data_depolarization=p` only, no measurement flips) finds that Pathfinder **does not** beat PyMatching on this out-of-distribution noise model. Naively, one might expect a CNN decoder trained on circuit-level noise to generalize to a strictly less-noisy variant of the same noise model; the data show this expectation is wrong, and a systematic eval across three code distances and five noise rates makes the failure mode clear. (An earlier version of this work informally noted apparent phenomenological generalization on a smaller sample; that observation does not survive the larger-sample eval.) Script: `bench/results/h200_main/tierB/phenom_eval*.py` (uploaded to the pod as `eval_phenomenological.py` and `eval_phenom_table1.py`). Raw data: `bench/results/h200_main/tierB/phenom_eval.json` (canonical Pathfinder), `phenom_eval_table1.json` (original 3-parameter Table-1 Pathfinder).
+**Noise models, phenomenological (no measurement errors).** A rigorous 60K-shot evaluation of Pathfinder on phenomenological noise (data-qubit `before_round_data_depolarization=p` only, no measurement flips) finds that Pathfinder **does not** beat PyMatching on this out-of-distribution noise model. Naively, one might expect a CNN decoder trained on circuit-level noise to generalize to a strictly less-noisy variant of the same noise model; the data show this expectation is wrong, and a systematic eval across three code distances and five noise rates makes the failure mode clear. (An earlier version of this work informally noted apparent phenomenological generalization on a smaller sample; that observation does not survive the larger-sample eval.) Scripts: `bench/results/h200_main/tierB/eval_phenomenological.py` (canonical fine-tune) and `eval_phenom_table1.py` (original Table-1), sharing core `_phenom_eval.py`; each regenerates its JSON below. Raw data: `bench/results/h200_main/tierB/phenom_eval.json` (canonical Pathfinder), `phenom_eval_table1.json` (original 3-parameter Table-1 Pathfinder).
 
 **Table 6a: Phenomenological-noise generalization (LER %, 60K shots; PF = canonical Pathfinder / Table-1 Pathfinder)**
 
@@ -1209,6 +1209,8 @@ Minimum versions (matches what was used for measurements reported in this paper)
 - Stim 1.15, PyMatching 2.3, for syndrome generation and the MWPM baseline
 - Muon optimizer: `pip install git+https://github.com/KellerJordan/Muon` (use the `SingleDeviceMuon` variant for single-GPU training)
 - NumPy, pybind11, pytest
+
+**Paths and evaluation hardware.** All file paths in this paper are relative to the repository root (after `git clone https://github.com/bledden/pathfinder && cd pathfinder`). Evaluate Pathfinder on a CUDA GPU or CPU: the Apple MPS backend mis-evaluates the `DirectionalConv3d` kernel at large batch (d=5 returns ~38% instead of ~3% at batch 2000, though it is correct at batch ≤ 256), so MPS is not recommended for evaluation.
 
 ### A.2 Reproducing the LER results (Table 1, 100K shots, MI300X or any CUDA GPU)
 
