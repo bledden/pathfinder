@@ -1,0 +1,269 @@
+{
+  "_note": "Leak-free d=7: select on val (seed=1), report on disjoint test (seed=2). 3-param noise. 'selected'=val-chosen option reported on test; 'deployable'=d7_final on test.",
+  "rows": [
+    {
+      "p": 0.0005,
+      "selected_on_val": "d7_final",
+      "selected_test_ler": 0.0,
+      "selected_test_ci": [
+        0.0,
+        3.8414524267635735e-05
+      ],
+      "deployable_d7final_test_ler": 0.0,
+      "deployable_test_ci": [
+        0.0,
+        3.8414524267635735e-05
+      ],
+      "pm_test_ler": 0.0,
+      "pm_test_ci": [
+        0.0,
+        3.8414524267635735e-05
+      ],
+      "all_test_ler": {
+        "d7_final": 0.0,
+        "d7_p01": 0.0,
+        "d7_mixed": 0.0,
+        "d7_p015": 0.0,
+        "ensemble": 0.0
+      },
+      "all_val_ler": {
+        "d7_final": 0.0,
+        "d7_p01": 0.0,
+        "d7_mixed": 0.0,
+        "d7_p015": 0.0,
+        "ensemble": 0.0
+      }
+    },
+    {
+      "p": 0.001,
+      "selected_on_val": "d7_p01",
+      "selected_test_ler": 0.0,
+      "selected_test_ci": [
+        0.0,
+        3.8414524267635735e-05
+      ],
+      "deployable_d7final_test_ler": 1e-05,
+      "deployable_test_ci": [
+        1.765202323777592e-06,
+        5.664855365337279e-05
+      ],
+      "pm_test_ler": 0.0,
+      "pm_test_ci": [
+        0.0,
+        3.8414524267635735e-05
+      ],
+      "all_test_ler": {
+        "d7_final": 1e-05,
+        "d7_p01": 0.0,
+        "d7_mixed": 0.0,
+        "d7_p015": 0.0,
+        "ensemble": 0.0
+      },
+      "all_val_ler": {
+        "d7_final": 1e-05,
+        "d7_p01": 0.0,
+        "d7_mixed": 0.0,
+        "d7_p015": 0.0,
+        "ensemble": 0.0
+      }
+    },
+    {
+      "p": 0.002,
+      "selected_on_val": "d7_p01",
+      "selected_test_ler": 3e-05,
+      "selected_test_ci": [
+        1.0202573900776641e-05,
+        8.820964549540304e-05
+      ],
+      "deployable_d7final_test_ler": 6e-05,
+      "deployable_test_ci": [
+        2.749844367635483e-05,
+        0.00013091147084836878
+      ],
+      "pm_test_ler": 4e-05,
+      "pm_test_ci": [
+        1.5555073765297794e-05,
+        0.00010285637734039654
+      ],
+      "all_test_ler": {
+        "d7_final": 6e-05,
+        "d7_p01": 3e-05,
+        "d7_mixed": 4e-05,
+        "d7_p015": 5e-05,
+        "ensemble": 4e-05
+      },
+      "all_val_ler": {
+        "d7_final": 9e-05,
+        "d7_p01": 5e-05,
+        "d7_mixed": 8e-05,
+        "d7_p015": 9e-05,
+        "ensemble": 5e-05
+      }
+    },
+    {
+      "p": 0.003,
+      "selected_on_val": "d7_p015",
+      "selected_test_ler": 0.00022,
+      "selected_test_ci": [
+        0.00014529497492867178,
+        0.0003331026469482862
+      ],
+      "deployable_d7final_test_ler": 0.00034,
+      "deployable_test_ci": [
+        0.00024332826620375529,
+        0.0004750601361873785
+      ],
+      "pm_test_ler": 0.0004,
+      "pm_test_ci": [
+        0.00029378060389919844,
+        0.0005446031887490232
+      ],
+      "all_test_ler": {
+        "d7_final": 0.00034,
+        "d7_p01": 0.00023,
+        "d7_mixed": 0.00027,
+        "d7_p015": 0.00022,
+        "ensemble": 0.0002
+      },
+      "all_val_ler": {
+        "d7_final": 0.00037,
+        "d7_p01": 0.00029,
+        "d7_mixed": 0.00034,
+        "d7_p015": 0.00025,
+        "ensemble": 0.00027
+      }
+    },
+    {
+      "p": 0.005,
+      "selected_on_val": "ensemble",
+      "selected_test_ler": 0.00241,
+      "selected_test_ci": [
+        0.0021246130259956362,
+        0.002733616340265029
+      ],
+      "deployable_d7final_test_ler": 0.00383,
+      "deployable_test_ci": [
+        0.00346574901040771,
+        0.004232371258604036
+      ],
+      "pm_test_ler": 0.00411,
+      "pm_test_ci": [
+        0.0037320636462351148,
+        0.004526035110643041
+      ],
+      "all_test_ler": {
+        "d7_final": 0.00383,
+        "d7_p01": 0.00282,
+        "d7_mixed": 0.00284,
+        "d7_p015": 0.00267,
+        "ensemble": 0.00241
+      },
+      "all_val_ler": {
+        "d7_final": 0.00398,
+        "d7_p01": 0.00282,
+        "d7_mixed": 0.00274,
+        "d7_p015": 0.0025,
+        "ensemble": 0.00246
+      }
+    },
+    {
+      "p": 0.007,
+      "selected_on_val": "d7_p015",
+      "selected_test_ler": 0.01071,
+      "selected_test_ci": [
+        0.010090543122121268,
+        0.011367048563036556
+      ],
+      "deployable_d7final_test_ler": 0.0166,
+      "deployable_test_ci": [
+        0.015826458208889893,
+        0.01741068095317206
+      ],
+      "pm_test_ler": 0.01548,
+      "pm_test_ci": [
+        0.014733238202196691,
+        0.01626398700839962
+      ],
+      "all_test_ler": {
+        "d7_final": 0.0166,
+        "d7_p01": 0.01223,
+        "d7_mixed": 0.01221,
+        "d7_p015": 0.01071,
+        "ensemble": 0.01058
+      },
+      "all_val_ler": {
+        "d7_final": 0.01662,
+        "d7_p01": 0.01191,
+        "d7_mixed": 0.01153,
+        "d7_p015": 0.01001,
+        "ensemble": 0.01003
+      }
+    },
+    {
+      "p": 0.01,
+      "selected_on_val": "d7_p015",
+      "selected_test_ler": 0.0414,
+      "selected_test_ci": [
+        0.040182776546021606,
+        0.04265245725563667
+      ],
+      "deployable_d7final_test_ler": 0.06739,
+      "deployable_test_ci": [
+        0.0658527282989125,
+        0.06896050871577436
+      ],
+      "pm_test_ler": 0.05257,
+      "pm_test_ci": [
+        0.051203864134049724,
+        0.053970511487136406
+      ],
+      "all_test_ler": {
+        "d7_final": 0.06739,
+        "d7_p01": 0.05174,
+        "d7_mixed": 0.0465,
+        "d7_p015": 0.0414,
+        "ensemble": 0.04225
+      },
+      "all_val_ler": {
+        "d7_final": 0.06748,
+        "d7_p01": 0.05112,
+        "d7_mixed": 0.04694,
+        "d7_p015": 0.04134,
+        "ensemble": 0.04261
+      }
+    },
+    {
+      "p": 0.015,
+      "selected_on_val": "d7_p015",
+      "selected_test_ler": 0.15546,
+      "selected_test_ci": [
+        0.1532274165292287,
+        0.1577190541511536
+      ],
+      "deployable_d7final_test_ler": 0.22407,
+      "deployable_test_ci": [
+        0.2214962307891023,
+        0.22666496865026003
+      ],
+      "pm_test_ler": 0.16883,
+      "pm_test_ci": [
+        0.16652092611058325,
+        0.17116451736542018
+      ],
+      "all_test_ler": {
+        "d7_final": 0.22407,
+        "d7_p01": 0.19509,
+        "d7_mixed": 0.17085,
+        "d7_p015": 0.15546,
+        "ensemble": 0.16009
+      },
+      "all_val_ler": {
+        "d7_final": 0.226,
+        "d7_p01": 0.19567,
+        "d7_mixed": 0.17055,
+        "d7_p015": 0.15524,
+        "ensemble": 0.1591
+      }
+    }
+  ]
+}
