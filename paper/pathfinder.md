@@ -253,7 +253,7 @@ Figure 1 visualizes the d=7 row of this data alongside the §5.11 Lange comparis
 
 **Figure 2.** *Pathfinder vs PyMatching across all three distances under 3-parameter circuit-level noise.* Per-distance small multiples (d=3, 5, 7), log–log; shaded bands are ±1 binomial half-width at 100K shots/point. Pathfinder (blue) sits below or on PyMatching (grey) at every (d, p) cell; Union-Find (yellow, dashed) is shown as a secondary baseline that lags both. The widening gap at higher p and higher d is the "waterfall": direction-aware 3-D convolution captures spacetime defect chains that local matching does not.
 
-PFWL3S (trained on Lange's 4-parameter circuit-level noise) strictly beats PyMatching on the §5.1 3-parameter noise model at **9 of the 18 evaluation points**: 5 of 6 d=5 points (every operational rate p ∈ {0.003, 0.005, 0.007, 0.010, 0.015}) and 4 of 6 d=7 points (p ∈ {0.003, 0.005, 0.007, 0.010}; p=0.015 is a soft win with overlapping CIs by 0.026 pp). At d=3 PFWL3S and PM are statistically tied at every noise rate (PM is already near-optimal at d=3; the canonical Pathfinder of Table 1 above also wins by <0.01 pp there). Note that PFWL3S's per-rate LER on this OOD 3-parameter noise is **higher** than the canonical Pathfinder of Table 1 above at every distance/rate (e.g., at d=7 p=0.007 PFWL3S 1.87% vs canonical 1.04%); this is expected, since canonical Pathfinder was trained directly on the 3-parameter noise model whereas PFWL3S was trained on a different (4-parameter) noise model. The headline finding is the *direction* of the comparison: even the OOD PFWL3S strictly beats PyMatching, confirming that the §5.13 PFWL3S recipe transfers across noise models without retraining. Data: `bench/results/h200_main/tierC1/pfwl3s_table1_3param.json`; eval log: `eval_pfwl3s_table1_3param.log`. **Practical implication**: deployments targeting 3-parameter noise can use either the canonical Pathfinder of Table 1 (best per-rate accuracy at the trained noise model) or the PFWL3S of Table 11 (best 4-parameter accuracy + this OOD strict-PM-win on 3-parameter noise) depending on the priority. The §5.13 multi-seed ensemble is therefore robust enough to ship across both noise models the paper evaluates.
+PFWL3S (trained on Lange's 4-parameter circuit-level noise) strictly beats PyMatching on the §5.1 3-parameter noise model at **9 of the 18 evaluation points**: 5 of 6 d=5 points (every operational rate p ∈ {0.003, 0.005, 0.007, 0.010, 0.015}) and 4 of 6 d=7 points (p ∈ {0.003, 0.005, 0.007, 0.010}; p=0.015 is a soft win with overlapping CIs by 0.026 pp). At d=3 PFWL3S and PM are statistically tied at every noise rate (PM is already near-optimal at d=3; the canonical Pathfinder of Table 1 above also wins by <0.01 pp there). Note that PFWL3S's per-rate LER on this OOD 3-parameter noise is **higher** than the canonical Pathfinder of Table 1 above at every distance/rate (e.g., at d=7 p=0.007 PFWL3S 1.87% vs canonical 1.07%); this is expected, since canonical Pathfinder was trained directly on the 3-parameter noise model whereas PFWL3S was trained on a different (4-parameter) noise model. The headline finding is the *direction* of the comparison: even the OOD PFWL3S strictly beats PyMatching, confirming that the §5.13 PFWL3S recipe transfers across noise models without retraining. Data: `bench/results/h200_main/tierC1/pfwl3s_table1_3param.json`; eval log: `eval_pfwl3s_table1_3param.log`. **Practical implication**: deployments targeting 3-parameter noise can use either the canonical Pathfinder of Table 1 (best per-rate accuracy at the trained noise model) or the PFWL3S of Table 11 (best 4-parameter accuracy + this OOD strict-PM-win on 3-parameter noise) depending on the priority. The §5.13 multi-seed ensemble is therefore robust enough to ship across both noise models the paper evaluates.
 
 ### 5.2 Error Suppression Scaling
 
@@ -263,14 +263,14 @@ The error suppression ratio Λ = LER(d)/LER(d+2) quantifies how effectively the 
 
 | p | Pathfinder Λ(3→5) | PM Λ(3→5) | Pathfinder Λ(5→7) | PM Λ(5→7) |
 |---|-------------------|-----------|-------------------|-----------|
-| 0.001 | 6.6× | 7.1× | n/a (0 err) | 9.0× |
-| 0.003 | **3.2×** | 2.6× | **3.3×** | 2.7× |
-| 0.005 | **1.7×** | 1.5× | **2.3×** | 1.7× |
-| 0.007 | **1.2×** | 1.1× | **1.5×** | 1.3× |
+| 0.001 | 6.6× | 7.1× | n/a (0 err) | n/a (0 err) |
+| 0.003 | **3.2×** | 2.6× | **4.7×** | 3.9× |
+| 0.005 | **1.7×** | 1.5× | **2.2×** | 1.8× |
+| 0.007 | **1.2×** | 1.1× | **1.4×** | 1.2× |
 
-At p=0.003, Pathfinder's d=5→7 suppression (3.3×) exceeds PyMatching's (2.7×), consistent with the "waterfall" regime identified by Gu et al. [8] where learned decoders exploit high-weight failure modes that MWPM cannot correct.
+At p=0.003, Pathfinder's d=5→7 suppression (4.7×) exceeds PyMatching's (3.9×), consistent with the "waterfall" regime identified by Gu et al. [8] where learned decoders exploit high-weight failure modes that MWPM cannot correct.
 
-**An honest note on the p=0.001 row.** At p=0.001, Pathfinder's Λ(5→7) is undefined (0/100,000 errors at d=7) and Λ(3→5) = 6.6× is lower than PyMatching's 7.1×, apparently contradicting the "scaling advantage" claim. This is a small-number artifact: at d=7, p=0.001, Pathfinder has 0/100,000 errors and PyMatching has 1/100,000 (Table 1). Both numbers are at the edge of 100K-shot statistics, and the resulting Λ ratios are driven by single-digit error counts. Similarly at d=5 Pathfinder has 7 errors vs PM's 9. An honest evaluation at p=0.001 would require 10⁷+ shots, which I did not run. The scaling-advantage claim holds rigorously for p ≥ 0.003 where error counts are in the hundreds or thousands.
+**An honest note on the p=0.001 row.** At p=0.001, Pathfinder's Λ(5→7) is undefined (0/100,000 errors at d=7) and Λ(3→5) = 6.6× is lower than PyMatching's 7.1×, apparently contradicting the "scaling advantage" claim. This is a small-number artifact: at d=7, p=0.001, Pathfinder has 0/100,000 errors and PyMatching has ≤1/100,000 (Table 1). Both numbers are at the edge of 100K-shot statistics, and the resulting Λ ratios are driven by single-digit error counts. Similarly at d=5 Pathfinder has 7 errors vs PM's 9. An honest evaluation at p=0.001 would require 10⁷+ shots, which I did not run. The scaling-advantage claim holds rigorously for p ≥ 0.003 where error counts are in the hundreds or thousands.
 
 ### 5.3 Inference Latency
 
@@ -457,7 +457,7 @@ The full d=7 model (H=256, L=7, 500K parameters) achieves the best LER and, with
 | 0.002 | **0.00005** | 0.00025 | 0.00007 |
 | 0.003 | **0.00032** | 0.00090 | 0.00057 |
 | 0.005 | **0.00253** | 0.00860 | 0.00442 |
-| 0.007 | **0.01041** | 0.02855 | 0.01489 |
+| 0.007 | **0.01071** | 0.02855 | 0.01489 |
 | 0.010 | **0.04104** | 0.09905 | 0.05161 |
 | 0.015 | **0.15843** | 0.27345 | 0.17045 |
 
@@ -511,7 +511,7 @@ Neither distilled variant closes the remaining gap to PyMatching (1.489%) as a s
 
 The priority note in the abstract acknowledges Lange et al. [14] as the first published open-source neural decoder to outperform PyMatching on rotated surface codes. This section reports a three-way LER comparison under Lange's 4-parameter circuit-level noise model between **Pathfinder** (the canonical checkpoint produced by the fine-tune recipe described below), Lange et al.'s pre-trained GNN weights, and PyMatching. All three decoders are run through a single evaluation harness (`bench/results/h200_session2/run_lange_v3.py`) that uses Lange et al.'s own graph-builder (`LangeDecoderWrapper`, instantiating their `GNN_7` model and loading the published `d{d}_d_t_{d_t}.pt` weights from the Lange repo). 60,000 shots per data point across 21 (d, p) points; 95% Wilson confidence intervals are computed for each entry.
 
-**The canonical Pathfinder training recipe (fine-tune).** The 3-parameter-noise Table-1 checkpoints (§5.1) are out-of-distribution on Lange's 4-parameter noise and inflate Pathfinder's LER by 2.5–4× at d=7 p=0.007 (4.01% vs. 1.04%). To produce a Pathfinder checkpoint that evaluates in-distribution at matched noise, I initialize from the 3-parameter Table-1 checkpoint and fine-tune for 40,000 steps on the 4-parameter noise model at a lower learning rate (`muon_lr=0.005`, `adam_lr=1e-3`, no curriculum). Script: `bench/results/h200_main/train_finetune_4param.py`. This is the same recipe at every distance, one script, three checkpoints (`finetune_d3`, `finetune_d5`, `finetune_d7`). Every "Pathfinder" row in the table below is one of these checkpoints; none are hand-tuned per noise rate.
+**The canonical Pathfinder training recipe (fine-tune).** The 3-parameter-noise Table-1 checkpoints (§5.1) are out-of-distribution on Lange's 4-parameter noise and inflate Pathfinder's LER by 2.5–4× at d=7 p=0.007 (4.01% vs. 1.07%). To produce a Pathfinder checkpoint that evaluates in-distribution at matched noise, I initialize from the 3-parameter Table-1 checkpoint and fine-tune for 40,000 steps on the 4-parameter noise model at a lower learning rate (`muon_lr=0.005`, `adam_lr=1e-3`, no curriculum). Script: `bench/results/h200_main/train_finetune_4param.py`. This is the same recipe at every distance, one script, three checkpoints (`finetune_d3`, `finetune_d5`, `finetune_d7`). Every "Pathfinder" row in the table below is one of these checkpoints; none are hand-tuned per noise rate.
 
 **Table 9: Pathfinder (canonical, fine-tune recipe) vs. Lange vs. PyMatching, 4-parameter circuit-level noise, 60K shots per point**
 
@@ -564,7 +564,7 @@ Lange is ≈9.5× slower at B=1 and ≈12× slower at B=1024 than Pathfinder + T
 
 **Controlled fairness check C3, does the win survive a *full-recipe* 3-seed Lange ensemble, under the paired test?** The headline PFWL3S is a 3-seed logit-mean ensemble, whereas C2 compares against a *single* fine-tuned Lange GNN, leaving open whether PFWL3S's margin is merely an ensemble-size effect. To close this against the strongest possible baseline, I built a **3-seed fine-tuned-Lange ensemble at Lange's full recipe** (each seed resumed from the published d=7 weights and fine-tuned at the full 2M-graphs/epoch × 30 epochs at p=0.007 (identical to C2's single seed) then logit-mean-ensembled, matched to PFWL3S's averaging), and re-ran the d=7 head-to-head at 100K shots reporting *both* the marginal-CI test and the paired **McNemar** test. The full-recipe ensemble (d=7 p=0.007 LER **2.652%**) is, as expected, stronger than both the single full-recipe FT-Lange (2.739%) and a lighter-recipe ensemble; it is the toughest control in this paper. Result:
 
-**Table: primary controlled comparison — PFWL3S vs. a full-recipe 3-seed fine-tuned-Lange ensemble (the prespecified primary endpoint, §5.0).**
+**Table: primary controlled comparison — PFWL3S vs. a full-recipe 3-seed fine-tuned-Lange ensemble (the prespecified primary endpoint, §5.11).**
 
 | d=7 rate | PFWL3S | Lange-FT 3-seed (full recipe) | marginal-CI | McNemar discordant (b / c) | McNemar (paired) | verdict |
 |---|---:|---:|:---:|:---:|:---:|:---:|
@@ -708,7 +708,7 @@ An obvious way to try to close the Pathfinder–Lange individual-LER gap in §5.
 |:-------|:----------------------------|:------|:----------|:--------|:----------|:------------------|
 | d=5 | Table-1 OOD | 376K | 2.94% | — | 2.60% | — |
 | d=5 | **Canonical Pathfinder** (fine-tune) | 376K | 3.04% | — | **2.66%** | — |
-| d=5 | Pathfinder-KD (distill) | 376K | ~3.3%* | — | — | — |
+| d=5 | Pathfinder-KD (distill) | 376K | ≈3.3%* | — | — | — |
 | d=7 | Table-1 OOD | 500K | 4.01% | — | 2.56% | loses |
 | d=7 | **Canonical Pathfinder** (fine-tune) | 500K | 3.34% | [3.20, 3.49] | **2.417%** | loses (non-overlap) |
 | d=7 | Pathfinder-KD (distill) | 500K | 3.09% | — | 2.495% | loses (non-overlap) |
@@ -753,7 +753,7 @@ The mechanism is straightforward: doubling the training-step budget from 80K to 
 | p=0.010 | **9.173%** [8.996, 9.354] | 10.764% [10.573, 10.958] | **8.689%** | **NON-OVERLAP, 1.219 pp gap, 14.8% relative** |
 | p=0.015 | **27.328%** [27.05, 27.61] | 30.200% [29.92, 30.49] | **25.872%** | **NON-OVERLAP, 2.311 pp gap, 9.5% relative** |
 
-The single-seed bottleneck identified by Pathfinder-Wide-XLong (240K-step single-seed plateau; §5.13 above) was the binding constraint; averaging predictions across three different random seeds tightens the effective LER by ~10–15 percentage points relative to any single seed at the matched noise. Pathfinder-Wide-Long-3seed therefore delivers the paper's **strictest open-source LER claim**: a **recipe-level** reversal (not a matched-architecture one) in which a 3-seed ensemble of H=384 CNNs (≈3.27M params total vs Lange's single 1.36M GNN), each distilled from Lange's GNN as teacher, exceeds the single published GNN by 9–16% relative LER (a single CNN at matched parameters, without the GNN teacher, loses to Lange; §5.11) with non-overlapping confidence intervals at three of three tested operational d=7 noise rates and (extension below) one of four tested d=5 noise rates. Inference latency cost: 3× per-shot CNN forward pass (still much smaller than Lange's per-shot GNN forward); ckpts are at `bench/results/h200_main/tierC1/pathfinder_wide_long_d7{,_seed1,_seed2}/best_model.pt` and the eval script that averages logits is `bench/results/h200_main/tierC1/multiseed_eval.log`. Pathfinder-Triad with the 3-seed-avg voter at the headline d=7 p=0.007 point achieves LER **2.384%**, the lowest open-source LER reported in this paper.
+The single-seed bottleneck identified by Pathfinder-Wide-XLong (240K-step single-seed plateau; §5.13 above) was the binding constraint; averaging predictions across three different random seeds tightens the effective LER by ~10–15 percent (relative) versus any single seed at the matched noise. Pathfinder-Wide-Long-3seed therefore delivers the paper's **strictest open-source LER claim**: a **recipe-level** reversal (not a matched-architecture one) in which a 3-seed ensemble of H=384 CNNs (≈3.27M params total vs Lange's single 1.36M GNN), each distilled from Lange's GNN as teacher, exceeds the single published GNN by 9–16% relative LER (a single CNN at matched parameters, without the GNN teacher, loses to Lange; §5.11) with non-overlapping confidence intervals at three of three tested operational d=7 noise rates and (extension below) one of four tested d=5 noise rates. Inference latency cost: 3× per-shot CNN forward pass (still much smaller than Lange's per-shot GNN forward); ckpts are at `bench/results/h200_main/tierC1/pathfinder_wide_long_d7{,_seed1,_seed2}/best_model.pt` and the eval script that averages logits is `bench/results/h200_main/tierC1/multiseed_eval.log`. Pathfinder-Triad with the 3-seed-avg voter at the headline d=7 p=0.007 point achieves LER **2.384%**, the lowest open-source LER reported in this paper.
 
 **Extending PFWL3S to d=5 and d=3, multi-seed Wide-Long at every distance.** I subsequently trained three independent random-seed Wide-Long ckpts at each of d=5 and d=3 using the same recipe as d=7 (H=384, 160K steps, distill from Lange teacher at single-noise p=0.007, `muon_lr=0.005`) and re-ran the 8-noise sweep at 100K shots with 3-seed-avg ensembling at every distance (the d=3 outcome, a recipe failure and its α_kl rescue, is in Appendix B; the d=5 result is below). Data: `bench/results/h200_main/tierC1/ensemble_pfwl3s_v2.json`; eval log: `eval_pfwl3s_v2.log`.
 
@@ -851,7 +851,7 @@ To address the §6.3 limitation that all evaluations in §5.1–§5.14 are on si
 
 | Decoder | LER | 95% Wilson CI | Notes |
 |---|---:|---|---|
-| **PyMatching v2 (algorithmic)** | **4.006%** | [3.838, 4.182] | Works on any noise model + circuit structure since PM builds its matching graph from Stim's detector error model. Real chip noise is roughly 6× harder than simulated 4-parameter noise at p=0.007 (4.0% vs 0.67% PM-on-simulated). |
+| **PyMatching v2 (algorithmic)** | **4.006%** | [3.838, 4.182] | Works on any noise model + circuit structure since PM builds its matching graph from Stim's detector error model. Real chip noise is roughly 1.2× harder than simulated 4-parameter noise at p=0.007 (PM 4.006% on real Willow vs 3.343% on simulated). |
 | PFWL3S (3-seed avg, T=8 truncation) | 46.336% | [45.899, 46.773] | **Effectively random predictions (4.0% true flip rate; PFWL3S close to random binary classification on the OOD input).** |
 | OR-oracle (both PF and PM wrong) | 2.080% | [1.959, 2.209] | Lower bound for any PM+PFWL3S ensemble; it shows the two decoders' failure modes are *not* purely correlated even in this OOD regime. |
 
@@ -1031,7 +1031,7 @@ The d=5 ablation (Table 4) shows that removing Muon (i.e., training with AdamW o
 | 5 | 1.28% | 2.20% | +72% (Table 4) |
 | 7 | 1.04% | **34.8%** | catastrophic (fails to learn) |
 
-(The ablation holds a fixed per-distance training configuration across the Muon/AdamW arms for a controlled comparison: its d=3 and d=7 full-Muon baselines coincide with Table 1, while its d=5 baseline of 1.28% is the ablation's own fixed-config model and differs from Table 1's per-rate-selected d=5 of 1.521%, §4.5.)
+(The ablation holds a fixed per-distance training configuration across the Muon/AdamW arms for a controlled comparison: its d=3 full-Muon baseline coincides with Table 1, while its d=7 baseline (a p=0.007-trained model at 1.04%) and d=5 baseline (1.28%) are the ablation's own fixed-config models, distinct from Table 1's d7_p015 (1.071%) and d=5 (1.521%) checkpoints, §4.5.)
 
 At d=3 the architecture is shallow enough (L=3, 252K parameters) that AdamW reaches near-Muon accuracy in 20,000 steps; the ≈17% gap is within the variance seen between independent runs. At d=5 the +72% gap is the headline Muon result. At d=7 (L=7, 500K parameters) AdamW-only fails to escape a high-loss plateau inside an 80,000-step budget that Muon converges within easily, landing at 34.8% LER versus Muon's 1.04%. I hypothesize that Muon's Newton-Schulz orthogonalization is critical for maintaining the diversity of the 7 directional weight matrices as depth grows; without it, gradient descent apparently collapses these matrices toward similar solutions at deep architectures, losing the directional specificity that distinguishes this architecture from standard convolution. The effect is therefore best described as *Muon's effect is large at d≥7 (catastrophic AdamW failure under the matched budget) and small at d=3*. Ablation checkpoints are at `bench/results/h200_main/checkpoints/ablation_adamw_{d3,d7}`.
 
@@ -1085,7 +1085,7 @@ At p=0.015 the Triad still beats Lange (Maj≪Lange) but PM dominates both; this
 
 **Narrow-model accuracy gap.** Distillation reduces the narrow H=128 model's LER by 17% at p=0.007 but does not close the gap to PyMatching (Section 5.10). The full 500K-parameter budget appears necessary for PM-beating accuracy at d=7; architecture search or distillation with a larger teacher are open directions.
 
-**Noise-target ensemble for the full model.** At d=7, the best-per-point LER across the full noise range was obtained by selecting among four full models trained at different target noise rates (Section 4.5). A single model that dominates PM across all noise rates from a single training run has not been identified.
+**Noise-target ensemble for the full model.** At d=7, a single fixed checkpoint (`d7_p015`, the p=0.015-trained model, validation-selected) dominates PyMatching across the full operational noise range from one training run (§4.5, §5.1); the earlier per-noise-rate selection among four models is no longer needed.
 
 **FP8.** Tested via `torch._scaled_mm` with `torchao` dynamic activation/weight quantization and found to regress latency at Pathfinder's matrix sizes (Section 5.3). Reported as a negative result; expected to become useful at 10M+ parameter scales.
 
@@ -1233,7 +1233,7 @@ python run_final_eval.py
 
 **Note on the Table 1 d=7 checkpoint.** Table 1's d=7 row uses a single fixed checkpoint, `d7_p015` (the p=0.015-trained model, which generalizes across the operational range), selected on a held-out validation sample and reported on disjoint test shots. Reproduce with `python bench/results/h200_main/clean_d7_eval.py` (data: `clean_d7_eval.json`). The `d7_final` checkpoint used in the §5.6 failure-overlap analysis is a different, lower-generalizing single checkpoint (1.67% at p=0.007).
 
-The repository includes the `d7_final/best_model.pt` checkpoint that produced the Table 1 numbers; `run_final_eval.py` can be pointed at this checkpoint to reproduce the LER comparison without retraining.
+The repository includes the `d7_p015/best_model.pt` checkpoint that produced the Table 1 d=7 numbers; `bench/results/h200_main/clean_d7_eval.py` reproduces the held-out LER comparison without retraining. (`d7_final` is the lower-generalizing checkpoint used only for the §5.6 failure-overlap analysis.)
 
 ### A.3 Reproducing the H200 latency numbers (Section 5.3)
 
@@ -1436,7 +1436,7 @@ The rescue lifts d=3 PFWL3S from a 14% LER recipe failure to a 3.18% LER converg
 | p=0.007 | 2.998% | 2.940% | 3.343% | **2.448%** |
 | p=0.010 | 10.855% | 10.822% | 10.300% | **9.017%** |
 
-Compare PF-Multi to PF-Wide single-noise at p=0.007 (2.998% vs. 2.995%): the multi-noise mixture loses essentially nothing per-rate. **One checkpoint can therefore replace the per-noise-rate specialization needed by §4.5 / §6.3 d=9**, simplifying deployment. Like Pathfinder-Wide and Pathfinder-XL, Pathfinder-Wide-Multi statistically ties Lange (overlapping CIs) at every tested p; none of the C1 attempts so far strictly beats Lange individually. The Pathfinder-Triad numbers in the rightmost column are essentially the best I have measured at any d=7 noise rate, marginally improving §5.12 Table 10's results: e.g., at p=0.007 the multi-noise Pathfinder voter gives Triad 2.448% vs. Table 10's 2.417% (with fine-tune voter), within ensemble seed-noise. Checkpoint: `bench/results/h200_main/tierC1/pathfinder_wide_multi_d7/best_model.pt`.
+Compare PF-Multi to PF-Wide single-noise at p=0.007 (2.998% vs. 2.995%): the multi-noise mixture loses essentially nothing per-rate. **One checkpoint can therefore replace the per-noise-rate fine-tuning the §6.3 d=9 extension still needs**, simplifying deployment. Like Pathfinder-Wide and Pathfinder-XL, Pathfinder-Wide-Multi statistically ties Lange (overlapping CIs) at every tested p; none of the C1 attempts so far strictly beats Lange individually. The Pathfinder-Triad numbers in the rightmost column are essentially the best I have measured at any d=7 noise rate, marginally improving §5.12 Table 10's results: e.g., at p=0.007 the multi-noise Pathfinder voter gives Triad 2.448% vs. Table 10's 2.417% (with fine-tune voter), within ensemble seed-noise. Checkpoint: `bench/results/h200_main/tierC1/pathfinder_wide_multi_d7/best_model.pt`.
 
 **Why canonical Pathfinder uses fine-tune, not distill.** Three independent reasons:
 
