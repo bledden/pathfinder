@@ -106,3 +106,5 @@ paper/_pathfinder_build.md
 paper/_header.tex
 paper/pathfinder_draft.pdf
 paper/pathfinder_draft.tex
+paper/arxiv/
+paper/pathfinder-arxiv-*.tar.gz
