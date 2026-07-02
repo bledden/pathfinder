@@ -77,7 +77,10 @@ h2h         = {**J("bench/results/h200_lange_headtohead_low_p.json"),
 phase2      = J("bench/results/h200_main/phase2/ensemble_results_final.json")
 tuned       = J("bench/results/h200_main/tuned/ensemble_results_tuned.json")
 pfw_full    = J("bench/results/h200_main/tierC1/ensemble_pfwl3s_full.json")
+pfw_v2      = J("bench/results/h200_main/tierC1/ensemble_pfwl3s_v2.json")   # Table 11 source: d3/d5 re-eval (d7 rows byte-identical to pfw_full)
 pfw_d9      = J("bench/results/h200_main/tierC1/ensemble_pfwl3s_d9.json")
+final_eval  = J("bench/results/final_eval.json")                            # Table 1 d=3/d=5 source
+clean_d7    = {r["p"]: r for r in J("bench/results/h200_main/clean_d7_eval.json")["rows"]}  # Table 1 d=7: leak-free single d7_p015
 lange_ft    = J("bench/results/h200_main/tierC1/lange_finetuned_eval_d7.json")
 triton_h384 = J("bench/results/h200_main/tierC1/triton_h384_stability.json")
 hybrid      = J("bench/results/h200_main/hybrid_d7_3seed/hybrid_eval_d7.json")
@@ -145,8 +148,9 @@ def fig01_hero():
                                 connectionstyle="arc3,rad=0.18"))
 
     # Honesty callout: PM competitive at the saturated regime (p=0.015)
-    # At p=0.015 d=7: PM 27.16% vs PFWL3S 27.34% — PM wins by 0.18 pp
-    ax.annotate("Above-threshold regime:\nPM beats PFWL3S by 0.18 pp here\n(see §6.3 saturated-regime note)",
+    # At p=0.015 d=7: PM 27.16% vs PFWL3S 27.33% — a 0.17 pp point-estimate
+    # edge with OVERLAPPING CIs (a statistical tie, not a strict win)
+    ax.annotate("Above-threshold regime:\nPM edges PFWL3S by 0.17 pp here\n(point estimate; CIs overlap — §6.3)",
                 xy=(0.015, 27.16),
                 xytext=(0.0028, 46),
                 fontsize=10, weight="bold", color=PAL["pm"], ha="left", va="center",
@@ -176,6 +180,26 @@ def fig01_hero():
 # ============================================================================
 def fig02_3param_multid():
     ps = [0.0005, 0.001, 0.002, 0.003, 0.005, 0.007, 0.010, 0.015]
+    N = 100000
+    from math import sqrt
+    def _wilson(f, n, z=1.96):
+        pr = f / n; den = 1 + z * z / n
+        c = (pr + z * z / (2 * n)) / den
+        h = z * sqrt(pr * (1 - pr) / n + z * z / (4 * n * n)) / den
+        return c - h, c + h
+    def _table1(d, p):
+        """EXACTLY Table 1's sources: final_eval.json for d=3/5; the leak-free
+        clean_d7_eval.json (single d7_p015, val-selected/test-reported) for d=7.
+        Returns (pf_ler, pm_ler, uf_ler) as fractions."""
+        fe = final_eval.get(f"rotZ_d{d}_p{p:g}", {})
+        if d == 7:
+            r = clean_d7[p]
+            pf = r["all_test_ler"]["d7_p015"]
+            pm = r["pm_test_ler"]
+            if pm is None:      # PM not re-run at the two lowest rates; Table 1 prints 0.000
+                pm = 0.0
+            return pf, pm, fe.get("uf", comp.get(f"d{d}_p{p:g}", {}).get("uf_ler", float("nan")))
+        return fe["neural"], fe["pm"], fe.get("uf", float("nan"))
     # Vertical 3x1 stack: each d-panel spans the FULL column width (the side-by-side
     # 1x3 layout forced each panel to ~1/3 width once scaled to 0.92\linewidth).
     fig, axs = plt.subplots(3, 1, figsize=(9.0, 11.5), sharex=True)
@@ -183,27 +207,35 @@ def fig02_3param_multid():
     tie_count = {3: 0, 5: 0, 7: 0}
     loss_count = {3: 0, 5: 0, 7: 0}
     for ax, d in zip(axs, [3, 5, 7]):
-        nl     = np.array([comp[f"d{d}_p{p}"]["neural_ler"]*100 for p in ps])
-        nl_hw  = np.array([comp[f"d{d}_p{p}"]["neural_ci"] *100 for p in ps])
-        pm_    = np.array([comp[f"d{d}_p{p}"]["pm_ler"]    *100 for p in ps])
-        pm_hw  = np.array([comp[f"d{d}_p{p}"]["pm_ci"]     *100 for p in ps])
-        uf_    = np.array([comp[f"d{d}_p{p}"].get("uf_ler", np.nan)*100 for p in ps])
+        vals   = [_table1(d, p) for p in ps]
+        nl     = np.array([v[0] * 100 for v in vals])
+        pm_    = np.array([v[1] * 100 for v in vals])
+        uf_    = np.array([v[2] * 100 for v in vals])
         ax.plot(ps, pm_, "o-", color=PAL["pm"], linewidth=2.6, markersize=9, label="PyMatching")
         ax.plot(ps, nl,  "s-", color=PAL["pf"], linewidth=3.0, markersize=10, label="Pathfinder")
         ax.plot(ps, uf_, "^--", color=PAL["uf"], linewidth=2.0, alpha=0.85, label="Union-Find")
-        # Per-cell verdict markers (below each Pathfinder point)
-        for p, y, nhw, py, phw in zip(ps, nl, nl_hw, pm_, pm_hw):
-            if y == 0 and py == 0:
-                sym, color = "≈", "#888"; tie_count[d] += 1
-            elif (y + nhw) < (py - phw):
+        # Per-cell verdict markers — 95% Wilson CIs recomputed from failure
+        # counts, the SAME strict-CI test as Table 1's text. Markers sit on a
+        # fixed row near the panel floor (axes coords) so zero-LER cells can
+        # never render outside the axes; glyphs are forced onto DejaVu Sans,
+        # which actually contains ✓/✗ (the paper font substitutes tofu).
+        from matplotlib.transforms import blended_transform_factory
+        tform = blended_transform_factory(ax.transData, ax.transAxes)
+        for p, y, py in zip(ps, nl, pm_):
+            f_pf, f_pm = round(y / 100 * N), round(py / 100 * N)
+            lo_pf, hi_pf = _wilson(f_pf, N)
+            lo_pm, hi_pm = _wilson(f_pm, N)
+            if f_pf == 0 and f_pm == 0:
+                sym, color = "≈", "#888"; tie_count[d] += 1       # zero observed errors
+            elif hi_pf < lo_pm:
                 sym, color = "✓", "#16A34A"; win_count[d] += 1   # PF strict-wins
-            elif (py + phw) < (y - nhw):
+            elif hi_pm < lo_pf:
                 sym, color = "✗", "#7C3AED"; loss_count[d] += 1  # PF strict-loses
             else:
                 sym, color = "≈", "#888"; tie_count[d] += 1       # overlap
-            label_y = max(y, 1e-4) * 0.45 if y > 0 else 5e-5
-            ax.text(p, label_y, sym, ha="center", va="top",
-                    fontsize=15, color=color, weight="bold")
+            ax.text(p, 0.045, sym, transform=tform, ha="center", va="bottom",
+                    fontsize=15, color=color, weight="bold",
+                    fontfamily="DejaVu Sans", clip_on=True)
         ax.set_xscale("log"); ax.set_yscale("log")
         verdict = f"{win_count[d]}W / {tie_count[d]}T / {loss_count[d]}L vs PM"
         ax.set_title(f"d = {d}   ({verdict})", fontsize=15.5, weight="bold", pad=8)
@@ -219,20 +251,21 @@ def fig02_3param_multid():
             ax.text(0.02, 0.98,
                     "✓ Pathfinder strict-CI wins    ≈ overlap (tie)    ✗ PM strict-CI wins",
                     transform=ax.transAxes, ha="left", va="top",
-                    fontsize=11.5, color="#374151", style="italic",
+                    fontsize=11.5, color="#374151", fontfamily="DejaVu Sans",
                     bbox=dict(boxstyle="round,pad=0.35", facecolor="white",
                               edgecolor="#D1D5DB", linewidth=0.6, alpha=0.95))
     axs[-1].set_xlabel("Physical error rate  p", fontsize=13)
     axs[-1].set_xticklabels([f"{p:g}" for p in ps], rotation=35, fontsize=12)
     total_w = sum(win_count.values()); total_t = sum(tie_count.values()); total_l = sum(loss_count.values())
+    loss_word = "loss" if total_l == 1 else "losses"
     fig.suptitle(
         f"Pathfinder vs PyMatching at d $\\in$ {{3,5,7}}: {total_w} strict-CI wins / {total_t} statistical ties / "
-        f"{total_l} strict-CI loss (3-param noise, 100K shots/point)",
+        f"{total_l} strict-CI {loss_word} (3-param noise, 100K shots/point)",
         fontsize=16, weight="bold", y=0.997, x=0.5, ha="center")
     fig.text(0.5, 0.012,
-             "Strict-CI test uses 95% Wilson intervals. Pathfinder's only strict-CI loss is at d=7, p=0.015 —\n"
-             "the above-threshold regime where the surface code can no longer suppress errors and PM's combinatorial\n"
-             "structure is provably near-optimal (same physics as the d=9 p=0.015 result of Fig 11).",
+             "Strict-CI test: 95% Wilson intervals recomputed from failure counts (N=100K) — the same test as Table 1.\n"
+             "d=7 uses the leak-free single d7_p015 checkpoint (val-selected, test-reported; clean_d7_eval.json).\n"
+             "Pathfinder is never strictly beaten; the closest cell is d=7 p=0.002, a one-failure difference (PF 5, PM 4).",
              ha="center", va="bottom", fontsize=11, style="italic", color="#6B7280")
     fig.tight_layout(rect=[0, 0.055, 1, 0.975])
     _save(fig, "fig02_3param_multid")
@@ -476,10 +509,11 @@ def fig06_lange_ft():
                           edgecolor=PAL["lange_ft"], linewidth=0.8, alpha=0.97),
                 arrowprops=dict(arrowstyle="-", color=PAL["lange_ft"], lw=0.8))
 
-    # Honesty callout at p=0.015: PM beats PFWL3S by 0.18 pp here
+    # Honesty callout at p=0.015 — computed from the plotted data, and labeled
+    # as the point-estimate edge it is (the CIs overlap: a statistical tie)
     idx15 = ps.index(0.015)
     ax.annotate(
-        f"At p=0.015: PM {pm_[idx15]:.2f}% beats PFWL3S {pfw[idx15]:.2f}% by 0.18 pp\n(above-threshold saturated regime — see §6.3)",
+        f"At p=0.015: PM {pm_[idx15]:.2f}% edges PFWL3S {pfw[idx15]:.2f}% by {pfw[idx15]-pm_[idx15]:.2f} pp\n(point estimate; CIs overlap — statistical tie; above-threshold regime, §6.3)",
         xy=(0.015, pm_[idx15]),
         xytext=(0.0050, 60), textcoords="data",
         ha="left", va="center", fontsize=10, weight="bold", color=PAL["pm"],
@@ -532,9 +566,14 @@ def fig07_dominance_heatmap():
         return "tie", 0.0
     def fetch(d, p):
         kd = f"d{d}_p{p}"
+        # PFWL3S rows come ONLY from the PFWL3S evals: pfw_d9 for d=9 (the
+        # H256-d9 variant, Table 14) and the v2 re-eval for d<=7 (Table 11's
+        # source; the pre-v2 pfw_full carried stale d3/d5 rows that inverted
+        # the d=5 win/loss direction). No silent fallback to canonical-PF
+        # (h2h) data — a missing key is a bug, fail loudly.
         if d == 9 and kd in pfw_d9:        r = pfw_d9[kd]
-        elif kd in pfw_full:               r = pfw_full[kd]
-        else:                              r = h2h.get(kd, {})
+        elif kd in pfw_v2:                 r = pfw_v2[kd]
+        else:                              raise KeyError(f"fig07: no PFWL3S data for {kd}")
         ft_l, ft_ci = None, None
         if d == 7 and f"p{p}" in lange_ft["rates"]:
             ft_l  = lange_ft["rates"][f"p{p}"]["lange_ft_ler"]
@@ -570,9 +609,13 @@ def fig07_dominance_heatmap():
                                         facecolor=color,
                                         edgecolor="white", linewidth=2.0))
             if status == "win":
-                lbl = f"WIN\n+{gap*100:.2f} pp";  tc = "white"; weight = "bold"
+                # show a third decimal for razor-thin margins so a marginal
+                # non-overlap never renders as a self-contradictory "+0.00 pp"
+                fmt = ".3f" if gap * 100 < 0.005 else ".2f"
+                lbl = f"WIN\n+{gap*100:{fmt}} pp";  tc = "white"; weight = "bold"
             elif status == "loss":
-                lbl = f"loss\n-{gap*100:.2f} pp"; tc = "white"; weight = "bold"
+                fmt = ".3f" if gap * 100 < 0.005 else ".2f"
+                lbl = f"loss\n-{gap*100:{fmt}} pp"; tc = "white"; weight = "bold"
             elif status == "tie":
                 lbl = "overlap"; tc = "#4B5563"; weight = "normal"
             else:
@@ -593,12 +636,19 @@ def fig07_dominance_heatmap():
     ]
     ax.legend(handles=handles, loc="upper left", bbox_to_anchor=(0.0, -0.06),
               ncol=3, frameon=False, fontsize=11)
-    ax.set_title("Triad strict-CI beats Lange at 5 of 8 d ≥ 7 ops points;\nloses to PM at d=9 p=0.015 (above threshold)",
+    # Title tallies are computed from the rendered cells — never hardcoded
+    # (an earlier draft shipped a stale "5 of 8" against a 7-of-8 grid).
+    d7plus = [i for i, (d, p) in enumerate(rows) if d >= 7]
+    tvl_wins = sum(1 for i in d7plus if cells[i][2][0] == "win")
+    ax.set_title(f"Triad strict-CI beats Lange at {tvl_wins} of {len(d7plus)} d ≥ 7 ops points;\n"
+                 "loses to PM at d=9 p=0.015 (above threshold)",
                  fontsize=15, weight="bold", pad=14, loc="left")
     footer(ax, "Wilson 95% CIs at 100K shots / point. WIN = row-decoder strictly beats column-decoder. "
-                "Numbers show CI-gap magnitude in percentage points (pp). The single 'loss' cell at d=9 p=0.015 in "
-                "the right column reflects that the d=9 surface code is above its pseudo-threshold at p=0.015, "
-                "where PM's combinatorial structure is provably near-optimal.")
+                "Numbers show CI-EDGE separation in percentage points (pp; point-estimate gaps are larger). "
+                "PFWL3S rows: d≤7 = the Table-11 re-eval (ensemble_pfwl3s_v2.json); d=9 = the PFWL3S-H256-d9 "
+                "variant (Table 14). The 'loss' cell at d=9 p=0.015 in the right column reflects that the d=9 "
+                "surface code is above its pseudo-threshold there, where PM's combinatorial structure is provably "
+                "near-optimal.")
     fig.tight_layout()
     _save(fig, "fig07_dominance_heatmap")
 
@@ -697,8 +747,10 @@ def fig10_muon_ablation():
     x = np.arange(len(d_ab))
     w = 0.34
     fig, ax = plt.subplots(figsize=(11.0, 5.8))
+    # NOTE: these are the §6.2 ablation run's own LERs (the d=7 Muon bar is the
+    # ablation-era canonical model, 1.04% — NOT Table 1's d7_p015 value, 1.071%).
     b1 = ax.bar(x - w/2, full, w, color=PAL["triad"], edgecolor="#1F2937",
-                linewidth=1.0, label="Full Muon  (Table 1)")
+                linewidth=1.0, label="Full Muon  (§6.2 ablation run)")
     b2 = ax.bar(x + w/2, adam, w, color=PAL["lange"], edgecolor="#1F2937",
                 linewidth=1.0, label="AdamW only  (§6.2)")
     ax.set_yscale("log")
@@ -723,10 +775,11 @@ def fig10_muon_ablation():
                     fontsize=12, fontweight="bold", color=color)
     ax.legend(loc="upper left", fontsize=11)
     ax.set_ylim(0.5, 200)
-    ax.set_title("Muon is essential at d=7 — removing it causes catastrophic failure",
+    ax.set_title("Muon's effect grows with depth — AdamW-only fails to converge at d=7\n(within the matched 80K-step budget)",
                  fontsize=14.5, weight="bold", pad=14, loc="left")
     thin_spine(ax)
-    footer(ax, "80K training steps / configuration. AdamW-only d=7 fails to escape its initial plateau.")
+    footer(ax, "80K training steps / configuration, matched budget (AdamW not separately LR-tuned) — a training-choice "
+                "comparison, not a tuned-optimizer duel (§4.2/§6.2). AdamW-only d=7 fails to escape its initial plateau.")
     fig.tight_layout()
     _save(fig, "fig10_muon_ablation")
 
@@ -793,7 +846,8 @@ def fig11_d9_triad():
                  fontsize=12.5, weight="bold", pad=12, loc="left")
     thin_spine(ax)
     footer(ax, "100K shots / point. PFWL3S-H256-d9 loses to Lange individually at every rate, "
-                "but the Triad strictly beats Lange at p=0.007 (0.154 pp) and p=0.010 (1.831 pp).")
+                "but the Triad strictly beats Lange at p=0.007 (0.154 pp CI-edge) and p=0.010 (1.831 pp CI-edge); "
+                "point-estimate gaps are larger (0.346 / 2.233 pp).")
     fig.tight_layout()
     _save(fig, "fig11_d9_triad")
 
