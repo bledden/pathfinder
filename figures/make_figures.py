@@ -298,9 +298,9 @@ def fig03_pareto():
     # Cycle-budget shaded region
     ax.axvspan(3, 7, color=PAL["budget_band"], alpha=0.9, zorder=0)
     ax.axvline(7.0, color="#15803D", ls=":", lw=1.4, zorder=1)
-    ax.text(7.4, 2.5, "d=7 cycle budget  (7 μs)", fontsize=11, color="#15803D",
+    ax.text(7.4, 2.5, "7 μs / syndrome service-rate target", fontsize=11, color="#15803D",
             ha="left", va="center", rotation=90, style="italic", weight="bold")
-    ax.text(4.7, 0.78, "sustains cycle budget", fontsize=11, color="#15803D",
+    ax.text(4.7, 0.78, "below service-rate target", fontsize=11, color="#15803D",
             style="italic", ha="center", weight="bold")
 
     # Pareto frontier (dotted)
@@ -363,7 +363,7 @@ def fig03_pareto():
                   fontsize=11, weight="bold", pad=10, loc="left", color="#6B7280")
     thin_spine(ax2)
 
-    fig.suptitle("Pathfinder+Triton is the only decoder that sustains the 7 μs cycle budget",
+    fig.suptitle("Pathfinder+Triton is the only decoder below the 7 μs/syndrome service-rate target (batched)",
                  fontsize=14.5, weight="bold", y=1.02, x=0.04, ha="left")
     fig.text(0.04, -0.04,
              "Latencies at throughput-optimal batch on each decoder's reported hardware. "
@@ -410,7 +410,7 @@ def fig04_triton_vs_ref():
                 ha="center", va="bottom", fontsize=11.5, color=color, weight="bold")
     # Cycle budget line
     ax.axhline(7.0, color="#15803D", ls=":", lw=1.4)
-    ax.text(2.45, 8.0, "d=7 cycle budget  (7 μs)", color="#15803D",
+    ax.text(2.45, 8.0, "7 μs / syndrome service-rate target", color="#15803D",
             ha="right", va="bottom", fontsize=10.5, style="italic", weight="bold",
             bbox=dict(boxstyle="round,pad=0.3", facecolor="white", edgecolor="#15803D", linewidth=0.8, alpha=0.92))
     ax.set_ylim(0.5, 9000)
