@@ -1,10 +1,10 @@
 # arXiv submission metadata — Pathfinder (prepared 2026-07-02)
 
-**Bundle:** `paper/pathfinder-arxiv-2026-07-02.tar.gz` (rebuild: `python3 paper/make_arxiv.py`) —
+**Bundle:** `paper/pathfinder-arxiv-2026-07-14.tar.gz` (rebuild: `python3 paper/make_arxiv.py`) —
 `pathfinder.tex` (100% ASCII, self-contained, iftex-guarded so it compiles under arXiv AutoTeX/pdflatex
 AND xelatex; sanity-compiled locally to the same 57 pp) + 11 PNG figures, flat layout.
 
-**Title:** Pathfinder: A Direction-Aware Neural Decoder Whose Ensemble Outperforms a Leading Open-Source Neural Decoder (Lange et al.) on Surface Codes
+**Title:** Pathfinder: Direction-Aware Neural Decoding and Complementary-Failure Ensembles for Surface Codes
 
 **Authors:** Blake Ledden (Independent Researcher, San Francisco, CA)
 

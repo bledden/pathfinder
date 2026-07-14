@@ -1,4 +1,4 @@
-# Pathfinder: A Direction-Aware Neural Decoder Whose Ensemble Outperforms a Leading Open-Source Neural Decoder (Lange et al.) on Surface Codes
+# Pathfinder: Direction-Aware Neural Decoding and Complementary-Failure Ensembles for Surface Codes
 
 **Blake Ledden**
 Independent Researcher · San Francisco, CA
