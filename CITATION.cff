@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+message: "If you use this software or build on the paper, please cite it as below."
+title: "Pathfinder: open-source neural decoders and ensembles for surface-code quantum error correction"
+type: software
+authors:
+  - family-names: Ledden
+    given-names: Blake
+    affiliation: "Independent Researcher"
+repository-code: "https://github.com/bledden/pathfinder"
+license: MIT
+preferred-citation:
+  type: article
+  title: "Pathfinder: Direction-Aware Neural Decoding and Complementary-Failure Ensembles for Surface Codes"
+  authors:
+    - family-names: Ledden
+      given-names: Blake
+      affiliation: "Independent Researcher"
+  year: 2026
+  doi: 10.5281/zenodo.21303610
+  url: "https://doi.org/10.5281/zenodo.21303610"
+  notes: "Preprint. 57 pages, 11 figures. Code, trained checkpoints, and raw evaluation data: https://github.com/bledden/pathfinder"
