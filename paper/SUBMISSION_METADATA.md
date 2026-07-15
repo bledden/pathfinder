@@ -14,7 +14,7 @@ AND xelatex; sanity-compiled locally to the same 57 pp) + 11 PNG figures, flat l
 
 **Metadata abstract (1,911 chars — field limit 1,920; the paper's full abstract stays in the PDF):**
 
-> See `SUBMISSION_ABSTRACT.txt` (plain text, paste verbatim).
+> See `SUBMISSION_ABSTRACT.txt` — for arXiv, paste WITHOUT the final "This record archives v1..." paragraph (that line is Zenodo-only; the abstract alone is 1,911 chars, under the 1,920 limit).
 
 **Pre-submission checklist**
 - [ ] arXiv account + **quant-ph endorsement** (first-time submitters to quant-ph may need an endorser — check https://arxiv.org/help/endorsement; a cs.LG primary is the fallback if endorsement stalls)
