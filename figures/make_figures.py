@@ -276,8 +276,8 @@ def fig02_3param_multid():
 def fig03_pareto():
     # Open-source decoders measured here on H200 SXM / Apple M4 — apples-to-apples comparable
     P_main = [
-        (6.12,  1.041, "Pathfinder+Triton (3-param)",                PAL["pf"],         "o", 150),
-        (6.12,  2.492, "PFWL3S (4-param, HERO)",                     PAL["pfwl3s"],     "s", 200),
+        (6.43,  1.071, "Pathfinder+Triton (3-param)",                PAL["pf"],         "o", 150),
+        (61.2,  2.492, "PFWL3S (4-param, HERO)",                     PAL["pfwl3s"],     "s", 200),
         (20.4,  2.78,  "PFWL3S single-seed (H=384)",                 PAL["pf_kd"],      "D", 130),
         (9.65,  1.489, "PyMatching (3-param, M4 CPU)",               PAL["pm"],         "o", 140),
         (9.65,  3.366, "PyMatching (4-param)",                       PAL["pm_alt"],     "^", 130),
