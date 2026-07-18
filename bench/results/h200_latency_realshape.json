@@ -1,0 +1,164 @@
+{
+  "gpu": "NVIDIA H200",
+  "torch": "2.6.0+cu124",
+  "cuda": "12.4",
+  "note": "realshape = (r+1, d+1, d+1) from stim detector coords (CDS mapping); synthetic = legacy (d,d,d) convention of the committed 6.12/7.86 headline",
+  "rows": [
+    {
+      "label": "d3_full_H256",
+      "triton": false,
+      "distance": 3,
+      "grids": {
+        "synthetic": [
+          3,
+          3,
+          3
+        ],
+        "realshape": [
+          4,
+          4,
+          4
+        ]
+      },
+      "params": 252417,
+      "synthetic_B1_us_call": 103.15,
+      "synthetic_B1_us_syn": 103.146,
+      "synthetic_B1024_us_call": 409.84,
+      "synthetic_B1024_us_syn": 0.4,
+      "realshape_B1_us_call": 104.41,
+      "realshape_B1_us_syn": 104.414,
+      "realshape_B1024_us_call": 578.84,
+      "realshape_B1024_us_syn": 0.565
+    },
+    {
+      "label": "d3_full_H256",
+      "triton": true,
+      "distance": 3,
+      "grids": {
+        "synthetic": [
+          3,
+          3,
+          3
+        ],
+        "realshape": [
+          4,
+          4,
+          4
+        ]
+      },
+      "params": 252417,
+      "synthetic_B1_us_call": 74.82,
+      "synthetic_B1_us_syn": 74.822,
+      "synthetic_B1024_us_call": 319.21,
+      "synthetic_B1024_us_syn": 0.312,
+      "realshape_B1_us_call": 75.02,
+      "realshape_B1_us_syn": 75.021,
+      "realshape_B1024_us_call": 462.0,
+      "realshape_B1024_us_syn": 0.451
+    },
+    {
+      "label": "d5_full_H256",
+      "triton": false,
+      "distance": 5,
+      "grids": {
+        "synthetic": [
+          5,
+          5,
+          5
+        ],
+        "realshape": [
+          6,
+          6,
+          6
+        ]
+      },
+      "params": 376321,
+      "synthetic_B1_us_call": 179.29,
+      "synthetic_B1_us_syn": 179.288,
+      "synthetic_B1024_us_call": 2151.21,
+      "synthetic_B1024_us_syn": 2.101,
+      "realshape_B1_us_call": 177.72,
+      "realshape_B1_us_syn": 177.721,
+      "realshape_B1024_us_call": 2898.22,
+      "realshape_B1024_us_syn": 2.83
+    },
+    {
+      "label": "d5_full_H256",
+      "triton": true,
+      "distance": 5,
+      "grids": {
+        "synthetic": [
+          5,
+          5,
+          5
+        ],
+        "realshape": [
+          6,
+          6,
+          6
+        ]
+      },
+      "params": 376321,
+      "synthetic_B1_us_call": 126.3,
+      "synthetic_B1_us_syn": 126.295,
+      "synthetic_B1024_us_call": 1781.72,
+      "synthetic_B1024_us_syn": 1.74,
+      "realshape_B1_us_call": 133.83,
+      "realshape_B1_us_syn": 133.826,
+      "realshape_B1024_us_call": 2277.62,
+      "realshape_B1024_us_syn": 2.224
+    },
+    {
+      "label": "d7_full_H256",
+      "triton": false,
+      "distance": 7,
+      "grids": {
+        "synthetic": [
+          7,
+          7,
+          7
+        ],
+        "realshape": [
+          8,
+          8,
+          8
+        ]
+      },
+      "params": 500225,
+      "synthetic_B1_us_call": 267.96,
+      "synthetic_B1_us_syn": 267.964,
+      "synthetic_B1024_us_call": 7628.49,
+      "synthetic_B1024_us_syn": 7.45,
+      "realshape_B1_us_call": 257.47,
+      "realshape_B1_us_syn": 257.465,
+      "realshape_B1024_us_call": 8328.79,
+      "realshape_B1024_us_syn": 8.134
+    },
+    {
+      "label": "d7_full_H256",
+      "triton": true,
+      "distance": 7,
+      "grids": {
+        "synthetic": [
+          7,
+          7,
+          7
+        ],
+        "realshape": [
+          8,
+          8,
+          8
+        ]
+      },
+      "params": 500225,
+      "synthetic_B1_us_call": 208.85,
+      "synthetic_B1_us_syn": 208.853,
+      "synthetic_B1024_us_call": 6311.7,
+      "synthetic_B1024_us_syn": 6.164,
+      "realshape_B1_us_call": 215.43,
+      "realshape_B1_us_syn": 215.431,
+      "realshape_B1024_us_call": 6586.42,
+      "realshape_B1024_us_syn": 6.432
+    }
+  ]
+}

@@ -6,7 +6,7 @@ Two open-source decoder systems for quantum error correction on rotated surface 
 
 ## TL;DR
 
-- **System 1: throughput-optimized decoder.** Canonical Pathfinder (H=256, 500K params) + a custom Triton kernel for DirectionalConv3d → **6.12 μs/syndrome at d=7 batch=1024 on NVIDIA H200 SXM** — batched throughput below a 7-μs-per-syndrome service-rate target at every operational noise rate. This is amortized throughput, not streaming real-time (batch-1 latency is 201 μs), and a cross-hardware comparison — PyMatching is CPU-timed (paper §5.3, §A.3). On accuracy, **never statistically beaten by PyMatching** across Table 1's 24 points under 3-parameter circuit-level noise: 20 point-estimate wins, 12 with non-overlapping 95% Wilson CIs, using one fixed validation-selected checkpoint per distance (paper §5.1, Table 1).
+- **System 1: throughput-optimized decoder.** Canonical Pathfinder (H=256, 500K params) + a custom Triton kernel for DirectionalConv3d → **6.43 μs/syndrome at d=7 batch=1024 on NVIDIA H200 SXM** (real pipeline shape [B,1,8,8,8]) — batched throughput below a 7-μs-per-syndrome service-rate target at every operational noise rate. This is amortized throughput, not streaming real-time (batch-1 latency is 215 μs), and a cross-hardware comparison — PyMatching is CPU-timed (paper §5.3, §A.3). On accuracy, **never statistically beaten by PyMatching** across Table 1's 24 points under 3-parameter circuit-level noise: 20 point-estimate wins, 12 with non-overlapping 95% Wilson CIs, using one fixed validation-selected checkpoint per distance (paper §5.1, Table 1).
 
 - **System 2: lowest-LER decoder (Pathfinder-Triad with PFWL3S voter).** A 3-way majority vote of (PFWL3S, Lange et al. 2025, PyMatching), where **PFWL3S** = three independent random-seed H=384 Pathfinders trained 160K steps each with Lange-teacher distillation, ensembled by averaging logits. Achieves **LER 2.384% at d=7 p=0.007 (100K shots)** vs Lange's 2.956% — **strict statistical win** with non-overlapping 95% Wilson CIs (**Triad vs Lange: 19.4% relative LER reduction**; the PFWL3S voter alone is 2.492%, 15.7% vs Lange). Strict-CI wins at 5 (d, p) operational points: **d=7 p ∈ {0.007, 0.010, 0.015} and d=9 p ∈ {0.007, 0.010}** (paper §5.12, §6.3). Latency is Lange-bounded at ≈72 μs/syn — for non-real-time deployment (offline verification, post-selection in repeat-until-success).
 
@@ -22,7 +22,7 @@ PFWL3S as an *individual* decoder also strictly beats Lange at 4 (d, p) points (
 
 1. **Pathfinder-Triad** — among the open-source decoders evaluated in this study, the only decoder system to statistically-significantly beat Lange on matched noise, at 5 (d, p) points across two code distances (paper §5.12, §6.3; the d=9 pair is vs published out-of-distribution Lange, with no fine-tuned control).
 2. **PFWL3S** — to my knowledge, the first open-source individual neural decoder to strictly beat Lange's GNN with non-overlapping 95% Wilson CIs at any operational noise rate (paper §5.13, 4 (d, p) wins).
-3. **The DirectionalConv3d Triton kernel** — 12× faster than Lange's GNN on identical H200 hardware for single-seed canonical Pathfinder, with batched throughput below the 7-μs/syn service-rate target (paper §5.3 + §5.11).
+3. **The DirectionalConv3d Triton kernel** — 11× faster than Lange's GNN on identical H200 hardware for single-seed canonical Pathfinder, with batched throughput below the 7-μs/syn service-rate target (paper §5.3 + §5.11).
 4. **Depth-dependent Muon ablation** — the optimizer's effect goes from +17% LER at d=3 to +72% at d=5 to catastrophic at d=7 (1.04% → 34.8% LER without Muon; paper §6.2).
 5. **Extended-noise-rate Table 1** — evaluation down to p=0.0005 and up to p=0.015, broader than prior open-source coverage.
 6. **Documented negative results** strengthening the headline claims:
@@ -67,15 +67,15 @@ Bold = strictly better. Note PFWL3S-H256-d9 *loses* individually to Lange at d=9
 
 | Configuration | B=1 latency | B=1024 throughput | Below 7-μs/syn service-rate target? |
 |---|---|---|---|
-| **Canonical Pathfinder + Triton** | 201 μs | **6.12 μs/syn** | **✓ (13% below)** |
-| Canonical Pathfinder (Inductor only) | 250 μs | 7.86 μs/syn | ✗ (12% above) |
-| Lange GNN (measured here on H200) | 1,918 μs | 71.67 μs/syn | ✗ (12× above) |
+| **Canonical Pathfinder + Triton** | 215 μs | **6.43 μs/syn** | **✓ (8% below)** |
+| Canonical Pathfinder (Inductor only) | 258 μs | 8.13 μs/syn | ✗ (16% above) |
+| Lange GNN (measured here on H200) | 1,918 μs | 71.67 μs/syn | ✗ (11× Pathfinder's) |
 | PFWL3S (3-seed-avg, reference impl) | — | ≈61 μs/syn | ✗ (paper §5.13 latency) |
 | PFWL3S (3-seed-avg, Triton extrapolated) | — | ≈24 μs/syn | ✗ (3.5× above) |
 | Pathfinder-Triad (Lange-bounded) | — | ≈72 μs/syn | ✗ (10× above) |
 | PyMatching v2 (Apple M4 single core, p=0.007) | 9.65 μs | 7.77 μs/syn (batch) | ✗ at p ≥ 0.007 |
 
-The 12× faster claim is **canonical 1-seed Pathfinder + Triton vs Lange**, both at d=7 batch=1024 on H200. The service-rate target is amortized batched throughput — batch-1 latency remains two orders of magnitude above streaming real-time requirements (paper §5.3). The strict-CI-winning PFWL3S and Pathfinder-Triad systems are above the target; they're for non-real-time deployment.
+The 11× faster claim is **canonical 1-seed Pathfinder + Triton vs Lange** (both on real-shaped inputs), both at d=7 batch=1024 on H200. The service-rate target is amortized batched throughput — batch-1 latency remains two orders of magnitude above streaming real-time requirements (paper §5.3). The strict-CI-winning PFWL3S and Pathfinder-Triad systems are above the target; they're for non-real-time deployment.
 
 ## Architecture
 
