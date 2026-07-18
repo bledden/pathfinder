@@ -314,9 +314,9 @@ def fig03_pareto():
 
     # Manual offset table to keep numbered labels from overlapping
     offset = {
-        1: (1.18, 0.97), 2: (1.18, 0.97), 3: (1.20, 0.98), 4: (1.16, 0.97),
-        5: (1.16, 0.97), 6: (1.14, 1.03), 7: (1.14, 0.90), 8: (0.78, 1.05),
-        9: (0.78, 0.90),
+        1: (1.18, 0.97), 2: (0.78, 1.07), 3: (1.20, 0.98), 4: (1.16, 0.97),
+        5: (1.16, 0.97), 6: (1.14, 1.05), 7: (1.16, 0.92), 8: (1.13, 1.04),
+        9: (1.13, 0.90),
     }
     handles = []
     for i, (lat, ler, lbl, color, marker, size) in enumerate(P, 1):
@@ -372,6 +372,7 @@ def fig03_pareto():
              "are reported on different hardware OR a different problem — shown for context, not strictly comparable.",
              fontsize=10.5, style="italic", color="#6B7280", wrap=True)
     fig.tight_layout()
+    ax2.xaxis.set_minor_formatter(NullFormatter())
     _save(fig, "fig03_pareto_d7")
 
 # ============================================================================
@@ -470,8 +471,8 @@ def fig05_failure_overlap():
     ax.set_title(f"Pathfinder and Lange fail on largely disjoint syndromes "
                  f"(only {both_pct:.2f}% shot overlap)",
                  fontsize=14.5, weight="bold", pad=14, loc="center")
-    ax.text(0.5, -0.02, "This near-disjoint failure mode is the structural reason "
-            "the §5.12 three-way majority vote (Pathfinder-Triad) beats every individual decoder.",
+    ax.text(0.5, -0.02, "This partial failure-mode independence is the structural reason "
+            "the §5.6 three-way majority vote (Pathfinder-Triad) beats every individual decoder.",
             transform=ax.transAxes, ha="center", va="top",
             fontsize=11, style="italic", color="#4B5563")
     fig.tight_layout()
