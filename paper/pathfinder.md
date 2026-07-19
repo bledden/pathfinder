@@ -46,7 +46,7 @@ The paper's distinct contributions are:
 
 The full experimental program used approximately 150 GPU-hours across AMD MI300X and NVIDIA H200 instances; a complete compute/cost itemization is reported for reproducibility in §4.6.
 
-**A note on priority.** Lange et al. [14] (PRR 2025; arXiv:2307.01241) previously released the first open-source neural decoder to outperform PyMatching on rotated surface codes under circuit-level noise. The present work extends Lange's open-source priority with: (a) coverage of operational noise rates p ∈ {0.007, 0.010, 0.015} not in Lange's training distribution; (b) a depth-dependent Muon ablation (§6.2) showing Muon materially improves d≥7 convergence, with AdamW catastrophically failing under the matched budget; (c) the Triton kernel of System 1 closing the d=7 service-rate gap; (d) PFWL3S and Pathfinder-Triad of System 2 — among the open-source decoders evaluated here, the only systems in this study to strictly beat Lange's GNN under the reported confidence-interval criterion.
+**A note on priority.** Lange et al. [14] (PRR 2025; arXiv:2307.01241) previously released the first open-source neural decoder to outperform PyMatching on rotated surface codes under circuit-level noise. The present work extends Lange's open-source priority with: (a) coverage of operational noise rates p ∈ {0.007, 0.010, 0.015} not in Lange's training distribution; (b) a depth-dependent Muon ablation (§6.2) showing Muon materially improves accuracy at d≥5 and is required for d=7 convergence under the matched budget, with AdamW catastrophically failing there; (c) the Triton kernel of System 1 closing the d=7 service-rate gap; (d) PFWL3S and Pathfinder-Triad of System 2 — among the open-source decoders evaluated here, the only systems in this study to strictly beat Lange's GNN under the reported confidence-interval criterion.
 
 **Relation to prior work.** Pathfinder is a composition of ideas, not a novel invention. The direction-specific 3D convolution architecture is a reimplementation of the design principles described by Gu et al. [8]. PyMatching with Sparse Blossom [2] is both the decoder this work is benchmarked against and, through its meticulous open-source release, the reason a comparison of this scope was possible. The Stim simulator [10] is what makes generating syndromes at the rate required for on-the-fly training tractable. The Muon optimizer [11], whose effect on this decoder grows from small (+18%) at d=3 to catastrophic at d=7 (removing it causes training to fail entirely within the same step budget; see §6.2), is due to Jordan et al. AlphaQubit [5] established that neural decoders can beat MWPM on real quantum hardware, validating this line of research before the open-source ecosystem could. Google's Willow [1] established the experimental regime (sub-threshold surface codes) that makes a decoder like this worth building. The novel contributions here are (a) the empirical finding that, under the matched training budget and schedules evaluated here, optimizer choice (Muon vs. AdamW) has a larger observed effect on this decoder family's accuracy than the architectural choice (DirectionalConv3d vs. standard Conv3d); (b) the partial independence of the decoders' failure modes that the §5.6 Triad exploits (Pathfinder and Lange co-fail on only 35% of their combined d=7 failures; the most extreme pair, Pathfinder vs PyMatching at d=5, overlaps just 0.01% — 5 of 50K shots, a small absolute count ~3× below independence; §5.4); (c) a custom Triton kernel for DirectionalConv3d that closes the d=7 service-rate gap on H200 (Section 5.3); and (d) an open-source reference implementation reproducible by individual researchers on commodity cloud hardware.
 
@@ -203,13 +203,13 @@ Each Table-1 model trains for 80,000 steps at batch size 512–1024 on a single 
 
 ### 5.1 Overview: two systems from one backbone
 
-This section reports two open-source decoder systems, both built on the Pathfinder backbone, together with the experiments that produced them. **System 1** (canonical Pathfinder + Triton; §5.2, §5.3, §S1–§S8) is a single direction-aware CNN per code distance: it beats PyMatching across the operational noise range (§5.2) at a batched throughput below the d=7 7-μs-per-syndrome service-rate target (§5.3). **System 2** (Pathfinder-Triad; §5.5–§5.7, §S9) is a three-way majority vote of PFWL3S, Lange's GNN, and PyMatching: it reaches the lowest LER among the decoders benchmarked here by exploiting the three decoders' largely independent failure modes (§S4, §5.6), strictly beating Lange's GNN at d=7 and d=9 operational rates with non-overlapping 95% Wilson CIs.
+This section reports two open-source decoder systems, both built on the Pathfinder backbone, together with the experiments that produced them. **System 1** (canonical Pathfinder + Triton; §5.2, §5.3, §S1–§S8) is a single direction-aware CNN per code distance: it beats PyMatching across the operational noise range (§5.2) at a batched throughput below the d=7 7-μs-per-syndrome service-rate target (§5.3). **System 2** (Pathfinder-Triad; §5.5–§5.8, §S9) is a three-way majority vote of PFWL3S, Lange's GNN, and PyMatching: it reaches the lowest LER among the decoders benchmarked here by exploiting the three decoders' largely independent failure modes (§S4, §5.6), strictly beating Lange's GNN at d=7 and d=9 operational rates with non-overlapping 95% Wilson CIs.
 
 Two results give the ensemble claim its force, and both are reported in full below. First, canonical Pathfinder *individually* loses to Lange's GNN at matched noise (§5.5): the Triad wins not because any single component is best but because the components' error modes are complementary. Second, a deliberate effort to distill the Triad's coverage into one CNN student failed across six recipe variants (§S9), so the three-way coverage is an architectural property rather than an artifact of an under-trained voter. PFWL3S (a wider, longer-trained, 3-seed-averaged Pathfinder) is the one individual variant that does strictly beat Lange (§S9), but it does not absorb the Triad's advantage. The making-of narrative, how this began as a single-decoder-versus-PyMatching project and became an ensemble result, is recounted in a companion note; here the paper reports the systems and the evidence directly.
 
 ![Pathfinder-Triad beats every individual decoder at d=7 operational rates](../figures/fig01_hero_d7.png){.fig}
 
-**Figure 1.** *Pathfinder-Triad beats every individual decoder at d=7 operational rates.* Logical error rate as a function of physical error rate p at d=7, log–log scale. The pale gold band marks the operational regime p ∈ {0.005, …, 0.015}. Within it the Pathfinder-Triad (purple, hero) strictly beats Lange's GNN (red) at p ∈ {0.007, 0.010, 0.015} and PyMatching (grey) across the band (non-overlapping 95% Wilson CIs); vs PFWL3S alone (blue) the Triad's edge is a point-estimate improvement with overlapping CIs (at p=0.005 the Triad–Lange edge is a razor-thin 0.005 pp non-overlap, reported as marginal, not a headline claim). At the headline operational rate p=0.007 the Triad reaches 2.38% LER versus Lange's 2.96%, a 0.372 pp CI-edge separation at 100K shots (this is the published, out-of-distribution Lange; the fine-tuned-Lange controls are in §5.5). Data from `bench/results/h200_main/tierC1/ensemble_pfwl3s_full.json`.
+**Figure 1.** *Pathfinder-Triad beats every individual decoder at d=7 operational rates.* Logical error rate as a function of physical error rate p at d=7, log–log scale. The pale gold band marks the operational regime p ∈ {0.005, …, 0.015}. Within it the Pathfinder-Triad (purple, hero) strictly beats Lange's GNN (red) at p ∈ {0.007, 0.010, 0.015} and PyMatching (grey) across the band (non-overlapping 95% Wilson CIs); vs PFWL3S alone (blue) the Triad's edge is a point-estimate improvement with overlapping CIs (at p=0.005 the Triad–Lange edge is a razor-thin 0.005 pp non-overlap, reported as marginal, not a headline claim). At the headline operational rate p=0.007 the Triad reaches 2.38% LER versus Lange's 2.96%, a 0.372 pp CI-edge separation at 100K shots (this is the published, out-of-distribution Lange; the fine-tuned-Lange controls are in §5.5). Data from `bench/results/h200_main/tierC1/ensemble_pfwl3s_full.json`. (The PyMatching 4-parameter point is the 100K-shot draw, 3.366%; the §5.5 table's 3.343% is the 60K-shot draw of the same configuration.)
 
 ### 5.2 Main Results: Rotated Surface Code
 
@@ -568,7 +568,7 @@ Removing Muon — training with AdamW [27] on all 2D weights under the same fixe
 
 | d | Full Muon (ablation baseline) | AdamW-only | Relative increase |
 |---|---------------------|------------|-------------------|
-| 3 | 1.82% | 2.14% | +17% (small) |
+| 3 | 1.82% | 2.14% | +18% (small) |
 | 5 | 1.28% | 2.20% | +72% (headline) |
 | 7 | 1.04% | **34.8%** | catastrophic (fails to learn) |
 
@@ -756,7 +756,7 @@ This work owes a specific intellectual debt to several teams. Andi Gu and collea
 
 # Supplementary Material
 
-**Section crosswalk (original → this version).** The supplement is renumbered S1–S13; original numbering (as cited in v1 of this preprint and external commentary) maps as follows. Main-text sections 5.4, 5.7, 5.8, and 6.2 are new summaries of S4, S9, S11, and S13 respectively. Figures and tables retain their v1 global numbering, so figure order is not sequential across the main/supplement split (e.g., Figure 11 appears in main §6.3; Figures 7–10 in the supplement).
+**Section crosswalk (original → this version).** The supplement is renumbered S1–S13; original numbering (as cited in v1 of this preprint and external commentary) maps as follows. Main-text sections 5.4, 5.7, 5.8, and 6.2 are new summaries of S4, S9, S11, and S13 respectively. Figures and tables retain their v1 global numbering, so figure order is not sequential across the main/supplement split (e.g., Figure 11 appears in main §6.3; Figures 7–10 in the supplement). Image filenames (fig01–fig11) are asset identifiers and do not track figure numbers.
 
 | Original | Now | | Original | Now |
 |---|---|---|---|---|
@@ -1256,7 +1256,7 @@ The d=5 ablation (Table 4) shows that removing Muon (i.e., training with AdamW o
 
 | d | Full Muon (ablation baseline) | AdamW-only | Relative increase |
 |---|---------------------|------------|-------------------|
-| 3 | 1.82% | 2.14% | +17% (small) |
+| 3 | 1.82% | 2.14% | +18% (small) |
 | 5 | 1.28% | 2.20% | +72% (Table 4) |
 | 7 | 1.04% | **34.8%** | catastrophic (fails to learn) |
 
@@ -1266,7 +1266,7 @@ At d=3 the architecture is shallow enough (L=3, 252K parameters) that AdamW reac
 
 ![Removing Muon causes catastrophic d=7 training failure under the matched budget (AdamW not separately LR-tuned)](../figures/fig10_muon_ablation.png){.fig}
 
-**Figure 10.** *Depth-dependent Muon effect: LER at p=0.007 with full Muon (purple) vs AdamW-only on the same architecture (red), log-y.* The depth-dependence of the regression is the headline finding: +17% at d=3, +72% at d=5 (the original Table 4 number), catastrophic failure at d=7. The d=7 AdamW-only run never escapes its initial loss plateau within the same 80K-step budget that Muon converges in (AdamW was not separately LR-tuned or given a longer budget, so this is a within-budget convergence failure, not a tuned-AdamW comparison). Within this fixed training budget, the *optimizer* choice, not the architecture, dominates accuracy at depth.
+**Figure 10.** *Depth-dependent Muon effect: LER at p=0.007 with full Muon (purple) vs AdamW-only on the same architecture (red), log-y.* The depth-dependence of the regression is the headline finding: +18% at d=3, +72% at d=5 (the original Table 4 number), catastrophic failure at d=7. The d=7 AdamW-only run never escapes its initial loss plateau within the same 80K-step budget that Muon converges in (AdamW was not separately LR-tuned or given a longer budget, so this is a within-budget convergence failure, not a tuned-AdamW comparison). Within this fixed training budget, the *optimizer* choice, not the architecture, dominates accuracy at depth.
 
 ## Appendix A: Reproducibility
 
