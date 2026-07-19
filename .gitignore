@@ -108,3 +108,5 @@ paper/pathfinder_draft.pdf
 paper/pathfinder_draft.tex
 paper/arxiv/
 paper/pathfinder-arxiv-*.tar.gz
+!coda_experiments/substrate_validation/
+!coda_experiments/substrate_validation/*

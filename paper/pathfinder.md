@@ -1426,7 +1426,17 @@ Table-1 training was performed on a rented AMD Instinct MI300X (192 GB HBM3) via
 
 Pathfinder's PyTorch model code (`train/model.py`) has no vendor-specific dependencies and runs on CUDA, ROCm, MPS, and CPU. The Triton kernel (`bench/triton_directional.py`) is NVIDIA-specific (Triton 3.2+ on Hopper); it is *not* imported by the training or evaluation scripts and does not affect the core repository's AMD/CPU compatibility.
 
-### A.9 Trained checkpoints
+### A.9 Independent substrate validation
+
+`coda_experiments/substrate_validation/` contains a three-route validation of the code
+substrate behind §3.3 and the §5.3 shape correction: an analytic derivation of the
+detector-grid geometry (r(d²−1) detectors, r+1 time layers, (d+1)×(d+1) spatial grid),
+a Qiskit statevector execution of the Surface-17 memory-Z circuit (deterministic
+Z-stabilizers, preserved logical-Z parity, outcome cardinality exactly 2⁸), and a Stim
+tableau mirror with assertion tests (`stim_mirror_test.py`). The analytic and Qiskit
+routes were contributed by Coda (see Acknowledgments); the routes share no code.
+
+### A.10 Trained checkpoints
 
 All checkpoints are distributed under `train/checkpoints/` and `bench/results/h200_main/`:
 
