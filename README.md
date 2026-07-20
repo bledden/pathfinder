@@ -6,30 +6,30 @@ Two open-source decoder systems for quantum error correction on rotated surface 
 
 ## TL;DR
 
-- **System 1: throughput-optimized decoder.** Canonical Pathfinder (H=256, 500K params) + a custom Triton kernel for DirectionalConv3d → **6.43 μs/syndrome at d=7 batch=1024 on NVIDIA H200 SXM** (real pipeline shape [B,1,8,8,8]) — batched throughput below a 7-μs-per-syndrome service-rate target at every operational noise rate. This is amortized throughput, not streaming real-time (batch-1 latency is 215 μs), and a cross-hardware comparison — PyMatching is CPU-timed (paper §5.3, §A.3). On accuracy, **never statistically beaten by PyMatching** across Table 1's 24 points under 3-parameter circuit-level noise: 20 point-estimate wins, 12 with non-overlapping 95% Wilson CIs, using one fixed validation-selected checkpoint per distance (paper §5.1, Table 1).
+- **System 1: throughput-optimized decoder.** Canonical Pathfinder (H=256, 500K params) + a custom Triton kernel for DirectionalConv3d → **6.43 μs/syndrome at d=7 batch=1024 on NVIDIA H200 SXM** (real pipeline shape [B,1,8,8,8]) — batched throughput below a 7-μs-per-syndrome service-rate target at every operational noise rate. This is amortized throughput, not streaming real-time (batch-1 latency is 215 μs), and a cross-hardware comparison — PyMatching is CPU-timed (paper §5.3, §A.3). On accuracy, **never statistically beaten by PyMatching** across Table 1's 24 points under 3-parameter circuit-level noise: 20 point-estimate wins, 12 with non-overlapping 95% Wilson CIs, using one fixed validation-selected checkpoint per distance (paper §5.2, Table 1).
 
-- **System 2: lowest-LER decoder (Pathfinder-Triad with PFWL3S voter).** A 3-way majority vote of (PFWL3S, Lange et al. 2025, PyMatching), where **PFWL3S** = three independent random-seed H=384 Pathfinders trained 160K steps each with Lange-teacher distillation, ensembled by averaging logits. Achieves **LER 2.384% at d=7 p=0.007 (100K shots)** vs Lange's 2.956% — **strict statistical win** with non-overlapping 95% Wilson CIs (**Triad vs Lange: 19.4% relative LER reduction**; the PFWL3S voter alone is 2.492%, 15.7% vs Lange). Strict-CI wins at 5 (d, p) operational points: **d=7 p ∈ {0.007, 0.010, 0.015} and d=9 p ∈ {0.007, 0.010}** (paper §5.12, §6.3). Latency is Lange-bounded at ≈72 μs/syn — for non-real-time deployment (offline verification, post-selection in repeat-until-success).
+- **System 2: lowest-LER decoder (Pathfinder-Triad with PFWL3S voter).** A 3-way majority vote of (PFWL3S, Lange et al. 2025, PyMatching), where **PFWL3S** = three independent random-seed H=384 Pathfinders trained 160K steps each with Lange-teacher distillation, ensembled by averaging logits. Achieves **LER 2.384% at d=7 p=0.007 (100K shots)** vs Lange's 2.956% — **strict statistical win** with non-overlapping 95% Wilson CIs (**Triad vs Lange: 19.4% relative LER reduction**; the PFWL3S voter alone is 2.492%, 15.7% vs Lange). Strict-CI wins at 5 (d, p) operational points: **d=7 p ∈ {0.007, 0.010, 0.015} and d=9 p ∈ {0.007, 0.010}** (paper §5.6, §6.3). Latency is Lange-bounded at ≈72 μs/syn — for non-real-time deployment (offline verification, post-selection in repeat-until-success).
 
-PFWL3S as an *individual* decoder also strictly beats Lange at 4 (d, p) points (d=5 p=0.015, d=7 p ∈ {0.007, 0.010, 0.015}; paper §5.13) — to my knowledge the first open-source individual neural decoder reported to do so.
+PFWL3S as an *individual* decoder also strictly beats Lange at 4 (d, p) points (d=5 p=0.015, d=7 p ∈ {0.007, 0.010, 0.015}; paper §S9) — to my knowledge the first open-source individual neural decoder reported to do so.
 
 ## A note on priority and fairness
 
-[**Lange et al.** (Phys. Rev. Research 7, 023181, 2025)](https://github.com/LangeMoritz/GNN_decoder) previously released the first open-source neural decoder to outperform PyMatching on rotated surface codes under circuit-level noise. **Pathfinder is not the first open-source decoder to beat PyMatching on this task** — Lange et al. holds that priority. At matched-noise head-to-head, Lange's GNN has lower individual LER than canonical Pathfinder (paper §5.11).
+[**Lange et al.** (Phys. Rev. Research 7, 023181, 2025)](https://github.com/LangeMoritz/GNN_decoder) previously released the first open-source neural decoder to outperform PyMatching on rotated surface codes under circuit-level noise. **Pathfinder is not the first open-source decoder to beat PyMatching on this task** — Lange et al. holds that priority. At matched-noise head-to-head, Lange's GNN has lower individual LER than canonical Pathfinder (paper §5.5).
 
-**Fairness check (controlled, resolved — paper §5.11 Table 9b).** Lange's published weights were trained at p ∈ {0.001, …, 0.005}, so the strict-CI wins at p ∈ {0.007, 0.010, 0.015} initially compared in-distribution PFWL3S against *out-of-distribution* Lange. To control for this I fine-tuned Lange's GNN at p=0.007 using its own training infrastructure: that closed most of the OOD gap (d=7 p=0.007: 2.956% → 2.739%), but **PFWL3S still strictly beats this single fine-tuned Lange** at all three operational rates *under the marginal-CI test* — the CI-edge gaps shrink to 0.049 / 0.55 / 0.27 pp but never invert. The strict-CI win is therefore a *controlled* result, not an out-of-distribution artifact. I further controlled for **ensemble size and training budget** (paper §5.11 audit C3): against a *full-recipe 3-seed fine-tuned-Lange ensemble* (the strongest possible baseline, d=7 p=0.007 = 2.652%), PFWL3S still wins under both the marginal-CI test **and** the more-powerful paired **McNemar** test at p=0.007 (McNemar p=0.0025) and p=0.010 (p<10⁻⁴, robust to Bonferroni over all 24 comparisons), but at **p=0.015 the win does not survive the paired test** (McNemar p=0.09; PyMatching also ties PFWL3S there). Honest bottom line: PFWL3S beats even a full-recipe Lange ensemble at p=0.007 and p=0.010 (most robustly p=0.010); at p=0.015 it ties the strongest control.
+**Fairness check (controlled, resolved — paper §5.5 Table 9b).** Lange's published weights were trained at p ∈ {0.001, …, 0.005}, so the strict-CI wins at p ∈ {0.007, 0.010, 0.015} initially compared in-distribution PFWL3S against *out-of-distribution* Lange. To control for this I fine-tuned Lange's GNN at p=0.007 using its own training infrastructure: that closed most of the OOD gap (d=7 p=0.007: 2.956% → 2.739%), but **PFWL3S still strictly beats this single fine-tuned Lange** at all three operational rates *under the marginal-CI test* — the CI-edge gaps shrink to 0.049 / 0.55 / 0.27 pp but never invert. The strict-CI win is therefore a *controlled* result, not an out-of-distribution artifact. I further controlled for **ensemble size and training budget** (paper §5.5 audit C3): against a *full-recipe 3-seed fine-tuned-Lange ensemble* (the strongest possible baseline, d=7 p=0.007 = 2.652%), PFWL3S still wins under both the marginal-CI test **and** the more-powerful paired **McNemar** test at p=0.007 (McNemar p=0.0025) and p=0.010 (p<10⁻⁴, robust to Bonferroni over all 24 comparisons), but at **p=0.015 the win does not survive the paired test** (McNemar p=0.09; PyMatching also ties PFWL3S there). Honest bottom line: PFWL3S beats even a full-recipe Lange ensemble at p=0.007 and p=0.010 (most robustly p=0.010); at p=0.015 it ties the strongest control.
 
 ## Distinct contributions of this work
 
-1. **Pathfinder-Triad** — among the open-source decoders evaluated in this study, the only decoder system to statistically-significantly beat Lange on matched noise, at 5 (d, p) points across two code distances (paper §5.12, §6.3; the d=9 pair is vs published out-of-distribution Lange, with no fine-tuned control).
-2. **PFWL3S** — to my knowledge, the first open-source individual neural decoder to strictly beat Lange's GNN with non-overlapping 95% Wilson CIs at any operational noise rate (paper §5.13, 4 (d, p) wins).
-3. **The DirectionalConv3d Triton kernel** — 11× faster than Lange's GNN on identical H200 hardware for single-seed canonical Pathfinder, with batched throughput below the 7-μs/syn service-rate target (paper §5.3 + §5.11).
-4. **Depth-dependent Muon ablation** — the optimizer's effect goes from +17% LER at d=3 to +72% at d=5 to catastrophic at d=7 (1.04% → 34.8% LER without Muon; paper §6.2).
+1. **Pathfinder-Triad** — among the open-source decoders evaluated in this study, the only decoder system to statistically-significantly beat Lange on matched noise, at 5 (d, p) points across two code distances (paper §5.6, §6.3; the d=9 pair is vs published out-of-distribution Lange, with no fine-tuned control).
+2. **PFWL3S** — to my knowledge, the first open-source individual neural decoder to strictly beat Lange's GNN with non-overlapping 95% Wilson CIs at any operational noise rate (paper §S9, 4 (d, p) wins).
+3. **The DirectionalConv3d Triton kernel** — 11× faster than Lange's GNN on identical H200 hardware for single-seed canonical Pathfinder, with batched throughput below the 7-μs/syn service-rate target (paper §5.3 + §5.5).
+4. **Depth-dependent Muon ablation** — the optimizer's effect goes from +18% LER at d=3 to +72% at d=5 to catastrophic at d=7 (1.04% → 34.8% LER without Muon; paper §6.2).
 5. **Extended-noise-rate Table 1** — evaluation down to p=0.0005 and up to p=0.015, broader than prior open-source coverage.
 6. **Documented negative results** strengthening the headline claims:
-   - **Triad-distillation arc** (paper §5.13, ~$110 GPU): 6 recipe variants showing the Triad's coverage advantage is *architectural*, not absorbable into a single PF student.
-   - **Modern-primitives hybrid** (paper §5.14): CNN+attention+SwiGLU at 9× parameter count is *worse* than the simpler CNN at matched compute.
-   - **d=9 PFWL3S-H256-d9** (paper §6.3): individually loses to Lange (the recipe-level reversal does *not* extend to d=9 at H=256). However, Pathfinder-Triad with this PFWL3S-H256-d9 voter still strictly beats Lange at d=9 p=0.007 and p=0.010 (extending the §5.12 result from d=7 to d=9).
-7. **Offline decoding of real IBM hardware data (Heron r2)** (paper §5.15): PFWL3S, trained only on simulated noise and decoding recorded `ibm_fez` measurement data offline (not in the device's control loop), shows **no statistically resolved difference from PyMatching** at d=3 r=3 (10K shots, Wilson-CI criterion) — which does not establish equivalence or an advantage. A soft (analog-IQ) readout follow-up (§5.15.2) also resolves no difference on this clean, matching-saturated chip; a synthetic readout-SNR positive control confirms the soft pipeline is not inert (peak gain at SNR≈4, McNemar p=3×10⁻⁴, Holm/Bonferroni-robust).
+   - **Triad-distillation arc** (paper §S9, ~$110 GPU): 6 recipe variants showing the Triad's coverage advantage is *architectural*, not absorbable into a single PF student.
+   - **Modern-primitives hybrid** (paper §S10): CNN+attention+SwiGLU at 9× parameter count is *worse* than the simpler CNN at matched compute.
+   - **d=9 PFWL3S-H256-d9** (paper §6.3): individually loses to Lange (the recipe-level reversal does *not* extend to d=9 at H=256). However, Pathfinder-Triad with this PFWL3S-H256-d9 voter still strictly beats Lange at d=9 p=0.007 and p=0.010 (extending the §5.6 result from d=7 to d=9).
+7. **Offline decoding of real IBM hardware data (Heron r2)** (paper §S11): PFWL3S, trained only on simulated noise and decoding recorded `ibm_fez` measurement data offline (not in the device's control loop), shows **no statistically resolved difference from PyMatching** at d=3 r=3 (10K shots, Wilson-CI criterion) — which does not establish equivalence or an advantage. A soft (analog-IQ) readout follow-up (§S11.2) also resolves no difference on this clean, matching-saturated chip; a synthetic readout-SNR positive control confirms the soft pipeline is not inert (peak gain at SNR≈4, McNemar p=3×10⁻⁴, Holm/Bonferroni-robust).
 
 ## Results
 
@@ -46,7 +46,7 @@ PFWL3S as an *individual* decoder also strictly beats Lange at 4 (d, p) points (
 | 0.010 | **3.521** | 3.742 | **4.145** | 4.810 | **4.140** | 5.257 |
 | 0.015 | **7.315** | 7.728 | **12.137** | 12.606 | **15.546** | 16.883 |
 
-Bold = lower (better). One fixed checkpoint per distance, **no per-rate model selection** (the d=7 checkpoint is validation-selected on held-out shots and reported on disjoint test shots). Pathfinder is **never statistically beaten**: 20 point-estimate wins, 3 zero-error ties, and one single-failure statistical tie (d=7 p=0.002: PF 5 vs PM 4 failures in 100K shots). 12 of 24 points show non-overlapping 95% Wilson CIs — all Pathfinder wins, spanning every distance and concentrating at p ≥ 0.005 (paper §5.1).
+Bold = lower (better). One fixed checkpoint per distance, **no per-rate model selection** (the d=7 checkpoint is validation-selected on held-out shots and reported on disjoint test shots). Pathfinder is **never statistically beaten**: 20 point-estimate wins, 3 zero-error ties, and one single-failure statistical tie (d=7 p=0.002: PF 5 vs PM 4 failures in 100K shots). 12 of 24 points show non-overlapping 95% Wilson CIs — all Pathfinder wins, spanning every distance and concentrating at p ≥ 0.005 (paper §5.2).
 
 ### Pathfinder-Triad vs Lange, 4-parameter noise (operational rates) — Logical Error Rate (%), 100K shots
 
@@ -59,9 +59,9 @@ Bold = lower (better). One fixed checkpoint per distance, **no per-rate model se
 | (9, 0.007) | 3.310% (PFWL3S-H256-d9) | 2.623% | **2.277%** | strict CI · 13.2% |
 | (9, 0.010) | 15.061% (PFWL3S-H256-d9) | 13.085% | **10.852%** | strict CI · 17.1% |
 
-*"rel. LER ↓" = relative reduction of the Triad's LER vs Lange = (Lange − Triad)/Lange. "strict CI" = non-overlapping 95% Wilson intervals (vs published Lange). The matched-control / paired-McNemar analysis of these wins is in paper §5.11 (audits C2/C3).*
+*"rel. LER ↓" = relative reduction of the Triad's LER vs Lange = (Lange − Triad)/Lange. "strict CI" = non-overlapping 95% Wilson intervals (vs published Lange). The matched-control / paired-McNemar analysis of these wins is in paper §5.5 (audits C2/C3).*
 
-Bold = strictly better. Note PFWL3S-H256-d9 *loses* individually to Lange at d=9; the Triad still wins because PM and PF catch independent errors (paper §6.3 analysis). Triad's coverage advantage is structural, not a recipe artifact (Triad-distill negative result, paper §5.13).
+Bold = strictly better. Note PFWL3S-H256-d9 *loses* individually to Lange at d=9; the Triad still wins because PM and PF catch independent errors (paper §6.3 analysis). Triad's coverage advantage is structural, not a recipe artifact (Triad-distill negative result, paper §S9).
 
 ### Inference Latency at d=7 (H200 SXM, FP16, torch.compile max-autotune)
 
@@ -70,7 +70,7 @@ Bold = strictly better. Note PFWL3S-H256-d9 *loses* individually to Lange at d=9
 | **Canonical Pathfinder + Triton** | 215 μs | **6.43 μs/syn** | **✓ (8% below)** |
 | Canonical Pathfinder (Inductor only) | 258 μs | 8.13 μs/syn | ✗ (16% above) |
 | Lange GNN (measured here on H200) | 1,918 μs | 71.67 μs/syn | ✗ (11× Pathfinder's) |
-| PFWL3S (3-seed-avg, reference impl) | — | ≈61 μs/syn | ✗ (paper §5.13 latency) |
+| PFWL3S (3-seed-avg, reference impl) | — | ≈61 μs/syn | ✗ (paper §S9 latency) |
 | PFWL3S (3-seed-avg, Triton extrapolated) | — | ≈24 μs/syn | ✗ (3.5× above) |
 | Pathfinder-Triad (Lange-bounded) | — | ≈72 μs/syn | ✗ (10× above) |
 | PyMatching v2 (Apple M4 single core, p=0.007) | 9.65 μs | 7.77 μs/syn (batch) | ✗ at p ≥ 0.007 |
@@ -112,7 +112,7 @@ cd pathfinder
 The simplest entry point is the top-level dispatcher (`python cli.py --help` lists all subcommands and which paper section each one produces):
 
 ```bash
-python cli.py eval-table1            # paper §5.1 Table 1, ~3 min on GPU
+python cli.py eval-table1            # paper §5.2 Table 1, ~3 min on GPU
 python cli.py --help                 # full subcommand list
 ```
 
@@ -135,7 +135,7 @@ python train/train.py --distance 5 --hidden_dim 256 --steps 80000
 python train/train.py --distance 7 --hidden_dim 256 --steps 80000
 ```
 
-### Reproduce the §5.13 PFWL3S strict-CI win at d=7
+### Reproduce the §S9 PFWL3S strict-CI win at d=7
 
 ```bash
 # 1. Fine-tune at 4-parameter noise (~20 min on H200, init from Table-1 ckpt)
@@ -188,23 +188,23 @@ python -m pytest tests/ -v --ignore=tests/test_cpp_decoder.py
 
 | Section | Topic | Finding |
 |---|---|---|
-| §5.4 | Muon vs AdamW (d=5) | Muon: +72% LER reduction |
-| §5.13 Table 11 | Pathfinder-Wide / XL / Wide-Long / XLong / PFWL3S | Capacity ceiling at H=384; multi-seed averaging breaks through |
-| §5.13 d=3 rescue | PFWL3S at d=3 with α_kl=0.3 | Rescues 14% → 3.18% but still loses to Lange — d=3 deployment uses canonical fine-tune |
-| §5.13 Triad-distill | 6 recipes (~$110 GPU) trying to beat Triad with single decoder | Triad coverage is architectural, not absorbable |
-| §5.14 | CNN+attention+SwiGLU hybrid (4.36M params) | Worse than simpler 500K CNN at matched budget |
-| §6.2 | Depth-dependent Muon | +17% (d=3) → +72% (d=5) → catastrophic (d=7) |
+| §S2 | Muon vs AdamW (d=5) | Muon: +72% LER reduction |
+| §S9 Table 11 | Pathfinder-Wide / XL / Wide-Long / XLong / PFWL3S | Capacity ceiling at H=384; multi-seed averaging breaks through |
+| §S9 d=3 rescue | PFWL3S at d=3 with α_kl=0.3 | Rescues 14% → 3.18% but still loses to Lange — d=3 deployment uses canonical fine-tune |
+| §S9 Triad-distill | 6 recipes (~$110 GPU) trying to beat Triad with single decoder | Triad coverage is architectural, not absorbable |
+| §S10 | CNN+attention+SwiGLU hybrid (4.36M params) | Worse than simpler 500K CNN at matched budget |
+| §6.2 | Depth-dependent Muon | +18% (d=3) → +72% (d=5) → catastrophic (d=7) |
 | §6.3 | d=9 PFWL3S-H256-d9 | Individually loses to Lange; Triad still strict-wins at p=0.007/0.010 |
 
 ## Generalization
 
 | Generalization axis | Result |
 |---|---|
-| 4-parameter circuit-level noise (Lange's noise model) — canonical Pathfinder | Loses to Lange ~14% relative at d=7, non-overlapping CIs (McNemar p=1.7×10⁻⁸; §5.11) |
-| 4-parameter noise — PFWL3S | **Strict-CI wins** at 4 (d, p) operational points (§5.13) |
-| Phenomenological noise (data errors only) | **PyMatching wins 15/15 — Pathfinder does not generalize cleanly** (§5.7, retraction of an earlier claim) |
-| Color code XYZ (d=3) | **Pathfinder beats PM 3.3×** (3.76% vs 12.51%, §5.7 Table 6) — direction-specific architecture is especially effective on richer stabilizer geometry |
-| 3-parameter noise (cross-eval of PFWL3S trained on 4-param) | PFWL3S strictly beats PM at 9/18 operational points (§5.1 Table 1b) |
+| 4-parameter circuit-level noise (Lange's noise model) — canonical Pathfinder | Loses to Lange ~14% relative at d=7, non-overlapping CIs (McNemar p=1.7×10⁻⁸; §5.5) |
+| 4-parameter noise — PFWL3S | **Strict-CI wins** at 4 (d, p) operational points (§S9) |
+| Phenomenological noise (data errors only) | **PyMatching wins 15/15 — Pathfinder does not generalize cleanly** (§S5, retraction of an earlier claim) |
+| Color code XYZ (d=3) | **Pathfinder beats PM 3.3×** (3.76% vs 12.51%, §S5 Table 6) — direction-specific architecture is especially effective on richer stabilizer geometry |
+| 3-parameter noise (cross-eval of PFWL3S trained on 4-param) | PFWL3S strictly beats PM at 9/18 operational points (§5.2 Table 1b) |
 
 ## Compute Cost (full project)
 
