@@ -1,6 +1,6 @@
 # Pathfinder
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21303610.svg)](https://doi.org/10.5281/zenodo.21303610)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21303609.svg)](https://doi.org/10.5281/zenodo.21303609)
 
 Two open-source decoder systems for quantum error correction on rotated surface codes, both built on **Pathfinder** — a direction-specific 3D CNN [Gu et al. 2026] trained with the Muon optimizer.
 
@@ -225,7 +225,7 @@ Six weeks calendar time; single engineer working part-time across multiple short
 
 **"Pathfinder: Direction-Aware Neural Decoding and Complementary-Failure Ensembles for Surface Codes"** — 57 pages, 11 figures.
 
-- Preprint PDF: [`paper/pathfinder.pdf`](paper/pathfinder.pdf) · archived at [doi:10.5281/zenodo.21303610](https://doi.org/10.5281/zenodo.21303610)
+- Preprint PDF: [`paper/pathfinder.pdf`](paper/pathfinder.pdf) · archived at [doi:10.5281/zenodo.21303609](https://doi.org/10.5281/zenodo.21303609) (all versions; v2 current)
 - Source: [`paper/pathfinder.md`](paper/pathfinder.md) · reviewer-style audit: [`paper/AUDIT_2026-05-13.md`](paper/AUDIT_2026-05-13.md)
 
 To cite this work, see [`CITATION.cff`](CITATION.cff) (GitHub's "Cite this repository" button).

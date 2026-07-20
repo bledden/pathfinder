@@ -16,6 +16,6 @@ preferred-citation:
       given-names: Blake
       affiliation: "Independent Researcher"
   year: 2026
-  doi: 10.5281/zenodo.21303610
-  url: "https://doi.org/10.5281/zenodo.21303610"
+  doi: 10.5281/zenodo.21303609
+  url: "https://doi.org/10.5281/zenodo.21303609"
   notes: "Preprint. 57 pages, 11 figures. Code, trained checkpoints, and raw evaluation data: https://github.com/bledden/pathfinder"
